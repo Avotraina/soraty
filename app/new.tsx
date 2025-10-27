@@ -1,3 +1,4 @@
+import { default as Editor, default as RichEditor } from '@/components/dom-components/rich-editor';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
     ArrowLeft,
@@ -7,12 +8,17 @@ import {
 import React, { useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
+const IS_DOM = typeof Editor !== "undefined";
+
 export default function NoteDetailScreen() {
 
     const styles = makeStyles();
 
     const router = useRouter();
     const params = useLocalSearchParams();
+
+    const [editorState, setEditorState] = useState<string | null>(null);
+    const [plainText, setPlainText] = useState("");
 
     // Mock note data - in a real app this would come from a database
     const mockNote = {
@@ -97,8 +103,8 @@ export default function NoteDetailScreen() {
                                 key={index}
                                 onPress={() => handleColorChange(color)}
                                 className={`w-10 h-10 rounded-full border-2 ${note.color === color ? 'border-blue-500' : 'border-gray-300'}`}
-                                style={{... styles.colorCircle, backgroundColor: color, borderColor: note.color === color ? '#3b82f6' : '#d1d5db' }}
-                                // style={{ backgroundColor: color }}
+                                style={{ ...styles.colorCircle, backgroundColor: color, borderColor: note.color === color ? '#3b82f6' : '#d1d5db' }}
+                            // style={{ backgroundColor: color }}
                             />
                         ))}
                     </View>
@@ -130,7 +136,8 @@ export default function NoteDetailScreen() {
 
             {/* Note Content Editor */}
             <ScrollView className="flex-1 p-4">
-                <TextInput
+                <RichEditor setPlainText={setPlainText} setEditorState={setEditorState} />
+                {/* <TextInput
                     className="text-base text-gray-800 bg-transparent"
                     value={note.content}
                     onChangeText={(text) => setNote({ ...note, content: text })}
@@ -144,7 +151,7 @@ export default function NoteDetailScreen() {
                         borderRadius: 12,
                         padding: 16,
                     }}
-                />
+                /> */}
             </ScrollView>
 
             {/* Footer with metadata */}

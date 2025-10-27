@@ -10,7 +10,7 @@ import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 
 import { $getRoot } from "lexical";
-// import ExampleTheme from "./ExampleTheme";
+import ExampleTheme from "./example-theme";
 import ToolbarPlugin from "./plugins/toolbar-plugins";
 
 const placeholder = "Enter some rich text...";
@@ -23,8 +23,8 @@ const editorConfig = {
     throw error;
   },
   // The editor theme
-  // theme: ExampleTheme,
-  theme: {},
+  theme: ExampleTheme,
+  // theme: {},
 };
 export default function RichEditor({
   setPlainText,
