@@ -29,9 +29,11 @@ const editorConfig = {
 export default function RichEditor({
   setPlainText,
   setEditorState,
+  editorBackgroundColor
 }: {
   setPlainText: React.Dispatch<React.SetStateAction<string>>;
   setEditorState: React.Dispatch<React.SetStateAction<string | null>>;
+  editorBackgroundColor?: string;
 }) {
   return (
     <>
@@ -40,7 +42,7 @@ export default function RichEditor({
         {/* </div> */}
         <div className="editor-container">
           <ToolbarPlugin />
-          <div className="editor-inner">
+          <div className="editor-inner" style={{backgroundColor: editorBackgroundColor}}>
             <RichTextPlugin
               contentEditable={
                 <ContentEditable

@@ -32,6 +32,10 @@ const initialConfig = {
     onError: (error: Error) => console.error(error),
 };
 
+export type editorStyle = {
+    editorStyle: React.CSSProperties;
+}
+
 export default function NoteDetailScreen() {
 
     const styles = makeStyles();
@@ -172,7 +176,7 @@ export default function NoteDetailScreen() {
                 <RichEditor setPlainText={setPlainText} setEditorState={setEditorState} />
             </KeyboardAvoidingView> */}
             <View style={{ backgroundColor: 'black', borderRadius: 12, overflow: 'hidden', flex: 1 }}>
-                <RichEditor setPlainText={setPlainText} setEditorState={setEditorState} />
+                <RichEditor setPlainText={setPlainText} setEditorState={setEditorState} editorBackgroundColor={note.color} />
             </View>
 
             {/* <RichEditor setPlainText={setPlainText} setEditorState={setEditorState} /> */}
