@@ -2,13 +2,13 @@
 import "./styles.css";
 
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
-import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 
+import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { $getRoot } from "lexical";
 import ExampleTheme from "./example-theme";
 import ToolbarPlugin from "./plugins/toolbar-plugins";
@@ -36,6 +36,8 @@ export default function RichEditor({
   return (
     <>
       <LexicalComposer initialConfig={editorConfig}>
+        {/* <div style={{}}> */}
+        {/* </div> */}
         <div className="editor-container">
           <ToolbarPlugin />
           <div className="editor-inner">

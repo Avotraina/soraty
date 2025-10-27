@@ -1,4 +1,4 @@
-import { default as Editor, default as RichEditor } from '@/components/dom-components/rich-editor';
+import RichEditor, { default as Editor } from '@/components/dom-components/rich-editor';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
     ArrowLeft,
@@ -8,7 +8,29 @@ import {
 import React, { useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
+import ExampleTheme from "../components/dom-components/example-theme";
+
+const placeholder = "Enter some rich text...";
+
+const editorConfig = {
+    namespace: "React.js Demo",
+    nodes: [],
+    // Handling of errors during update
+    onError(error: Error) {
+        throw error;
+    },
+    // The editor theme
+    theme: ExampleTheme,
+    // theme: {},
+};
+
 const IS_DOM = typeof Editor !== "undefined";
+
+const initialConfig = {
+    namespace: "MyEditor",
+    theme: {},
+    onError: (error: Error) => console.error(error),
+};
 
 export default function NoteDetailScreen() {
 
@@ -135,9 +157,28 @@ export default function NoteDetailScreen() {
             </View> */}
 
             {/* Note Content Editor */}
-            <ScrollView className="flex-1 p-4">
+            {/* <LexicalComposer initialConfig={editorConfig}>
+                <ToolbarPlugin />
                 <RichEditor setPlainText={setPlainText} setEditorState={setEditorState} />
-                {/* <TextInput
+            </LexicalComposer> */}
+            {/* <View className="flex-1 m-4 rounded-xl overflow-hidden" style={{ flex: 1 }}> */}
+
+
+            {/* <KeyboardAvoidingView
+                style={{ flex: 1, margin: 0, borderRadius: 12, overflow: 'hidden', backgroundColor: note.color }}
+                behavior={Platform.OS === "ios" ? "padding" : undefined} // Android handles automatically
+                screenReaderFocusable={false}
+            >
+                <RichEditor setPlainText={setPlainText} setEditorState={setEditorState} />
+            </KeyboardAvoidingView> */}
+            <View style={{ backgroundColor: 'black', borderRadius: 12, overflow: 'hidden', flex: 1 }}>
+                <RichEditor setPlainText={setPlainText} setEditorState={setEditorState} />
+            </View>
+
+            {/* <RichEditor setPlainText={setPlainText} setEditorState={setEditorState} /> */}
+
+            {/* <ScrollView className="flex-1 p-4">
+                <TextInput
                     className="text-base text-gray-800 bg-transparent"
                     value={note.content}
                     onChangeText={(text) => setNote({ ...note, content: text })}
@@ -151,8 +192,8 @@ export default function NoteDetailScreen() {
                         borderRadius: 12,
                         padding: 16,
                     }}
-                /> */}
-            </ScrollView>
+                />
+            </ScrollView> */}
 
             {/* Footer with metadata */}
             <View className="bg-white py-3 px-4 border-t border-gray-200">
@@ -174,6 +215,8 @@ const makeStyles = (colors?: any) => StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f9fafb',
+        // display: 'flex',
+        // overflow: 'hidden',
     },
     headerContainer: {
         backgroundColor: '#3b82f6',
