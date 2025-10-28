@@ -3,7 +3,7 @@ import { Stack } from "expo-router";
 export default function RootLayout() {
   return (
     <Stack
-      initialRouteName="list"
+      initialRouteName="(category)/category-list"
       screenOptions={{
         headerShown: true,
         headerStyle: {
@@ -18,6 +18,7 @@ export default function RootLayout() {
       <Stack.Screen name="old-list" options={{ title: 'List' }} />
       <Stack.Screen name="list" options={{ title: 'List' }} />
       <Stack.Screen name="new" options={{ title: 'New' }} />
+      <Stack.Screen name="(category)/category-list" options={{ title: 'Categories' }} />
     </Stack>
   );
 }
