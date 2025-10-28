@@ -3,7 +3,7 @@ import { Stack } from "expo-router";
 export default function RootLayout() {
   return (
     <Stack
-      initialRouteName="new"
+      initialRouteName="list"
       screenOptions={{
         headerShown: true,
         headerStyle: {

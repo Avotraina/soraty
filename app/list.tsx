@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { Calendar, Filter, Plus, Save, Search, Settings, Trash2, X } from 'lucide-react-native';
+import { Calendar, Filter, Folder, Plus, Save, Search, Settings, Trash2, X } from 'lucide-react-native';
 import React, { useMemo, useState } from 'react';
 import { FlatList, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
@@ -10,6 +10,13 @@ type Note = {
   content: string;
   color: string;
   createdAt: Date;
+  categoryId?: string
+};
+
+type Category = {
+  id: string;
+  name: string;
+  color: string;
 };
 
 // Predefined colors for post-it notes
@@ -20,6 +27,14 @@ const NOTE_COLORS = [
   { name: 'Pink', value: '#F8BBD0' },
   { name: 'Purple', value: '#E1BEE7' },
   { name: 'Orange', value: '#FFE0B2' },
+];
+
+// Predefined categories
+const CATEGORIES: Category[] = [
+  { id: '1', name: 'Personal', color: '#FFD54F' },
+  { id: '2', name: 'Work', color: '#4FC3F7' },
+  { id: '3', name: 'Ideas', color: '#81C784' },
+  { id: '4', name: 'Shopping', color: '#E57373' },
 ];
 
 export default function PostItListScreen() {
@@ -34,6 +49,7 @@ export default function PostItListScreen() {
       content: 'Discuss project timeline with team',
       color: '#FFF9C4',
       createdAt: new Date(2023, 5, 15),
+      categoryId: '2',
     },
     {
       id: '2',
@@ -41,6 +57,7 @@ export default function PostItListScreen() {
       content: 'Milk, Eggs, Bread, Fruits',
       color: '#BBDEFB',
       createdAt: new Date(2023, 5, 12),
+      categoryId: '4',
     },
     {
       id: '3',
@@ -48,6 +65,7 @@ export default function PostItListScreen() {
       content: 'New app features to implement',
       color: '#C8E6C9',
       createdAt: new Date(2023, 5, 10),
+      categoryId: '3',
     },
     {
       id: '4',
@@ -55,6 +73,7 @@ export default function PostItListScreen() {
       content: 'Call mom on Sunday',
       color: '#F8BBD0',
       createdAt: new Date(2023, 5, 18),
+      categoryId: '1',
     },
     {
       id: '5',
@@ -89,11 +108,13 @@ export default function PostItListScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedColor, setSelectedColor] = useState('#FFF9C4');
   const [newNote, setNewNote] = useState({ title: '', content: '' });
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   // Search and filter states
   const [searchQuery, setSearchQuery] = useState('');
   const [filterColor, setFilterColor] = useState<string | null>(null);
   const [filterDate, setFilterDate] = useState<string | null>(null);
+  const [filterCategory, setFilterCategory] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
 
   const handleAddNote = () => {
@@ -104,9 +125,11 @@ export default function PostItListScreen() {
         content: newNote.content,
         color: selectedColor,
         createdAt: new Date(),
+        categoryId: selectedCategory || undefined,
       };
       setNotes([note, ...notes]);
       setNewNote({ title: '', content: '' });
+      setSelectedCategory(null);
       setModalVisible(false);
     }
   };
@@ -128,33 +151,56 @@ export default function PostItListScreen() {
         note.createdAt.toDateString() === new Date(filterDate).toDateString() :
         true;
 
-      return matchesSearch && matchesColor && matchesDate;
-    });
-  }, [notes, searchQuery, filterColor, filterDate]);
+      const matchesCategory = filterCategory ? note.categoryId === filterCategory : true;
 
-  const renderNoteItem = ({ item }: { item: Note }) => (
-    <TouchableOpacity
-      className="rounded-xl p-4 m-2 shadow-md"
-      activeOpacity={0.9}
-      // style={{ backgroundColor: item.color, minHeight: 150 }}
-      style={{ ...styles.noteContainer, backgroundColor: item.color, minHeight: 150 }}
-    >
-      <View className="flex-row justify-between items-start" style={styles.noteHeaderContainer}>
-        <Text className="text-lg font-bold text-gray-800 mb-2" style={styles.noteHeaderTitle} numberOfLines={1}>
-          {item.title || 'Untitled'}
+      return matchesSearch && matchesColor && matchesDate && matchesCategory;
+    });
+  }, [notes, searchQuery, filterColor, filterDate, filterCategory]);
+
+  const renderNoteItem = ({ item }: { item: Note }) => {
+    const category = item.categoryId ? CATEGORIES.find(cat => cat.id === item.categoryId) : null;
+
+    return (
+      <TouchableOpacity
+        className="rounded-xl p-4 m-2 shadow-md"
+        activeOpacity={0.9}
+        // style={{ backgroundColor: item.color, minHeight: 150 }}
+        style={{ ...styles.noteContainer, backgroundColor: item.color, minHeight: 150 }}
+      >
+        <View className="flex-row justify-between items-start" style={styles.noteHeaderContainer}>
+          <Text className="text-lg font-bold text-gray-800 mb-2" style={styles.noteHeaderTitle} numberOfLines={1}>
+            {item.title || 'Untitled'}
+          </Text>
+          <TouchableOpacity onPress={() => handleDeleteNote(item.id)} style={styles.noteHeaderIconsContainer}>
+            <Trash2 size={18} color="#666" />
+          </TouchableOpacity>
+        </View>
+
+        {category && (
+          <View
+            className="flex-row items-center self-start rounded-full px-2 py-1 mb-2"
+            style={{ ...styles.noteCategoryContainer, backgroundColor: `${category.color}40` }}
+          >
+            <Folder size={12} color={category.color} />
+            <Text
+              className="text-xs font-medium ml-1"
+              style={{ ...styles.noteCategoryText, color: category.color }}
+            >
+              {category.name}
+            </Text>
+          </View>
+        )}
+
+        <Text className="text-gray-700 mb-3" numberOfLines={4} style={styles.noteContentText}>
+          {item.content}
         </Text>
-        <TouchableOpacity onPress={() => handleDeleteNote(item.id)} style={styles.noteHeaderIconsContainer}>
-          <Trash2 size={18} color="#666" />
-        </TouchableOpacity>
-      </View>
-      <Text className="text-gray-700 mb-3" numberOfLines={4} style={styles.noteContentText}>
-        {item.content}
-      </Text>
-      <Text className="text-xs text-gray-500 mt-auto" style={styles.noteFooterText}>
-        {item.createdAt.toLocaleDateString()}
-      </Text>
-    </TouchableOpacity>
-  );
+        <Text className="text-xs text-gray-500 mt-auto" style={styles.noteFooterText}>
+          {item.createdAt.toLocaleDateString()}
+        </Text>
+      </TouchableOpacity>
+    )
+
+  };
 
   return (
     <View className="flex-1 bg-gray-100" style={styles.container}>
@@ -212,7 +258,7 @@ export default function PostItListScreen() {
           </TouchableOpacity>
 
           {/* Active Filters Indicator */}
-          {(filterColor || filterDate) && (
+          {(filterColor || filterDate || filterCategory) && (
             <View className="flex-row" style={styles.activeFiltersContainer}>
               {filterColor && (
                 <View
@@ -224,9 +270,31 @@ export default function PostItListScreen() {
                     style={{ ...styles.activeColorCircle, backgroundColor: filterColor }}
 
                   />
-                  <Text className="text-xs text-blue-800">Color</Text>
+                  <Text className="text-xs text-blue-800" style={styles.activeColorText}>Color</Text>
                 </View>
               )}
+              {filterCategory && (
+                <View
+                  className="flex-row items-center bg-purple-100 rounded-full px-3 py-1"
+                  style={styles.activeCategoryFilterContainer}
+                >
+                  <Folder size={12} color="#7e22ce" />
+                  <Text className="text-xs text-purple-800 ml-1" style={styles.activeCategoryFilterText}>Category</Text>
+                </View>
+              )}
+              {/* {filterCategory && (
+                <View
+                  className="flex-row items-center bg-blue-100 rounded-full px-3 py-1 mr-2"
+                  style={styles.activeCategoryFilterContainer}
+                >
+                  <View
+                    className="w-3 h-3 rounded-full mr-1"
+                    style={{ ...styles.activeColorCircle, backgroundColor: filterCategory }}
+
+                  />
+                  <Text className="text-xs text-blue-800">Color</Text>
+                </View>
+              )} */}
               {filterDate && (
                 <View
                   className="flex-row items-center bg-green-100 rounded-full px-3 py-1"
@@ -274,6 +342,34 @@ export default function PostItListScreen() {
               </View>
             </ScrollView>
 
+            {/* Category Filters */}
+            <Text className="font-semibold text-gray-700 mb-2" style={styles.categoryFilterHeaderText}>Filter by Category:</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-3" style={styles.categoryFilterOptionsScrollContainer}>
+              <View className="flex-row" style={{ flexDirection: 'row' }}>
+                <TouchableOpacity
+                  className={`rounded-full px-3 py-1 mr-2 ${!filterCategory ? 'bg-blue-500' : 'bg-gray-200'}`}
+                  style={{ ...styles.categoryFilterAllOptionContainer, backgroundColor: !filterCategory ? '#3b82f6' : '#e5e7eb' }}
+                  onPress={() => setFilterCategory(null)}
+                >
+                  <Text className={!filterCategory ? 'text-white' : 'text-gray-700'} style={{ color: !filterCategory ? '#fff' : '#4b5563' }}>All</Text>
+                </TouchableOpacity>
+
+                {CATEGORIES.map((category) => (
+                  <TouchableOpacity
+                    key={category.id}
+                    className={`flex-row items-center rounded-full px-3 py-1 mr-2 ${filterCategory === category.id ? 'bg-blue-500' : 'bg-gray-200'}`}
+                    style={{ ...styles.categoryFilterOptionsContainer, backgroundColor: filterCategory === category.id ? '#3b82f6' : '#e5e7eb' }}
+                    onPress={() => setFilterCategory(filterCategory === category.id ? null : category.id)}
+                  >
+                    <Folder size={12} color={category.color} className="mr-1" style={{ marginRight: 4 }} />
+                    <Text className={filterCategory === category.id ? 'text-white' : 'text-gray-700'} style={{ color: filterCategory === category.id ? '#fff' : '#4b5563' }}>
+                      {category.name}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </ScrollView>
+
             {/* Date Filters */}
             <Text className="font-semibold text-gray-700 mb-2" style={styles.dateFilterHeaderText}>Filter by Date:</Text>
             <View className="flex-row flex-wrap" style={styles.dateFilterHeaderContainer}>
@@ -305,13 +401,14 @@ export default function PostItListScreen() {
             </View>
 
             {/* Clear Filters Button */}
-            {(filterColor || filterDate) && (
+            {(filterColor || filterDate || filterCategory) && (
               <TouchableOpacity
                 className="self-start bg-red-100 rounded-full px-3 py-1 mt-2"
                 style={styles.clearFilterButton}
                 onPress={() => {
                   setFilterColor(null);
                   setFilterDate(null);
+                  setFilterCategory(null);
                 }}
               >
                 <Text className="text-red-700" style={styles.clearFilterButtonText}>Clear Filters</Text>
@@ -513,6 +610,20 @@ const makeStyles = (colors?: any) => StyleSheet.create({
     fontSize: 12,
     color: '#1E40AF',
   },
+  activeCategoryFilterContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f3e8ff', // Tailwind bg-purple-100
+    borderRadius: 9999,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    marginRight: 8,
+  },
+  activeCategoryFilterText: {
+    fontSize: 12,             // Tailwind 'text-xs'
+    color: '#6b21a8',         // Tailwind 'text-purple-800'
+    marginLeft: 4,            // Tailwind 'ml-1' (0.25rem = 4px)
+  },
   activeDateFilterContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -556,6 +667,29 @@ const makeStyles = (colors?: any) => StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
+    marginRight: 8,
+  },
+  categoryFilterHeaderText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
+  },
+  categoryFilterOptionsScrollContainer: {
+    marginBottom: 12,
+  },
+  categoryFilterAllOptionContainer: {
+    borderRadius: 9999,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    marginRight: 8,
+  },
+  categoryFilterOptionsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 9999,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
     marginRight: 8,
   },
   dateFilterHeaderText: {
@@ -635,6 +769,20 @@ const makeStyles = (colors?: any) => StyleSheet.create({
   },
   noteHeaderIconsContainer: {
 
+  },
+  noteCategoryContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    borderRadius: 9999,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    marginBottom: 8,
+  },
+  noteCategoryText: {
+    fontSize: 12,           // Tailwind 'text-xs'
+    fontWeight: '500',       // Tailwind 'font-medium'
+    marginLeft: 4,           // Tailwind 'ml-1' (0.25rem = 4px)
   },
   noteContentText: {
     fontSize: 14,
