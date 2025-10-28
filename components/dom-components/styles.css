@@ -77,7 +77,7 @@ h1 {
   scrollbar-width: thin;
   scrollbar-color: #bbb transparent;
   overflow: hidden;
-  
+
   background-color: red;
 }
 
@@ -280,6 +280,7 @@ h1 {
 }
 
 .editor-list-ol {
+  list-style-type: decimal;
   padding: 0;
   margin: 0;
   margin-left: 16px;
@@ -289,6 +290,7 @@ h1 {
   padding: 0;
   margin: 0;
   margin-left: 16px;
+  list-style-type: disc;
 }
 
 .editor-listitem {
@@ -357,11 +359,30 @@ pre::-webkit-scrollbar-thumb {
   border-top-right-radius: 10px;
   vertical-align: middle;
   margin-bottom: 20px;
-  flex-shrink: 0; /* prevent shrinking */
+  flex-shrink: 0;
+  /* prevent shrinking */
   position: sticky;
   /* position: fixed; */
   top: 0;
   z-index: 1000;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  /* scrollbar-color: green; */
+  /* min-width: 100%; */
+}
+
+.toolbar::-webkit-scrollbar {
+  height: thin;
+  color: #999
+}
+
+.toolbar::-webkit-scrollbar-thumb {
+  background-color: #999;
+  border-radius: 10px;
+}
+
+.toolbar::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .toolbar button.toolbar-item {

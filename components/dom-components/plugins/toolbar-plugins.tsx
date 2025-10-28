@@ -5,18 +5,25 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
+import {
+  $isListItemNode,
+  $isListNode,
+  INSERT_ORDERED_LIST_COMMAND,
+  INSERT_UNORDERED_LIST_COMMAND
+} from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { mergeRegister } from "@lexical/utils";
 import {
-    $getSelection,
-    $isRangeSelection,
-    CAN_REDO_COMMAND,
-    CAN_UNDO_COMMAND,
-    FORMAT_ELEMENT_COMMAND,
-    FORMAT_TEXT_COMMAND,
-    REDO_COMMAND,
-    SELECTION_CHANGE_COMMAND,
-    UNDO_COMMAND,
+  $createParagraphNode,
+  $getSelection,
+  $isRangeSelection,
+  CAN_REDO_COMMAND,
+  CAN_UNDO_COMMAND,
+  FORMAT_ELEMENT_COMMAND,
+  FORMAT_TEXT_COMMAND,
+  REDO_COMMAND,
+  SELECTION_CHANGE_COMMAND,
+  UNDO_COMMAND,
 } from "lexical";
 import { useCallback, useEffect, useRef, useState } from "react";
 import "../styles.css";
@@ -37,9 +44,78 @@ export default function ToolbarPlugin() {
   const [isUnderline, setIsUnderline] = useState(false);
   const [isStrikethrough, setIsStrikethrough] = useState(false);
 
+  const [blockType, setBlockType] = useState<"bullet" | "number" | "check" | "paragraph">("paragraph");
+
+  // const toggleBulletList = () => {
+  //   editor.update(() => {
+  //     const selection = $getSelection();
+  //     if (!$isRangeSelection(selection)) return;
+
+  //     const anchorNode = selection.anchor.getNode();
+  //     const parent = anchorNode.getParent();
+
+  //     // If we're already inside a bullet list, remove only that item
+  //     if (parent && $isListNode(parent) && parent.getListType() === "bullet") {
+  //       const listItem = parent;
+  //       const paragraph = $createParagraphNode();
+  //       listItem.replace(paragraph); // replaces only the selected list line
+  //     } else {
+  //       editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
+  //     }
+  //   });
+  // };
+
+  function toggleList(type: "bullet" | "number") {
+  editor.update(() => {
+    const selection = $getSelection();
+    if (!$isRangeSelection(selection)) return;
+
+    const anchorNode = selection.anchor.getNode();
+
+    // Find the nearest ListItemNode
+    let listItemNode = anchorNode;
+    while (listItemNode && !$isListItemNode(listItemNode)) {
+      const parent = listItemNode.getParent();
+      if (!parent) break;
+      listItemNode = parent;
+    }
+
+      if (listItemNode) {
+      const parentList = listItemNode.getParent();
+      if (parentList && $isListNode(parentList) && parentList.getListType() === type) {
+        // ✅ Convert ONLY this item to a paragraph
+        const paragraph = $createParagraphNode();
+        if ($isListItemNode(listItemNode)) {
+          paragraph.append(...listItemNode.getChildren());
+        }
+        listItemNode.replace(paragraph);
+        return;
+      }
+    }
+
+    // If not inside a list of that type, insert it
+    editor.dispatchCommand(
+      type === "bullet"
+        ? INSERT_UNORDERED_LIST_COMMAND
+        : INSERT_ORDERED_LIST_COMMAND,
+      undefined
+    );
+  });
+}
+
   const $updateToolbar = useCallback(() => {
     const selection = $getSelection();
     if ($isRangeSelection(selection)) {
+
+      const anchorNode = selection.anchor.getNode();
+      let element = anchorNode.getKey() === "root" ? anchorNode : anchorNode.getTopLevelElementOrThrow();
+
+      if ($isListNode(element)) {
+        const listType = element.getListType();
+        setBlockType(listType); // "bullet" or "number"
+      } else {
+        setBlockType("paragraph");
+      }
       // Update text format
       setIsBold(selection.hasFormat("bold"));
       setIsItalic(selection.hasFormat("italic"));
@@ -285,6 +361,56 @@ export default function ToolbarPlugin() {
           <path
             fillRule="evenodd"
             d="M2 12.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"
+          />
+        </svg>
+      </button>
+      {/* Bulleted List */}
+      <button
+        // onClick={() => {
+        //   if (blockType === "bullet") {
+        //     editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined);
+        //   } else {
+        //     editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
+        //   }
+        // }}
+        onClick={() => toggleList("bullet")}
+        className={`toolbar-item spaced ${blockType === "bullet" ? "active" : ""}`}
+        aria-label="Bulleted List"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          fill="currentColor"
+          className="bi bi-list-ul format"
+          viewBox="0 0 16 16"
+        >
+          <path
+            fillRule="evenodd"
+            d="M5 11.5a.5.5 0 0 1 .5-.5H15a.5.5 0 0 1 0 1H5.5a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5H15a.5.5 0 0 1 0 1H5.5a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 5.5 3H15a.5.5 0 0 1 0 1H5.5a.5.5 0 0 1-.5-.5zM2 4a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm0 4a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm0 4a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"
+          />
+        </svg>
+      </button>
+      {/* Numbered List */}
+      <button
+        // onClick={() => {
+        //   editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
+        // }}
+        onClick={() => toggleList("number")}
+        className="toolbar-item spaced"
+        aria-label="Numbered List"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          fill="currentColor"
+          className="bi bi-list-ol format"
+          viewBox="0 0 16 16"
+        >
+          <path
+            fillRule="evenodd"
+            d="M5 11.5a.5.5 0 0 1 .5-.5H15a.5.5 0 0 1 0 1H5.5a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5H15a.5.5 0 0 1 0 1H5.5a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 5.5 3H15a.5.5 0 0 1 0 1H5.5a.5.5 0 0 1-.5-.5zM2.713 2.22c.186.186.287.442.287.78h-.574c0-.141-.04-.248-.107-.315a.36.36 0 0 0-.257-.1c-.143 0-.24.05-.293.142a.46.46 0 0 0-.066.236c0 .11.035.21.105.303.07.091.17.17.297.238.127.067.278.126.45.18.173.052.34.12.505.2.164.082.308.19.427.322.12.132.214.295.277.492.063.197.095.428.095.696 0 .33-.06.626-.179.89a1.42 1.42 0 0 1-.504.601c-.22.147-.49.22-.814.22-.358 0-.66-.094-.908-.28a1.23 1.23 0 0 1-.442-.739l.563-.14c.02.12.067.235.14.342.075.107.168.19.278.25a.83.83 0 0 0 .425.104c.201 0 .356-.06.467-.179a.74.74 0 0 0 .163-.475c0-.18-.036-.328-.109-.445a.875.875 0 0 0-.288-.273 3.12 3.12 0 0 0-.485-.217 4.95 4.95 0 0 1-.474-.212 1.53 1.53 0 0 1-.38-.272 1.3 1.3 0 0 1-.259-.392A1.42 1.42 0 0 1 1.5 2.6c0-.33.106-.617.318-.858.212-.24.503-.36.871-.36.345 0 .623.093.832.28zM1.723 9.208v-.485h.5v2.277h-.5v-.485h-.55v-.524h.55V9.208h-.55V8.683h1.1v.525h-.55zm-.223 3.063h.746v-.52H1v-.522h.746v-.493h-.746v-.522h1.37v2.556H1.5z"
           />
         </svg>
       </button>

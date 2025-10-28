@@ -5,11 +5,14 @@ import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
+import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 
+import { ListItemNode, ListNode } from "@lexical/list";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { $getRoot } from "lexical";
+import React from "react";
 import ExampleTheme from "./example-theme";
 import ToolbarPlugin from "./plugins/toolbar-plugins";
 
@@ -17,7 +20,11 @@ const placeholder = "Enter some rich text...";
 
 const editorConfig = {
   namespace: "React.js Demo",
-  nodes: [],
+  nodes: [
+    ListNode,
+    ListItemNode,
+    // You can add more custom nodes here
+  ],
   // Handling of errors during update
   onError(error: Error) {
     throw error;
@@ -69,6 +76,7 @@ export default function RichEditor({
             />
             <HistoryPlugin />
             <AutoFocusPlugin />
+            <ListPlugin /> {/* <-- add this line */}
             {/* <TreeViewPlugin /> */}
           </div>
         </div>
