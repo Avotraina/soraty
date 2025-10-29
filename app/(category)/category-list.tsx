@@ -21,6 +21,19 @@ const CATEGORY_COLORS = [
 ];
 
 export default function CategoriesScreen() {
+    const [users, setUsers] = useState<{ id: number; name: string; email: string }[]>([]);
+
+    // useEffect(() => {
+    //     (async () => {
+    //         const db = await openDatabase();
+    //         await db.runAsync('INSERT INTO users (name, email) VALUES (?, ?)', 'John', 'john@example.com');
+    //         const allUsers = await db.getAllAsync<{ id: number; name: string; email: string }>(
+    //             'SELECT * FROM users'
+    //         );
+    //         setUsers(allUsers);
+    //         console.log('Users:', allUsers);
+    //     })();
+    // }, []);
 
     const styles = makeStyles();
 
