@@ -1,4 +1,4 @@
-import RichEditor, { default as Editor } from '@/components/dom-components/rich-editor';
+import RichEditor, { default as Editor } from '@/src/components/dom-components/rich-editor';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
     ArrowLeft,
@@ -11,7 +11,7 @@ import {
 import React, { useState } from 'react';
 import { Alert, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-import ExampleTheme from "../components/dom-components/example-theme";
+import ExampleTheme from "../src/components/dom-components/example-theme";
 
 const placeholder = "Enter some rich text...";
 

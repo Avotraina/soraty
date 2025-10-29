@@ -1,6 +1,7 @@
-import { Check, Edit3, Folder, Plus, Save, Trash2, X } from 'lucide-react-native';
+import NewCategoryModal from '@/src/components/category/new-category-modal';
+import { Edit3, Folder, Plus, Trash2, X } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { Alert, FlatList, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 type Category = {
     id: string;
@@ -194,7 +195,8 @@ export default function CategoriesScreen() {
             </View>
 
             {/* Add/Edit Category Modal */}
-            <Modal
+            <NewCategoryModal isVisible={isModalVisible} onClose={() => setIsModalVisible(false)} />
+            {/* <Modal
                 animationType="slide"
                 transparent={true}
                 visible={isModalVisible}
@@ -253,7 +255,7 @@ export default function CategoriesScreen() {
                         </View>
                     </View>
                 </View>
-            </Modal>
+            </Modal> */}
         </View>
     );
 }
