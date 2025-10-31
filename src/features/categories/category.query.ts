@@ -45,17 +45,18 @@ export const useCategoriesInfiniteQuery = () =>
     });
 
 
-export const useAddUserMutation = () => {
+export const useAddCategoryMutation = () => {
     const qc = useQueryClient();
     return useMutation({
-        mutationFn: ({ category_name, color }: T_Category) => CategoryRepo.create(category_name, color),
-        onSuccess: () => qc.invalidateQueries({ queryKey: ['categories'] })
+        mutationFn: ({ category_name, color }: Partial<T_Category>) => CategoryRepo.create(category_name as string, color as string),
+        onSuccess: () => qc.invalidateQueries({ queryKey: ['categories'] }),
+        onError: (error) => console.log("ERror", error)
     });
 }
 
 
 // Update user
-export const useUpdateUserMutation = () => {
+export const useUpdateCategoryMutation = () => {
     const qc = useQueryClient();
     return useMutation({
         mutationFn: ({ id, category_name, color }: T_Category) =>
@@ -65,7 +66,7 @@ export const useUpdateUserMutation = () => {
 };
 
 
-export const useDeleteUserMutation = () => {
+export const useDeleteCategoryMutation = () => {
     const qc = useQueryClient();
 
     return useMutation({

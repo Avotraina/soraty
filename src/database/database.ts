@@ -6,7 +6,7 @@ let dbPromise: Promise<SQLite.SQLiteDatabase> | null = null;
 
 export const openDatabase = (): Promise<SQLite.SQLiteDatabase> => {
   if (!dbPromise) {
-    dbPromise = SQLite.openDatabaseAsync('app.db');
+    dbPromise = SQLite.openDatabaseAsync('soraty.db');
   }
   return dbPromise;
 };

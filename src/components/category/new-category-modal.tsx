@@ -1,7 +1,11 @@
+import { useSnackbar } from "@/src/contexts/snackbar-provider";
+import { useAddCategoryMutation } from "@/src/features/categories/category.query";
 import { Check, Save } from "lucide-react-native";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { Alert, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Controller, useForm } from "react-hook-form";
+import { Alert, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { TextInput } from "react-native-paper";
+
 
 
 const CATEGORY_COLORS = [
@@ -44,6 +48,9 @@ export default function NewCategoryModal({ isVisible, onClose }: NewCategoryModa
     const [newCategory, setNewCategory] = useState({ name: '', color: CATEGORY_COLORS[0] });
     const [searchQuery, setSearchQuery] = useState('');
 
+    const { showSnackbar } = useSnackbar();
+
+
     const [categories, setCategories] = useState<Category[]>([
         { id: '1', name: 'Personal', color: '#FFD54F', noteCount: 5 },
         { id: '2', name: 'Work', color: '#4FC3F7', noteCount: 8 },
@@ -51,11 +58,32 @@ export default function NewCategoryModal({ isVisible, onClose }: NewCategoryModa
         { id: '4', name: 'Shopping', color: '#E57373', noteCount: 2 },
     ]);
 
+
+    const {mutate: addCategory, isPending, isError, isSuccess} = useAddCategoryMutation();
+
+    const onSubmit = async (data: any) => {
+        addCategory({category_name: data.category_name, color: newCategory.color}, {
+            onSuccess: async () => {
+                showSnackbar("New Category Added", 'success')
+            },
+            onError: async (error) => {
+                showSnackbar("Failed to add new category, try again", "error")
+                console.log("Error", error)
+            }
+        })
+    }
+
     const handleAddCategory = () => {
+
+        // showSnackbar('Lety e', 'success')
+
+        // return
         if (!newCategory.name.trim()) {
             Alert.alert('Error', 'Please enter a category name');
             return;
         }
+
+        
 
         if (editingCategory) {
             // Update existing category
@@ -102,13 +130,28 @@ export default function NewCategoryModal({ isVisible, onClose }: NewCategoryModa
                         {editingCategory ? 'Edit Category' : 'New Category'}
                     </Text>
 
-                    <TextInput
-                        className="border border-gray-300 rounded-lg p-3 mb-4"
-                        style={styles.modalCategoryNameInput}
-                        placeholder="Category name"
-                        value={newCategory.name}
-                        onChangeText={(text) => setNewCategory({ ...newCategory, name: text })}
+                    <Controller
+                        control={control}
+                        name="category_name"
+                        rules={{ required: "Category name is required" }}
+                        render={({ field: { onChange, value } }) => (
+                            <TextInput
+                                mode="outlined"
+                                // activeOutlineColor="red"
+                                // activeOutlineColor={newCategory.color ?? CATEGORY_COLORS[0]}
+                                // textColor="red"
+                                label="Category Name"
+                                placeholder="Enter Category name"
+                                value={value}
+                                onChangeText={onChange}
+                                right={<TextInput.Affix text={`${value.length}/100`} />}
+                                maxLength={100}
+                                style={{ ...styles.modalCategoryNameInput, outlineColor: newCategory.color }}
+                                error={!!errors.category_name}
+                            />
+                        )}
                     />
+                    {errors.category_name && <Text style={styles.errorLabel}>{errors.category_name.message}</Text>}
 
                     <Text className="font-semibold text-gray-700 mb-2" style={styles.categoryModalColorTitle}>Color</Text>
                     <View className="flex-row flex-wrap mb-6" style={styles.categoryModalColorsContainer}>
@@ -140,7 +183,8 @@ export default function NewCategoryModal({ isVisible, onClose }: NewCategoryModa
                         <TouchableOpacity
                             className="bg-blue-500 rounded-lg px-4 py-2 flex-row items-center"
                             style={styles.modalSaveButton}
-                            onPress={handleAddCategory}
+                            // onPress={handleAddCategory}
+                            onPress={handleSubmit(onSubmit)}
                         >
                             <Save size={16} color="white" className="mr-1" />
                             <Text className="text-white" style={styles.modalSaveText}>
@@ -178,10 +222,10 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         marginBottom: 16,        // Tailwind 'mb-4' (1rem = 16px)
     },
     modalCategoryNameInput: {
-        borderWidth: 1,           // Tailwind 'border'
+        // borderWidth: 1,           // Tailwind 'border'
         borderColor: '#d1d5db',   // Tailwind 'border-gray-300'
         borderRadius: 8,           // Tailwind 'rounded-lg'
-        padding: 12,               // Tailwind 'p-3' (0.75rem = 12px)
+        // padding: 12,               // Tailwind 'p-3' (0.75rem = 12px)
         marginBottom: 16,          // Tailwind 'mb-4' (1rem = 16px)
     },
     categoryModalColorTitle: {
@@ -228,5 +272,12 @@ const makeStyles = (colors?: any) => StyleSheet.create({
     },
     modalSaveText: {
         color: 'white',
-    }
+    },
+    errorLabel: {
+        color: 'red',
+        alignSelf: 'flex-start',
+        marginBottom: 8,
+        marginLeft: 4,
+        fontSize: 13,
+    },
 })
