@@ -4,7 +4,8 @@ import { Check, Save } from "lucide-react-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { TextInput } from "react-native-paper";
+import { ActivityIndicator, TextInput } from "react-native-paper";
+import { useToast } from "react-native-paper-toast";
 
 
 
@@ -34,6 +35,8 @@ type NewCategoryModalProps = {
 
 export default function NewCategoryModal({ isVisible, onClose }: NewCategoryModalProps) {
 
+    const toaster = useToast()
+
     const [isModalVisible, setIsModalVisible] = useState<boolean>(isVisible)
 
     const styles = makeStyles();
@@ -59,16 +62,24 @@ export default function NewCategoryModal({ isVisible, onClose }: NewCategoryModa
     ]);
 
 
-    const {mutate: addCategory, isPending, isError, isSuccess} = useAddCategoryMutation();
+    const { mutate: addCategory, isPending, isError, isSuccess } = useAddCategoryMutation();
 
     const onSubmit = async (data: any) => {
-        addCategory({category_name: data.category_name, color: newCategory.color}, {
+        // showSnackbar("New Category Added", 'success')
+        // return
+        addCategory({ category_name: data.category_name, color: newCategory.color }, {
             onSuccess: async () => {
                 showSnackbar("New Category Added", 'success')
+                control._reset()
+                // toaster.show({message: "New Category added", type: "success", position: "middle"})
             },
             onError: async (error) => {
-                showSnackbar("Failed to add new category, try again", "error")
                 console.log("Error", error)
+                if ((error?.message as any).includes('UNIQUE constraint failed')) {
+                    setError('category_name', { message: 'This category already exists' })
+                } else {
+                    showSnackbar("Failed to add new category, try again", "error")
+                }
             }
         })
     }
@@ -83,7 +94,7 @@ export default function NewCategoryModal({ isVisible, onClose }: NewCategoryModa
             return;
         }
 
-        
+
 
         if (editingCategory) {
             // Update existing category
@@ -186,10 +197,17 @@ export default function NewCategoryModal({ isVisible, onClose }: NewCategoryModa
                             // onPress={handleAddCategory}
                             onPress={handleSubmit(onSubmit)}
                         >
-                            <Save size={16} color="white" className="mr-1" />
-                            <Text className="text-white" style={styles.modalSaveText}>
-                                {editingCategory ? 'Update' : 'Create'}
-                            </Text>
+
+                            {
+                                isPending ? <ActivityIndicator hidesWhenStopped={true} animating={isPending} color="white" /> :
+                                    <>
+                                        <Save size={16} color="white" className="mr-1" />
+                                        <Text className="text-white" style={styles.modalSaveText}>
+                                            {editingCategory ? 'Update' : 'Create'}
+                                        </Text>
+                                    </>
+                            }
+
                         </TouchableOpacity>
                     </View>
                 </View>

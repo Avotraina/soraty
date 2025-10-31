@@ -7,6 +7,7 @@ import { Stack } from "expo-router";
 import { SQLiteProvider } from "expo-sqlite";
 import 'react-native-get-random-values';
 import { PaperProvider } from "react-native-paper";
+import { ToastProvider } from 'react-native-paper-toast';
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function RootLayout() {
@@ -16,12 +17,13 @@ export default function RootLayout() {
     //     <AppInner />
     //   </QueryClientProvider>
     // </SQLiteProvider>
-
+    // <Portal.Provider>
     <ThemeProvider>
       <SafeAreaProvider>
         <AppInner />
       </SafeAreaProvider>
     </ThemeProvider>
+    // </Portal.Provider>
 
   );
 }
@@ -38,6 +40,7 @@ function AppInner() {
         <QueryClientProvider client={queryClient}>
           {/* <NavigationContainer theme={theme} onReady={() => BootSplash.hide({ fade: true })}> */}
           {/* <NavigationContainer theme={theme}> */}
+          <ToastProvider>
             <SnackbarProvider>
               {/* <Rootstack /> */}
               <Stack
@@ -59,6 +62,7 @@ function AppInner() {
                 <Stack.Screen name="(category)/category-list" options={{ title: 'Categories' }} />
               </Stack>
             </SnackbarProvider>
+          </ToastProvider>
           {/* </NavigationContainer> */}
         </QueryClientProvider>
       </SQLiteProvider>
