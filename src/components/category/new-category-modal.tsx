@@ -65,12 +65,11 @@ export default function NewCategoryModal({ isVisible, onClose }: NewCategoryModa
     const { mutate: addCategory, isPending, isError, isSuccess } = useAddCategoryMutation();
 
     const onSubmit = async (data: any) => {
-        // showSnackbar("New Category Added", 'success')
-        // return
         addCategory({ category_name: data.category_name, color: newCategory.color }, {
             onSuccess: async () => {
                 showSnackbar("New Category Added", 'success')
                 control._reset()
+                onClose?.()
                 // toaster.show({message: "New Category added", type: "success", position: "middle"})
             },
             onError: async (error) => {
