@@ -3,6 +3,8 @@ import * as SQLite from 'expo-sqlite';
 export async function migrateDbIfNeeded(db: SQLite.SQLiteDatabase) {
   const DATABASE_VERSION = 2;
 
+  await db.execAsync('PRAGMA foreign_keys = ON;');
+
   const result = await db.getFirstAsync<{ user_version: number }>(
     'PRAGMA user_version'
   );
@@ -12,7 +14,7 @@ export async function migrateDbIfNeeded(db: SQLite.SQLiteDatabase) {
     if (currentVersion === 0) {
       await db.execAsync(`
         PRAGMA journal_mode = 'wal';
-
+        
 
         CREATE TABLE IF NOT EXISTS users (
           id INTEGER PRIMARY KEY NOT NULL,
@@ -52,11 +54,25 @@ export async function migrateDbIfNeeded(db: SQLite.SQLiteDatabase) {
           color TEXT,
           category_id TEXT,
           color_id TEXT,
-          FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
+          FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
           FOREIGN KEY (color_id) REFERENCES colors(id) ON DELETE SET NULL
         );
-
-      `);
+        
+        `);
+      // -- NOTES TABLE
+      // CREATE TABLE IF NOT EXISTS notes (
+      //   id TEXT PRIMARY KEY,
+      //   note_title,
+      //   note_content TEXT,
+      //   is_synced INTEGER DEFAULT 0,
+      //   created_at TEXT DEFAULT (datetime('now')),
+      //   updated_at TEXT DEFAULT (datetime('now')),
+      //   color TEXT,
+      //   category_id TEXT,
+      //   color_id TEXT,
+      //   FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
+      //   FOREIGN KEY (color_id) REFERENCES colors(id) ON DELETE SET NULL
+      // );
 
       // Default users to insert
       // const defaultColors = [

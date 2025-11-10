@@ -3,6 +3,7 @@ import { useCategoriesInfiniteQuery } from '@/app/src/features/categories/catego
 import { Edit3, Folder, Plus, Trash2, X } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import DeleteCategoryConfirmation from '../src/components/category/delete-category-confirmation';
 import EditCategoryModal from '../src/components/category/edit-category-modal';
 
 type Category = {
@@ -40,6 +41,7 @@ export default function CategoriesScreen() {
 
     const [isNewModalVisible, setIsNewModalVisible] = useState(false);
     const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+    const [isDeletionConfirmationVisible, setIsDeletionConfirmationVisible] = useState<boolean>(false)
     const [editingCategory, setEditingCategory] = useState<Category | null>(null);
     const [newCategory, setNewCategory] = useState({ name: '', color: CATEGORY_COLORS[0] });
     const [searchQuery, setSearchQuery] = useState('');
@@ -57,6 +59,11 @@ export default function CategoriesScreen() {
         setSelectedCategory(item);
         setIsEditModalVisible(true);
     };
+
+    const handleDelete = (item: Category) => {
+        setSelectedCategory(item);
+        setIsDeletionConfirmationVisible(true)
+    }
 
 
     const resetForm = () => {
@@ -94,6 +101,7 @@ export default function CategoriesScreen() {
                 <TouchableOpacity
                     className="p-2"
                 // onPress={() => handleDeleteCategory(item.id)}
+                    onPress={() => handleDelete(item)}
                 >
                     <Trash2 size={20} color="#666" />
                 </TouchableOpacity>
@@ -158,6 +166,8 @@ export default function CategoriesScreen() {
             {/* Add/Edit Category Modal */}
             <NewCategoryModal isVisible={isNewModalVisible} onClose={() => setIsNewModalVisible(false)} />
             <EditCategoryModal isVisible={isEditModalVisible} onClose={() => setIsEditModalVisible(false)} initialValue={ selectedCategory as Category } />
+            <DeleteCategoryConfirmation isVisible={isDeletionConfirmationVisible} onClose={() => setIsDeletionConfirmationVisible(false)} categoryId={selectedCategory?.id as string} isEmpty={(selectedCategory?.note_count ?? 0) > 0 ? false : true} />
+
         </View>
     );
 }

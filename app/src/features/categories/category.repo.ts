@@ -69,7 +69,7 @@ export const CategoryRepo = {
     },
 
     // Delete a category
-    async remove(id: number): Promise<void> {
+    async remove(id: string): Promise<void> {
         await runQuery('DELETE FROM categories WHERE id = ?', id);
     },
 

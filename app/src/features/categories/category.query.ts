@@ -72,7 +72,7 @@ export const useDeleteCategoryMutation = () => {
     const qc = useQueryClient();
 
     return useMutation({
-        mutationFn: (id: number) => CategoryRepo.remove(id),
+        mutationFn: (id: string) => CategoryRepo.remove(id),
         onSuccess: () => qc.invalidateQueries({ queryKey: ['categories'] }),
     });
 
