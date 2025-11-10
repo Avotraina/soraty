@@ -18,7 +18,7 @@ export default function DeleteCategoryConfirmation({ isVisible, onClose, categor
     const { showSnackbar } = useSnackbar();
 
 
-    const { mutate: deleteCategory, isPending, isError, error } = useDeleteCategoryMutation();
+    const { mutate: deleteCategory, isPending } = useDeleteCategoryMutation();
 
     const handleDelete = () => {
         deleteCategory(categoryId, {
