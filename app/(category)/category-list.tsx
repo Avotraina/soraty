@@ -3,6 +3,7 @@ import { useCategoriesInfiniteQuery } from '@/app/src/features/categories/catego
 import { Edit3, Folder, Plus, Trash2, X } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import EditCategoryModal from '../src/components/category/edit-category-modal';
 
 type Category = {
     id: string;
@@ -37,71 +38,29 @@ export default function CategoriesScreen() {
     //     { id: '4', name: 'Shopping', color: '#E57373', noteCount: 2 },
     // ]);
 
-    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isNewModalVisible, setIsNewModalVisible] = useState(false);
+    const [isEditModalVisible, setIsEditModalVisible] = useState(false);
     const [editingCategory, setEditingCategory] = useState<Category | null>(null);
     const [newCategory, setNewCategory] = useState({ name: '', color: CATEGORY_COLORS[0] });
     const [searchQuery, setSearchQuery] = useState('');
 
+    const [selectedCategory, setSelectedCategory] = React.useState<Category | null>(null);
+
     const { data } = useCategoriesInfiniteQuery(searchQuery);
-    
+
     const categoryList = data?.pages[0]?.flatMap((page: any) => page) || []
     // const categoryList = data?.pages || []
 
     console.log("Data", categoryList, data)
 
+    const handleEdit = (item: Category) => {
+        setSelectedCategory(item);
+        setIsEditModalVisible(true);
+    };
 
-    // const handleAddCategory = () => {
-    //     if (!newCategory.name.trim()) {
-    //         Alert.alert('Error', 'Please enter a category name');
-    //         return;
-    //     }
-
-    //     if (editingCategory) {
-    //         // Update existing category
-    //         setCategories(categories.map(cat =>
-    //             cat.id === editingCategory.id
-    //                 ? { ...cat, name: newCategory.name, color: newCategory.color }
-    //                 : cat
-    //         ));
-    //     } else {
-    //         // Add new category
-    //         const category: Category = {
-    //             id: Date.now().toString(),
-    //             name: newCategory.name,
-    //             color: newCategory.color,
-    //             noteCount: 0,
-    //         };
-    //         setCategories([category, ...categories]);
-    //     }
-
-    //     resetForm();
-    // };
-
-    // const handleEditCategory = (category: Category) => {
-    //     setEditingCategory(category);
-    //     setNewCategory({ name: category.name, color: category.color });
-    //     setIsModalVisible(true);
-    // };
-
-    // const handleDeleteCategory = (id: string) => {
-    //     Alert.alert(
-    //         'Delete Category',
-    //         'Are you sure you want to delete this category? Notes in this category will become uncategorized.',
-    //         [
-    //             { text: 'Cancel', style: 'cancel' },
-    //             {
-    //                 text: 'Delete',
-    //                 style: 'destructive',
-    //                 onPress: () => {
-    //                     setCategories(categories.filter(cat => cat.id !== id));
-    //                 },
-    //             },
-    //         ]
-    //     );
-    // };
 
     const resetForm = () => {
-        setIsModalVisible(false);
+        setIsNewModalVisible(false);
         setEditingCategory(null);
         setNewCategory({ name: '', color: CATEGORY_COLORS[0] });
     };
@@ -127,13 +86,14 @@ export default function CategoriesScreen() {
             <View className="flex-row" style={styles.categoryIconsContainer}>
                 <TouchableOpacity
                     className="p-2 mr-2"
-                    // onPress={() => handleEditCategory(item)}
+                // onPress={() => handleEditCategory(item)}
+                onPress={() => handleEdit(item)}
                 >
                     <Edit3 size={20} color="#666" />
                 </TouchableOpacity>
                 <TouchableOpacity
                     className="p-2"
-                    // onPress={() => handleDeleteCategory(item.id)}
+                // onPress={() => handleDeleteCategory(item.id)}
                 >
                     <Trash2 size={20} color="#666" />
                 </TouchableOpacity>
@@ -150,7 +110,7 @@ export default function CategoriesScreen() {
                     <TouchableOpacity
                         className="bg-blue-500 rounded-full p-3"
                         style={styles.headerSaveButton}
-                        onPress={() => setIsModalVisible(true)}
+                        onPress={() => setIsNewModalVisible(true)}
                     >
                         <Plus size={20} color="white" />
                     </TouchableOpacity>
@@ -196,7 +156,8 @@ export default function CategoriesScreen() {
             </View>
 
             {/* Add/Edit Category Modal */}
-            <NewCategoryModal isVisible={isModalVisible} onClose={() => setIsModalVisible(false)} />
+            <NewCategoryModal isVisible={isNewModalVisible} onClose={() => setIsNewModalVisible(false)} />
+            <EditCategoryModal isVisible={isEditModalVisible} onClose={() => setIsEditModalVisible(false)} initialValue={ selectedCategory as Category } />
         </View>
     );
 }

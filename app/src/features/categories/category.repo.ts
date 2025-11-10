@@ -50,7 +50,6 @@ export const CategoryRepo = {
                 GROUP BY c.id
                 ORDER BY c.created_at DESC
                 LIMIT ? OFFSET ?;
-
             `,
             like,
             limit,
@@ -66,7 +65,7 @@ export const CategoryRepo = {
     },
 
     async update(id: string, category_name: string, color: string): Promise<void> {
-        await runQuery('UPDATE categories SET category_name = ?, email = ? WHERE id = ?', category_name, color, id);
+        await runQuery('UPDATE categories SET category_name = ?, color = ? WHERE id = ?', category_name, color, id);
     },
 
     // Delete a category

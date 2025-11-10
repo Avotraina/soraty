@@ -1,7 +1,7 @@
 import { useSnackbar } from "@/app/src/contexts/snackbar-provider";
-import { useAddCategoryMutation } from "@/app/src/features/categories/category.query";
+import { useUpdateCategoryMutation } from "@/app/src/features/categories/category.query";
 import { Check, Save } from "lucide-react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ActivityIndicator, TextInput } from "react-native-paper";
@@ -24,16 +24,25 @@ type Category = {
     id: string;
     name: string;
     color: string;
-    // noteCount: number;
+    note_count: string;
+    noteCount: number;
+
 };
 
-type NewCategoryModalProps = {
+type EditCategoryModalProps = {
     isVisible: boolean;
     onClose?: () => void;
+    initialValue: {
+        id: string;
+        category_name: string;
+        color: string;
+    }
     // Add any other props you want to pass
 };
 
-export default function NewCategoryModal({ isVisible, onClose }: NewCategoryModalProps) {
+export default function EditCategoryModal({ isVisible, onClose, initialValue }: EditCategoryModalProps) {
+
+    console.log('initial value', initialValue)
 
     const toaster = useToast()
 
@@ -41,33 +50,39 @@ export default function NewCategoryModal({ isVisible, onClose }: NewCategoryModa
 
     const styles = makeStyles();
 
-    const { control, handleSubmit, formState: { errors }, setError, setFocus } = useForm({
+    const { control, handleSubmit, formState: { errors }, setError, setFocus, reset } = useForm({
         defaultValues: {
-            category_name: "",
+            // id: initialValue.id,
+            category_name: initialValue?.category_name ?? '',
+            // color: initialValue.color
         }
     })
 
     const [editingCategory, setEditingCategory] = useState<Category | null>(null);
     const [newCategory, setNewCategory] = useState({ name: '', color: CATEGORY_COLORS[0] });
-    const [searchQuery, setSearchQuery] = useState('');
 
     const { showSnackbar } = useSnackbar();
 
 
-    // const [categories, setCategories] = useState<Category[]>([
-    //     { id: '1', name: 'Personal', color: '#FFD54F', noteCount: 5 },
-    //     { id: '2', name: 'Work', color: '#4FC3F7', noteCount: 8 },
-    //     { id: '3', name: 'Ideas', color: '#81C784', noteCount: 3 },
-    //     { id: '4', name: 'Shopping', color: '#E57373', noteCount: 2 },
-    // ]);
+    // const { mutate: addCategory, isPending, isError, isSuccess } = useAddCategoryMutation();
 
+    const {mutate: updateCategory, isPending, isError, isSuccess} = useUpdateCategoryMutation()
 
-    const { mutate: addCategory, isPending, isError, isSuccess } = useAddCategoryMutation();
+    // 🧠 Reset form when modal opens or initialValue changes
+    useEffect(() => {
+        if (isVisible && initialValue) {
+            reset({
+                category_name: initialValue.category_name,
+            });
+            setNewCategory({ name: initialValue.category_name, color: initialValue.color });
+        }
+    }, [isVisible, initialValue, reset]);
+
 
     const onSubmit = async (data: any) => {
-        addCategory({ category_name: data.category_name, color: newCategory.color }, {
+        updateCategory({ id: initialValue.id,category_name: data.category_name, color: newCategory.color }, {
             onSuccess: async () => {
-                showSnackbar("New Category Added", 'success')
+                showSnackbar("Updated", 'success')
                 control._reset()
                 onClose?.()
                 // toaster.show({message: "New Category added", type: "success", position: "middle"})
@@ -77,44 +92,11 @@ export default function NewCategoryModal({ isVisible, onClose }: NewCategoryModa
                 if ((error?.message as any).includes('UNIQUE constraint failed')) {
                     setError('category_name', { message: 'This category already exists' })
                 } else {
-                    showSnackbar("Failed to add new category, try again", "error")
+                    showSnackbar("Failed to edit this category, try again", "error")
                 }
             }
         })
     }
-
-    // const handleAddCategory = () => {
-
-    //     // showSnackbar('Lety e', 'success')
-
-    //     // return
-    //     if (!newCategory.name.trim()) {
-    //         Alert.alert('Error', 'Please enter a category name');
-    //         return;
-    //     }
-
-
-
-    //     if (editingCategory) {
-    //         // Update existing category
-    //         setCategories(categories.map(cat =>
-    //             cat.id === editingCategory.id
-    //                 ? { ...cat, name: newCategory.name, color: newCategory.color }
-    //                 : cat
-    //         ));
-    //     } else {
-    //         // Add new category
-    //         const category: Category = {
-    //             id: Date.now().toString(),
-    //             name: newCategory.name,
-    //             color: newCategory.color,
-    //             noteCount: 0,
-    //         };
-    //         setCategories([category, ...categories]);
-    //     }
-
-    //     resetForm();
-    // };
 
     const resetForm = () => {
         isVisible = false
@@ -137,7 +119,8 @@ export default function NewCategoryModal({ isVisible, onClose }: NewCategoryModa
             <View className="flex-1 justify-center items-center bg-black/50" style={styles.modalOverlay}>
                 <View className="bg-white rounded-xl p-6 w-11/12 max-w-md" style={styles.modalContainer}>
                     <Text className="text-xl font-bold text-gray-800 mb-4" style={styles.modalTitle}>
-                        {editingCategory ? 'Edit Category' : 'New Category'}
+                        {/* {editingCategory ? 'Edit Category' : 'New Category'} */}
+                        Edit Category
                     </Text>
 
                     <Controller
@@ -202,7 +185,8 @@ export default function NewCategoryModal({ isVisible, onClose }: NewCategoryModa
                                     <>
                                         <Save size={16} color="white" className="mr-1" />
                                         <Text className="text-white" style={styles.modalSaveText}>
-                                            {editingCategory ? 'Update' : 'Create'}
+                                            {/* {editingCategory ? 'Update' : 'Create'} */}
+                                            Save
                                         </Text>
                                     </>
                             }
