@@ -1,7 +1,7 @@
-import { SnackbarProvider } from "@/src/contexts/snackbar-provider";
-import { migrateDbIfNeeded } from "@/src/database/migrations/init-database";
-import { ThemeProvider, useThemeContext } from "@/src/theme/theme-context";
-import { queryClient } from "@/src/utils/query-client";
+import { SnackbarProvider } from "@/app/src/contexts/snackbar-provider";
+import { migrateDbIfNeeded } from "@/app/src/database/migrations/init-database";
+import { ThemeProvider, useThemeContext } from "@/app/src/theme/theme-context";
+import { queryClient } from "@/app/src/utils/query-client";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { SQLiteProvider } from "expo-sqlite";

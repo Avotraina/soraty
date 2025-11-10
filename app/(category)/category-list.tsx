@@ -1,13 +1,16 @@
-import NewCategoryModal from '@/src/components/category/new-category-modal';
+import NewCategoryModal from '@/app/src/components/category/new-category-modal';
+import { useCategoriesInfiniteQuery } from '@/app/src/features/categories/category.query';
 import { Edit3, Folder, Plus, Trash2, X } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 type Category = {
     id: string;
-    name: string;
+    category_name: string;
+    name?: string;
     color: string;
-    noteCount: number;
+    noteCount?: number;
+    note_count?: number;
 };
 
 const CATEGORY_COLORS = [
@@ -22,83 +25,80 @@ const CATEGORY_COLORS = [
 ];
 
 export default function CategoriesScreen() {
-    const [users, setUsers] = useState<{ id: number; name: string; email: string }[]>([]);
 
-    // useEffect(() => {
-    //     (async () => {
-    //         const db = await openDatabase();
-    //         await db.runAsync('INSERT INTO users (name, email) VALUES (?, ?)', 'John', 'john@example.com');
-    //         const allUsers = await db.getAllAsync<{ id: number; name: string; email: string }>(
-    //             'SELECT * FROM users'
-    //         );
-    //         setUsers(allUsers);
-    //         console.log('Users:', allUsers);
-    //     })();
-    // }, []);
+    const [users, setUsers] = useState<{ id: number; name: string; email: string }[]>([]);
 
     const styles = makeStyles();
 
-    const [categories, setCategories] = useState<Category[]>([
-        { id: '1', name: 'Personal', color: '#FFD54F', noteCount: 5 },
-        { id: '2', name: 'Work', color: '#4FC3F7', noteCount: 8 },
-        { id: '3', name: 'Ideas', color: '#81C784', noteCount: 3 },
-        { id: '4', name: 'Shopping', color: '#E57373', noteCount: 2 },
-    ]);
+    // const [categories, setCategories] = useState<Category[]>([
+    //     { id: '1', name: 'Personal', color: '#FFD54F', noteCount: 5 },
+    //     { id: '2', name: 'Work', color: '#4FC3F7', noteCount: 8 },
+    //     { id: '3', name: 'Ideas', color: '#81C784', noteCount: 3 },
+    //     { id: '4', name: 'Shopping', color: '#E57373', noteCount: 2 },
+    // ]);
 
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [editingCategory, setEditingCategory] = useState<Category | null>(null);
     const [newCategory, setNewCategory] = useState({ name: '', color: CATEGORY_COLORS[0] });
     const [searchQuery, setSearchQuery] = useState('');
 
-    const handleAddCategory = () => {
-        if (!newCategory.name.trim()) {
-            Alert.alert('Error', 'Please enter a category name');
-            return;
-        }
+    const { data } = useCategoriesInfiniteQuery(searchQuery);
+    
+    const categoryList = data?.pages[0]?.flatMap((page: any) => page) || []
+    // const categoryList = data?.pages || []
 
-        if (editingCategory) {
-            // Update existing category
-            setCategories(categories.map(cat =>
-                cat.id === editingCategory.id
-                    ? { ...cat, name: newCategory.name, color: newCategory.color }
-                    : cat
-            ));
-        } else {
-            // Add new category
-            const category: Category = {
-                id: Date.now().toString(),
-                name: newCategory.name,
-                color: newCategory.color,
-                noteCount: 0,
-            };
-            setCategories([category, ...categories]);
-        }
+    console.log("Data", categoryList, data)
 
-        resetForm();
-    };
 
-    const handleEditCategory = (category: Category) => {
-        setEditingCategory(category);
-        setNewCategory({ name: category.name, color: category.color });
-        setIsModalVisible(true);
-    };
+    // const handleAddCategory = () => {
+    //     if (!newCategory.name.trim()) {
+    //         Alert.alert('Error', 'Please enter a category name');
+    //         return;
+    //     }
 
-    const handleDeleteCategory = (id: string) => {
-        Alert.alert(
-            'Delete Category',
-            'Are you sure you want to delete this category? Notes in this category will become uncategorized.',
-            [
-                { text: 'Cancel', style: 'cancel' },
-                {
-                    text: 'Delete',
-                    style: 'destructive',
-                    onPress: () => {
-                        setCategories(categories.filter(cat => cat.id !== id));
-                    },
-                },
-            ]
-        );
-    };
+    //     if (editingCategory) {
+    //         // Update existing category
+    //         setCategories(categories.map(cat =>
+    //             cat.id === editingCategory.id
+    //                 ? { ...cat, name: newCategory.name, color: newCategory.color }
+    //                 : cat
+    //         ));
+    //     } else {
+    //         // Add new category
+    //         const category: Category = {
+    //             id: Date.now().toString(),
+    //             name: newCategory.name,
+    //             color: newCategory.color,
+    //             noteCount: 0,
+    //         };
+    //         setCategories([category, ...categories]);
+    //     }
+
+    //     resetForm();
+    // };
+
+    // const handleEditCategory = (category: Category) => {
+    //     setEditingCategory(category);
+    //     setNewCategory({ name: category.name, color: category.color });
+    //     setIsModalVisible(true);
+    // };
+
+    // const handleDeleteCategory = (id: string) => {
+    //     Alert.alert(
+    //         'Delete Category',
+    //         'Are you sure you want to delete this category? Notes in this category will become uncategorized.',
+    //         [
+    //             { text: 'Cancel', style: 'cancel' },
+    //             {
+    //                 text: 'Delete',
+    //                 style: 'destructive',
+    //                 onPress: () => {
+    //                     setCategories(categories.filter(cat => cat.id !== id));
+    //                 },
+    //             },
+    //         ]
+    //     );
+    // };
 
     const resetForm = () => {
         setIsModalVisible(false);
@@ -106,9 +106,9 @@ export default function CategoriesScreen() {
         setNewCategory({ name: '', color: CATEGORY_COLORS[0] });
     };
 
-    const filteredCategories = categories.filter(category =>
-        category.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    // const filteredCategories = categories.filter(category =>
+    //     category.name.toLowerCase().includes(searchQuery.toLowerCase())
+    // );
 
     const renderCategoryItem = ({ item }: { item: Category }) => (
         <View className="bg-white rounded-xl p-4 mb-3 shadow-sm flex-row items-center" style={styles.categoryContainer}>
@@ -120,20 +120,20 @@ export default function CategoriesScreen() {
             </View>
 
             <View className="flex-1" style={styles.categoryLabelsContainer}>
-                <Text className="text-lg font-semibold text-gray-800" style={styles.categoryName}>{item.name}</Text>
-                <Text className="text-gray-500" style={styles.categoryNoteCount}>{item.noteCount} notes</Text>
+                <Text className="text-lg font-semibold text-gray-800" style={styles.categoryName}>{item.category_name}</Text>
+                <Text className="text-gray-500" style={styles.categoryNoteCount}>{item.note_count} notes</Text>
             </View>
 
             <View className="flex-row" style={styles.categoryIconsContainer}>
                 <TouchableOpacity
                     className="p-2 mr-2"
-                    onPress={() => handleEditCategory(item)}
+                    // onPress={() => handleEditCategory(item)}
                 >
                     <Edit3 size={20} color="#666" />
                 </TouchableOpacity>
                 <TouchableOpacity
                     className="p-2"
-                    onPress={() => handleDeleteCategory(item.id)}
+                    // onPress={() => handleDeleteCategory(item.id)}
                 >
                     <Trash2 size={20} color="#666" />
                 </TouchableOpacity>
@@ -177,7 +177,8 @@ export default function CategoriesScreen() {
 
             {/* Categories List */}
             <View className="flex-1 px-4" style={styles.categoryListContainer}>
-                {filteredCategories.length === 0 ? (
+                {/* {filteredCategories.length === 0 ? ( */}
+                {categoryList.length === 0 ? (
                     <View className="flex-1 justify-center items-center py-10" style={styles.noCategoriesContainer}>
                         <Folder size={48} color="#ccc" />
                         <Text className="text-gray-500 text-lg mt-4" style={styles.noCategoriesFound}>No categories found</Text>
@@ -185,7 +186,7 @@ export default function CategoriesScreen() {
                     </View>
                 ) : (
                     <FlatList
-                        data={filteredCategories}
+                        data={categoryList}
                         renderItem={renderCategoryItem}
                         keyExtractor={(item) => item.id}
                         showsVerticalScrollIndicator={false}
@@ -196,66 +197,6 @@ export default function CategoriesScreen() {
 
             {/* Add/Edit Category Modal */}
             <NewCategoryModal isVisible={isModalVisible} onClose={() => setIsModalVisible(false)} />
-            {/* <Modal
-                animationType="slide"
-                transparent={true}
-                visible={isModalVisible}
-                onRequestClose={resetForm}
-            >
-                <View className="flex-1 justify-center items-center bg-black/50" style={styles.modalOverlay}>
-                    <View className="bg-white rounded-xl p-6 w-11/12 max-w-md" style={styles.modalContainer}>
-                        <Text className="text-xl font-bold text-gray-800 mb-4" style={styles.modalTitle}>
-                            {editingCategory ? 'Edit Category' : 'New Category'}
-                        </Text>
-
-                        <TextInput
-                            className="border border-gray-300 rounded-lg p-3 mb-4"
-                            style={styles.modalCategoryNameInput}
-                            placeholder="Category name"
-                            value={newCategory.name}
-                            onChangeText={(text) => setNewCategory({ ...newCategory, name: text })}
-                        />
-
-                        <Text className="font-semibold text-gray-700 mb-2" style={styles.categoryModalColorTitle}>Color</Text>
-                        <View className="flex-row flex-wrap mb-6" style={styles.categoryModalColorsContainer}>
-                            {CATEGORY_COLORS.map((color) => (
-                                <TouchableOpacity
-                                    key={color}
-                                    className="w-10 h-10 rounded-full m-1 border-2 items-center justify-center"
-                                    style={{
-                                        ...styles.colorItem,
-                                        backgroundColor: color,
-                                        borderColor: newCategory.color === color ? '#4A90E2' : 'transparent'
-                                    }}
-                                    onPress={() => setNewCategory({ ...newCategory, color })}
-                                >
-                                    {newCategory.color === color && <Check size={16} color="white" />}
-                                </TouchableOpacity>
-                            ))}
-                        </View>
-
-                        <View className="flex-row justify-end" style={styles.modalFooterContainer}>
-                            <TouchableOpacity
-                                className="bg-gray-200 rounded-lg px-4 py-2 mr-2"
-                                style={styles.modalCancelButton}
-                                onPress={resetForm}
-                            >
-                                <Text className="text-gray-700" style={styles.modalCancelText}>Cancel</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                className="bg-blue-500 rounded-lg px-4 py-2 flex-row items-center"
-                                style={styles.modalSaveButton}
-                                onPress={handleAddCategory}
-                            >
-                                <Save size={16} color="white" className="mr-1" />
-                                <Text className="text-white" style={styles.modalSaveText}>
-                                    {editingCategory ? 'Update' : 'Create'}
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
-            </Modal> */}
         </View>
     );
 }
@@ -358,42 +299,6 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         flexDirection: 'row',
         gap: 24,
     },
-    modalOverlay: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)'
-    },
-    modalContainer: {
-        backgroundColor: 'white',
-        borderRadius: 12,
-        padding: 24,
-        width: '91.666667%',   // 11/12 in percentage
-        maxWidth: 448,         // Tailwind 'max-w-md' = 28rem = 448px
-    },
-    modalTitle: {
-        fontSize: 20,           // Tailwind 'text-xl'
-        fontWeight: '700',       // Tailwind 'font-bold'
-        color: '#1f2937',        // Tailwind 'text-gray-800'
-        marginBottom: 16,        // Tailwind 'mb-4' (1rem = 16px)
-    },
-    modalCategoryNameInput: {
-        borderWidth: 1,           // Tailwind 'border'
-        borderColor: '#d1d5db',   // Tailwind 'border-gray-300'
-        borderRadius: 8,           // Tailwind 'rounded-lg'
-        padding: 12,               // Tailwind 'p-3' (0.75rem = 12px)
-        marginBottom: 16,          // Tailwind 'mb-4' (1rem = 16px)
-    },
-    categoryModalColorTitle: {
-        fontWeight: '600',        // Tailwind 'font-semibold'
-        color: '#374151',         // Tailwind 'text-gray-700'
-        marginBottom: 8,          // Tailwind 'mb-2' (0.5rem = 8px)
-    },
-    categoryModalColorsContainer: {
-        flexDirection: 'row',    // Tailwind 'flex-row'
-        flexWrap: 'wrap',        // Tailwind 'flex-wrap'
-        marginBottom: 24,        // Tailwind 'mb-6' (1.5rem = 24px)
-    },
     colorItem: {
         width: 40,                // Tailwind 'w-10' (2.5rem = 40px)
         height: 40,               // Tailwind 'h-10' (2.5rem = 40px)
@@ -403,31 +308,4 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         alignItems: 'center',     // Tailwind 'items-center'
         justifyContent: 'center', // Tailwind 'justify-center'
     },
-    modalFooterContainer: {
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-    },
-    modalCancelButton: {
-        backgroundColor: '#e5e7eb', // Tailwind 'bg-gray-200'
-        borderRadius: 8,             // Tailwind 'rounded-lg'
-        paddingHorizontal: 16,       // Tailwind 'px-4' (1rem = 16px)
-        paddingVertical: 8,          // Tailwind 'py-2' (0.5rem = 8px)
-        marginRight: 8,              // Tailwind 'mr-2' (0.5rem = 8px)
-    },
-    modalCancelText: {
-        color: '#374151', // Tailwind 'text-gray-700'
-    },
-    modalSaveButton: {
-        backgroundColor: '#3b82f6', // Tailwind 'bg-blue-500'
-        borderRadius: 8,             // Tailwind 'rounded-lg'
-        paddingHorizontal: 16,       // Tailwind 'px-4' (1rem = 16px)
-        paddingVertical: 8,          // Tailwind 'py-2' (0.5rem = 8px)
-        flexDirection: 'row',        // Tailwind 'flex-row'
-        alignItems: 'center',        // Tailwind 'items-center',
-        gap: 4
-    },
-    modalSaveText: {
-        color: 'white',
-    }
-
 })

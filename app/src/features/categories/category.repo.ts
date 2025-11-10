@@ -1,4 +1,4 @@
-import { getAll, getFirst, runQuery } from "@/src/database/database";
+import { getAll, getFirst, runQuery } from "@/app/src/database/database";
 import { v7 as uuidv7 } from 'uuid';
 
 
@@ -28,10 +28,31 @@ export const CategoryRepo = {
     },
 
     // Fetch paginated categories with offset and limit
-    async getPaginated(page: number = 0, limit: number = PAGE_SIZE): Promise<T_Category[]> {
+    // async getPaginated(page: number = 0, limit: number = PAGE_SIZE): Promise<T_Category[]> {
+    async getPaginated(page: number = 0, limit: number = PAGE_SIZE, search: string): Promise<any> {
         const offset = page * limit;
-        return getAll<T_Category>(
-            'SELECT * FROM categories ORDER BY id DESC LIMIT ? OFFSET ?',
+        const like = `%${search}%`
+        // const like = `%`
+        // return getAll<T_Category>(
+        return getAll<any>(
+            // 'SELECT c.id, c.category_name, COUNT(n.id) AS note_count FROM categories c LEFT JOIN notes n ON n.category_id = c.id WHERE c.category_name LIKE ? ORDER BY id DESC LIMIT ? OFFSET ?',
+            // 'SELECT DISTINCT c.id, c.category_name, c.color, (SELECT COUNT(*) FROM notes WHERE notes.category_id = c.id) AS note_count FROM categories WHERE c.category_name LIKE ? c LEFT JOIN notes n ON n.category_id = c.id GROUP BY c.id ORDER BY id DESC LIMIT ? OFFSET ?',
+            // 'SELECT id, category_name FROM categories WHERE category_name LIKE ? ORDER BY id DESC LIMIT ? OFFSET ?',
+            `
+                SELECT
+                    c.id,
+                    c.category_name,
+                    c.color,
+                    COUNT(n.id) as note_count
+                FROM categories c
+                LEFT JOIN notes n ON n.category_id = c.id
+                WHERE c.category_name LIKE ?
+                GROUP BY c.id
+                ORDER BY c.created_at DESC
+                LIMIT ? OFFSET ?;
+
+            `,
+            like,
             limit,
             offset
         );

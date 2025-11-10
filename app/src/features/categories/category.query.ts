@@ -25,17 +25,19 @@ export const useCategoriesQuery = () =>
 
 
 
-export const useCategoriesInfiniteQuery = () =>
+export const useCategoriesInfiniteQuery = (search: string) =>
     useInfiniteQuery<
-        T_Category[],   // TData: type of a single page
+        // T_Category[],   // TData: type of a single page
+        any,   // TData: type of a single page
         Error,          // TError
-        T_Category[],   // TQueryFnData: return type of queryFn
+        // T_Category[],   // TQueryFnData: return type of queryFn
+        any,   // TQueryFnData: return type of queryFn
         readonly unknown[], // TQueryKey
         number          // TPageParam
     >({
-        queryKey: ['categories', 'infinite'],
+        queryKey: ['categories', 'infinite', search],
         queryFn: async ({ pageParam = 0 }) => {
-            return CategoryRepo.getPaginated(pageParam, PAGE_SIZE);
+            return CategoryRepo.getPaginated(pageParam, PAGE_SIZE, search);
         },
         getNextPageParam: (lastPage, allPages) => {
             if (lastPage.length < PAGE_SIZE) return undefined;
