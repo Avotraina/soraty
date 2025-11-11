@@ -5,13 +5,14 @@ import {
     Save
 } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { Controller, useForm } from 'react-hook-form';
 import { TextInput } from 'react-native-paper';
 import ColorSelect, { COLORS } from '../src/components/color/color-select';
 import ExampleTheme from "../src/components/dom-components/example-theme";
 import CategorySelect from '../src/components/note/category-select';
+import { useSnackbar } from '../src/contexts/snackbar-provider';
 import { useAddNoteMutation } from '../src/features/notes/note.query';
 
 const placeholder = "Enter some rich text...";
@@ -56,61 +57,16 @@ export default function NoteDetailScreen() {
     const [editorState, setEditorState] = useState<string | null>(null);
     const [plainText, setPlainText] = useState("");
 
-    // Mock note data - in a real app this would come from a database
-    // const mockNote = {
-    //     id: params.id?.toString() || '1',
-    //     title: params.title?.toString() || 'Meeting Notes',
-    //     content: params.content?.toString() || 'Discuss project requirements with team\n- Review timeline\n- Assign tasks\n- Set milestones',
-    //     color: params.color?.toString() || '#FFE599',
-    //     category: (params.category as unknown as Category) || null,
-    //     createdAt: params.createdAt?.toString() || new Date().toISOString(),
-    //     updatedAt: new Date().toISOString(),
-    // };
 
-
-    const [note, setNote] = useState({});
-    const [isEditing, setIsEditing] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
     const [selectedColor, setSelectedColor] = useState<string | undefined>(COLORS[0]);
 
-    const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
+
+    const { showSnackbar } = useSnackbar();
 
 
-    // const [categories] = useState<Category[]>(mockCategories);
-    const [newCategoryName, setNewCategoryName] = useState('');
 
-
-    const handleColorChange = (color: string) => {
-        setNote({ ...note, color });
-    };
-
-    const handleCategorySelect = (category: Category | null) => {
-        setNote({ ...note, category: (category as Category) });
-        setIsCategoryModalVisible(false);
-    };
-
-    const handleAddCategory = () => {
-        if (!newCategoryName.trim()) {
-            Alert.alert('Error', 'Please enter a category name');
-            return;
-        }
-
-        // In a real app, this would save to a database
-        const newCategory: Category = {
-            id: Date.now().toString(),
-            category_name: newCategoryName,
-            color: '#4FC3F7', // Default color
-        };
-
-        // For now, we'll just select the new category
-        handleCategorySelect(newCategory);
-        setNewCategoryName('');
-        setIsCategoryModalVisible(false);
-    };
-
-    // const currentCategory = categories.find(cat => cat.id === note.category?.id) || note.category;
-
-    const { control, handleSubmit, formState: { errors }, setError, setFocus, getValues } = useForm({
+    const { control, handleSubmit, formState: { errors }, setError, setFocus, getValues, reset } = useForm({
         defaultValues: {
             note_title: "New note",
             note_content: "",
@@ -119,37 +75,21 @@ export default function NoteDetailScreen() {
         }
     })
 
-    const handleSave = async (data: any) => {
-
-        // Alert.alert("")
-
-        console.log("FORM DATA", data)
-        // In a real app, this would save to a database
-        // Alert.alert('Note Saved', 'Your note has been saved successfully!', [
-        //     { text: 'OK', onPress: () => router.back() }
-        // ]);
-    };
-
     const { mutate: addNote, isPending, isError, isSuccess } = useAddNoteMutation();
 
-    // const onSubmit = async () => {
-    //     addNote({ note_title: data.note_title, color: newCategory.color }, {
-    //         onSuccess: async () => {
-    //             showSnackbar("New Category Added", 'success')
-    //             control._reset()
-    //             onClose?.()
-    //             // toaster.show({message: "New Category added", type: "success", position: "middle"})
-    //         },
-    //         onError: async (error) => {
-    //             console.log("Error", error)
-    //             if ((error?.message as any).includes('UNIQUE constraint failed')) {
-    //                 setError('category_name', { message: 'This category already exists' })
-    //             } else {
-    //                 showSnackbar("Failed to add new category, try again", "error")
-    //             }
-    //         }
-    //     })
-    // }
+    const onSubmit = async (data: any) => {
+
+        addNote({ note_title: data.note_title, color: data.color, note_content: data.note_content, category_id: data.category_id }, {
+            onSuccess: async () => {
+                showSnackbar("New Note Added", 'success')
+                reset()
+            },
+            onError: async (error) => {
+                console.log("Error", error)
+                showSnackbar("Failed to add new note, try again", "error")
+            }
+        })
+    }
 
 
 
@@ -185,12 +125,13 @@ export default function NoteDetailScreen() {
                             )}
 
                         />
-                        
+
                     </View>
 
                     <TouchableOpacity
                         // onPress={handleSave}
-                        onPress={handleSubmit(handleSave)}
+                        // onPress={handleSubmit(handleSave)}
+                        onPress={handleSubmit(onSubmit)}
                         className="p-2 rounded-full bg-blue-600"
                         style={styles.saveButtonContainer}
                     >

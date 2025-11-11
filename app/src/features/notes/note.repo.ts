@@ -37,7 +37,7 @@ export const NoteRepo = {
     // Create a new category
     async create({note_title, note_content, color, category_id}: {note_title: string, note_content: string, color: string, category_id: string | null}): Promise<void> {
         const id = uuidv7();
-        await runQuery('INSERT INTO notes (id, note_title, note_content, color, category_id) VALUES (?, ?, ?)', id, note_title, note_content, color, category_id);
+        await runQuery('INSERT INTO notes (id, note_title, note_content, color, category_id) VALUES (?, ?, ?, ?, ?)', id, note_title, note_content, color, category_id);
     },
 
 }

@@ -13,7 +13,7 @@ import { ListItemNode, ListNode } from "@lexical/list";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $createParagraphNode, $createTextNode, $getRoot } from "lexical";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ExampleTheme from "./example-theme";
 import ToolbarPlugin from "./plugins/toolbar-plugins";
 
@@ -35,44 +35,7 @@ const editorConfig = {
   // theme: {},
 };
 
-// 🧩 This plugin sets the editor content from the `value` prop
-// function SetEditorValuePlugin({ value }: { value?: string }) {
-//   const [editor] = useLexicalComposerContext();
 
-//   useEffect(() => {
-//     if (value) {
-//       editor.update(() => {
-//         const root = $getRoot();
-//         root.clear(); // clear previous content
-//         const paragraph = $createParagraphNode();
-//         paragraph.append($createTextNode(value));
-//         root.append(paragraph);
-//       });
-//     }
-//   }, [editor, value]);
-
-//   return null;
-// }
-
-// function SetEditorValuePlugin({ value }: { value?: string }) {
-//   const [editor] = useLexicalComposerContext();
-//   const [initialized, setInitialized] = useState(false);
-
-//   useEffect(() => {
-//     if (value && !initialized) {
-//       editor.update(() => {
-//         const root = $getRoot();
-//         root.clear();
-//         const paragraph = $createParagraphNode();
-//         paragraph.append($createTextNode(value));
-//         root.append(paragraph);
-//       });
-//       setInitialized(true);
-//     }
-//   }, [editor, value, initialized]);
-
-//   return null;
-// }
 
 // ✅ safer initialization plugin
 function InitializeValuePlugin({ value }: { value?: string }) {
@@ -96,6 +59,46 @@ function InitializeValuePlugin({ value }: { value?: string }) {
 }
 
 
+function SyncValuePlugin({ value }: { value?: string }) {
+  const [editor] = useLexicalComposerContext();
+  const prevValueRef = useRef<string | undefined>('');
+
+  useEffect(() => {
+    if (value === undefined || value === prevValueRef.current) return;
+
+    editor.update(() => {
+      const root = $getRoot();
+      const textContent = root.getTextContent();
+
+      if (textContent !== value) {
+        // Save current selection
+        const selection = editor.getEditorState().read(() => {
+          return editor.getEditorState().read(() => {
+            return editor.getEditorState().toJSON(); // save state snapshot
+          });
+        });
+
+        root.clear();
+        const paragraph = $createParagraphNode();
+        paragraph.append($createTextNode(value));
+        root.append(paragraph);
+
+        // Restore selection via editor.update (optional, approximate)
+        // Lexical doesn’t expose direct selection API in TS; usually you just reset to the end:
+        const nodes = root.getChildren();
+        if (nodes.length > 0) {
+          nodes[nodes.length - 1].selectEnd(); // move cursor to end
+        }
+      }
+    });
+
+    prevValueRef.current = value;
+  }, [editor, value]);
+
+  return null;
+}
+
+
 export default function RichEditor({
   setPlainText,
   setEditorState,
@@ -110,9 +113,14 @@ export default function RichEditor({
   value?: string;
 }) {
 
+  const skipNextChange = useRef(false); // at top of RichEditor
+
 
   const [bgColor, setBgColor] = useState(editorBackgroundColor);
   const [isReady, setIsReady] = useState(false);
+
+  const [editorContent, setEditorContent] = useState(value || "");
+  const editorRef = useRef<any>(null); // store Lexical editor instance
 
   // 👇 delay onChange activation until after first mount
   useEffect(() => {
@@ -128,6 +136,12 @@ export default function RichEditor({
     }
   }, [editorBackgroundColor]);
 
+  // Sync value prop into editor when form resets
+  useEffect(() => {
+    if (value !== editorContent) {
+      setEditorContent(value || "");
+    }
+  }, [value]);
 
   return (
     <>
@@ -152,11 +166,20 @@ export default function RichEditor({
             {isReady && (
               <OnChangePlugin
                 onChange={(editorState, editor, tags) => {
+                  // if (skipNextChange.current) {
+                  //   skipNextChange.current = false;
+                  //   return; // ignore this change to prevent reverse overwrite
+                  // }
+                  if (skipNextChange.current) {
+                    skipNextChange.current = false;
+                    return; // ignore the next change to prevent reverse overwrite
+                  }
                   editorState.read(() => {
                     const root = $getRoot();
                     const textContent = root.getTextContent();
                     setPlainText(textContent);
                     onChange?.(textContent); // notify React Hook Form
+                    setEditorContent(textContent);
                   });
                   setEditorState(JSON.stringify(editorState.toJSON()));
                 }}
@@ -166,7 +189,8 @@ export default function RichEditor({
             )}
 
             {/* <SetEditorValuePlugin value={value} /> */}
-            <InitializeValuePlugin value={value} />
+            <SyncValuePlugin value={value} skipNextChange={skipNextChange} />
+            {/* <InitializeValuePlugin value={value} /> */}
             <HistoryPlugin />
             <AutoFocusPlugin />
             <ListPlugin /> {/* <-- add this line */}
