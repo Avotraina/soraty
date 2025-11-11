@@ -83,38 +83,6 @@ export default function NewCategoryModal({ isVisible, onClose }: NewCategoryModa
         })
     }
 
-    // const handleAddCategory = () => {
-
-    //     // showSnackbar('Lety e', 'success')
-
-    //     // return
-    //     if (!newCategory.name.trim()) {
-    //         Alert.alert('Error', 'Please enter a category name');
-    //         return;
-    //     }
-
-
-
-    //     if (editingCategory) {
-    //         // Update existing category
-    //         setCategories(categories.map(cat =>
-    //             cat.id === editingCategory.id
-    //                 ? { ...cat, name: newCategory.name, color: newCategory.color }
-    //                 : cat
-    //         ));
-    //     } else {
-    //         // Add new category
-    //         const category: Category = {
-    //             id: Date.now().toString(),
-    //             name: newCategory.name,
-    //             color: newCategory.color,
-    //             noteCount: 0,
-    //         };
-    //         setCategories([category, ...categories]);
-    //     }
-
-    //     resetForm();
-    // };
 
     const resetForm = () => {
         isVisible = false

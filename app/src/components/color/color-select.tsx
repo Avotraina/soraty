@@ -4,11 +4,12 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-nati
 
 type ColorSelectProps = {
     onClose?: () => void;
-    currentColor?: string | null
-    onSelectColor?: (color: string | null) => void;
+    currentColor?: string | undefined
+    onSelectColor?: (color: string | undefined) => void;
+    value?: string;
 }
 
-const COLORS = [
+export const COLORS = [
     '#FFE599', // Yellow
     '#A4C2F4', // Blue
     '#F9CB9C', // Orange
@@ -23,6 +24,7 @@ const COLORS = [
 export default function ColorSelect({
     currentColor,
     onSelectColor,
+    value
 }: ColorSelectProps) {
 
     const styles = makeStyles();
@@ -33,8 +35,8 @@ export default function ColorSelect({
         }
     }, [currentColor, onSelectColor]);
 
-    const handleColorSelect = (color: string | null) => {
-        onSelectColor?.(color); // ⬅️ Notify parent
+    const handleColorSelect = (color: string | undefined) => {
+        onSelectColor?.(color);
     };
 
 

@@ -5,11 +5,14 @@ import {
     Save
 } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import ColorSelect from '../src/components/color/color-select';
+import { Controller, useForm } from 'react-hook-form';
+import { TextInput } from 'react-native-paper';
+import ColorSelect, { COLORS } from '../src/components/color/color-select';
 import ExampleTheme from "../src/components/dom-components/example-theme";
 import CategorySelect from '../src/components/note/category-select';
+import { useAddNoteMutation } from '../src/features/notes/note.query';
 
 const placeholder = "Enter some rich text...";
 
@@ -54,20 +57,21 @@ export default function NoteDetailScreen() {
     const [plainText, setPlainText] = useState("");
 
     // Mock note data - in a real app this would come from a database
-    const mockNote = {
-        id: params.id?.toString() || '1',
-        title: params.title?.toString() || 'Meeting Notes',
-        content: params.content?.toString() || 'Discuss project requirements with team\n- Review timeline\n- Assign tasks\n- Set milestones',
-        color: params.color?.toString() || '#FFE599',
-        category: (params.category as unknown as Category) || null,
-        createdAt: params.createdAt?.toString() || new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-    };
+    // const mockNote = {
+    //     id: params.id?.toString() || '1',
+    //     title: params.title?.toString() || 'Meeting Notes',
+    //     content: params.content?.toString() || 'Discuss project requirements with team\n- Review timeline\n- Assign tasks\n- Set milestones',
+    //     color: params.color?.toString() || '#FFE599',
+    //     category: (params.category as unknown as Category) || null,
+    //     createdAt: params.createdAt?.toString() || new Date().toISOString(),
+    //     updatedAt: new Date().toISOString(),
+    // };
 
-    const [note, setNote] = useState(mockNote);
+
+    const [note, setNote] = useState({});
     const [isEditing, setIsEditing] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-    const [selectedColor, setSelectedColor] = useState<string | null>(null);
+    const [selectedColor, setSelectedColor] = useState<string | undefined>(COLORS[0]);
 
     const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
 
@@ -75,13 +79,6 @@ export default function NoteDetailScreen() {
     // const [categories] = useState<Category[]>(mockCategories);
     const [newCategoryName, setNewCategoryName] = useState('');
 
-
-    const handleSave = () => {
-        // In a real app, this would save to a database
-        Alert.alert('Note Saved', 'Your note has been saved successfully!', [
-            { text: 'OK', onPress: () => router.back() }
-        ]);
-    };
 
     const handleColorChange = (color: string) => {
         setNote({ ...note, color });
@@ -113,6 +110,48 @@ export default function NoteDetailScreen() {
 
     // const currentCategory = categories.find(cat => cat.id === note.category?.id) || note.category;
 
+    const { control, handleSubmit, formState: { errors }, setError, setFocus, getValues } = useForm({
+        defaultValues: {
+            note_title: "New note",
+            note_content: "",
+            category_id: null,
+            color: ""
+        }
+    })
+
+    const handleSave = async (data: any) => {
+
+        // Alert.alert("")
+
+        console.log("FORM DATA", data)
+        // In a real app, this would save to a database
+        // Alert.alert('Note Saved', 'Your note has been saved successfully!', [
+        //     { text: 'OK', onPress: () => router.back() }
+        // ]);
+    };
+
+    const { mutate: addNote, isPending, isError, isSuccess } = useAddNoteMutation();
+
+    // const onSubmit = async () => {
+    //     addNote({ note_title: data.note_title, color: newCategory.color }, {
+    //         onSuccess: async () => {
+    //             showSnackbar("New Category Added", 'success')
+    //             control._reset()
+    //             onClose?.()
+    //             // toaster.show({message: "New Category added", type: "success", position: "middle"})
+    //         },
+    //         onError: async (error) => {
+    //             console.log("Error", error)
+    //             if ((error?.message as any).includes('UNIQUE constraint failed')) {
+    //                 setError('category_name', { message: 'This category already exists' })
+    //             } else {
+    //                 showSnackbar("Failed to add new category, try again", "error")
+    //             }
+    //         }
+    //     })
+    // }
+
+
 
     return (
         <View className="flex-1 bg-gray-50" style={styles.container}>
@@ -128,18 +167,30 @@ export default function NoteDetailScreen() {
                     </TouchableOpacity>
 
                     <View className="flex-1 px-4" style={styles.titleContainer}>
-                        <TextInput
-                            className="text-white text-xl font-bold bg-transparent"
-                            style={styles.titleInput}
-                            value={note.title as string}
-                            onChangeText={(text) => setNote({ ...note, title: text })}
-                            placeholder="Note Title"
-                            placeholderTextColor="#e0e0e0"
+                        <Controller
+                            control={control}
+                            name="note_title"
+                            rules={{ required: "Title is required" }}
+                            render={({ field: { onChange, value } }) => (
+                                <TextInput
+                                    className="text-white text-xl font-bold bg-transparent"
+                                    style={styles.titleInput}
+                                    value={value}
+                                    // onChangeText={(text) => setNote({ ...note, title: text })}
+                                    onChangeText={onChange}
+                                    placeholder="Note Title"
+                                    placeholderTextColor="#e0e0e0"
+                                    error={!!errors.note_title}
+                                />
+                            )}
+
                         />
+                        
                     </View>
 
                     <TouchableOpacity
-                        onPress={handleSave}
+                        // onPress={handleSave}
+                        onPress={handleSubmit(handleSave)}
                         className="p-2 rounded-full bg-blue-600"
                         style={styles.saveButtonContainer}
                     >
@@ -149,25 +200,60 @@ export default function NoteDetailScreen() {
             </View>
 
             {/* Color Selection */}
-            <ColorSelect currentColor={selectedColor} onSelectColor={setSelectedColor} />
+            <Controller
+                control={control}
+                name="color"
+                rules={{}}
+                render={({ field: { onChange, value } }) => (
+                    <ColorSelect currentColor={value} onSelectColor={(color) => {
+                        setSelectedColor(color);  // update local state
+                        onChange(color);          // update React Hook Form
+                    }} value={value} />
+                )}
 
+            />
+            {/* <ColorSelect currentColor={selectedColor} onSelectColor={setSelectedColor} /> */}
 
             {/* Category Selection */}
-            <CategorySelect currentCategory={selectedCategory} onSelectCategory={setSelectedCategory} />
+
+            {/* Color Selection */}
+            <Controller
+                control={control}
+                name="category_id"
+                rules={{}}
+                render={({ field: { onChange, value } }) => (
+                    <CategorySelect currentCategory={selectedCategory} onSelectCategory={(category) => {
+                        setSelectedCategory(category);
+                        onChange(category?.id || null)
+                    }} />
+                )}
+
+            />
+            {/* <CategorySelect currentCategory={selectedCategory} onSelectCategory={setSelectedCategory} /> */}
 
 
             <View style={{ backgroundColor: 'black', borderRadius: 12, overflow: 'hidden', flex: 1 }}>
-                <RichEditor setPlainText={setPlainText} setEditorState={setEditorState} editorBackgroundColor={selectedColor as string} />
+
+                <Controller
+                    control={control}
+                    name="note_content"
+                    rules={{}}
+                    render={({ field: { onChange, value } }) => (
+                        <RichEditor setPlainText={setPlainText} setEditorState={setEditorState} editorBackgroundColor={selectedColor} onChange={onChange} value={value} />
+                    )}
+                />
+
+                {/* <RichEditor setPlainText={setPlainText} setEditorState={setEditorState} editorBackgroundColor={selectedColor} /> */}
             </View>
 
             {/* Footer with metadata */}
             <View className="bg-white py-3 px-4 border-t border-gray-200" style={styles.footerContainer}>
                 <View className="flex-row justify-between" style={styles.footer}>
                     <Text className="text-gray-500 text-sm" style={styles.createdAtText}>
-                        Created: {new Date(note.createdAt).toLocaleDateString()}
+                        {/* Created: {new Date(note.createdAt).toLocaleDateString()} */}
                     </Text>
                     <Text className="text-gray-500 text-sm" style={styles.updatedAtText}>
-                        Last edited: {new Date(note.updatedAt).toLocaleDateString()}
+                        {/* Last edited: {new Date(note.updatedAt).toLocaleDateString()} */}
                     </Text>
                 </View>
             </View>

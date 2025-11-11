@@ -17,12 +17,14 @@ type CategorySelectProps = {
     onClose?: () => void;
     currentCategory?: Category | null
     onSelectCategory?: (category: Category | null) => void;
+    value?: string;
 }
 
 
 export default function CategorySelect({
     currentCategory,
     onSelectCategory,
+    value
 }: CategorySelectProps) {
 
     const styles = makeStyles();
