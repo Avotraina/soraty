@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import DeleteCategoryConfirmation from '../src/components/category/delete-category-confirmation';
 import EditCategoryModal from '../src/components/category/edit-category-modal';
+import { useDebounce } from '../src/hooks/debounce';
 
 type Category = {
     id: string;
@@ -45,10 +46,12 @@ export default function CategoriesScreen() {
     const [editingCategory, setEditingCategory] = useState<Category | null>(null);
     const [newCategory, setNewCategory] = useState({ name: '', color: CATEGORY_COLORS[0] });
     const [searchQuery, setSearchQuery] = useState('');
+    const debouncedSearch = useDebounce(searchQuery);
 
-    const [selectedCategory, setSelectedCategory] = React.useState<Category | null>(null);
 
-    const { data } = useCategoriesInfiniteQuery(searchQuery);
+    const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+
+    const { data } = useCategoriesInfiniteQuery({ debouncedSearch: debouncedSearch});
 
     const categoryList = data?.pages[0]?.flatMap((page: any) => page) || []
     // const categoryList = data?.pages || []
@@ -93,14 +96,14 @@ export default function CategoriesScreen() {
             <View className="flex-row" style={styles.categoryIconsContainer}>
                 <TouchableOpacity
                     className="p-2 mr-2"
-                // onPress={() => handleEditCategory(item)}
-                onPress={() => handleEdit(item)}
+                    // onPress={() => handleEditCategory(item)}
+                    onPress={() => handleEdit(item)}
                 >
                     <Edit3 size={20} color="#666" />
                 </TouchableOpacity>
                 <TouchableOpacity
                     className="p-2"
-                // onPress={() => handleDeleteCategory(item.id)}
+                    // onPress={() => handleDeleteCategory(item.id)}
                     onPress={() => handleDelete(item)}
                 >
                     <Trash2 size={20} color="#666" />
@@ -165,7 +168,7 @@ export default function CategoriesScreen() {
 
             {/* Add/Edit Category Modal */}
             <NewCategoryModal isVisible={isNewModalVisible} onClose={() => setIsNewModalVisible(false)} />
-            <EditCategoryModal isVisible={isEditModalVisible} onClose={() => setIsEditModalVisible(false)} initialValue={ selectedCategory as Category } />
+            <EditCategoryModal isVisible={isEditModalVisible} onClose={() => setIsEditModalVisible(false)} initialValue={selectedCategory as Category} />
             <DeleteCategoryConfirmation isVisible={isDeletionConfirmationVisible} onClose={() => setIsDeletionConfirmationVisible(false)} categoryId={selectedCategory?.id as string} isEmpty={(selectedCategory?.note_count ?? 0) > 0 ? false : true} />
 
         </View>

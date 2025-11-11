@@ -25,7 +25,7 @@ export const useCategoriesQuery = () =>
 
 
 
-export const useCategoriesInfiniteQuery = (search: string) =>
+export const useCategoriesInfiniteQuery = ({ debouncedSearch }: { debouncedSearch: string }) =>
     useInfiniteQuery<
         // T_Category[],   // TData: type of a single page
         any,   // TData: type of a single page
@@ -35,9 +35,9 @@ export const useCategoriesInfiniteQuery = (search: string) =>
         readonly unknown[], // TQueryKey
         number          // TPageParam
     >({
-        queryKey: ['categories', 'infinite', search],
+        queryKey: ['categories', 'infinite', debouncedSearch],
         queryFn: async ({ pageParam = 0 }) => {
-            return CategoryRepo.getPaginated(pageParam, PAGE_SIZE, search);
+            return CategoryRepo.getPaginated(pageParam, PAGE_SIZE, debouncedSearch);
         },
         getNextPageParam: (lastPage, allPages) => {
             if (lastPage.length < PAGE_SIZE) return undefined;

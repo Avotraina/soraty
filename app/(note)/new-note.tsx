@@ -2,14 +2,14 @@ import RichEditor, { default as Editor } from '@/app/src/components/dom-componen
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
     ArrowLeft,
-    Folder,
-    Palette,
     Save
 } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
+import ColorSelect from '../src/components/color/color-select';
 import ExampleTheme from "../src/components/dom-components/example-theme";
+import CategorySelect from '../src/components/note/category-select';
 
 const placeholder = "Enter some rich text...";
 
@@ -39,7 +39,7 @@ export type editorStyle = {
 
 type Category = {
     id: string;
-    name: string;
+    category_name: string;
     color: string;
 };
 
@@ -66,31 +66,15 @@ export default function NoteDetailScreen() {
 
     const [note, setNote] = useState(mockNote);
     const [isEditing, setIsEditing] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+    const [selectedColor, setSelectedColor] = useState<string | null>(null);
 
     const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
 
-    // Mock categories data - in a real app this would come from a database
-    const mockCategories: Category[] = [
-        { id: '1', name: 'Personal', color: '#FFD54F' },
-        { id: '2', name: 'Work', color: '#4FC3F7' },
-        { id: '3', name: 'Ideas', color: '#81C784' },
-        { id: '4', name: 'Shopping', color: '#E57373' },
-    ];
 
-    const [categories] = useState<Category[]>(mockCategories);
+    // const [categories] = useState<Category[]>(mockCategories);
     const [newCategoryName, setNewCategoryName] = useState('');
 
-    // Note colors for selection
-    const noteColors = [
-        '#FFE599', // Yellow
-        '#A4C2F4', // Blue
-        '#F9CB9C', // Orange
-        '#B4A7D6', // Purple
-        '#8FBC8F', // Green
-        '#F9B7B7', // Red
-        '#E6B8AF', // Pink
-        '#D5A6BD', // Magenta
-    ];
 
     const handleSave = () => {
         // In a real app, this would save to a database
@@ -117,7 +101,7 @@ export default function NoteDetailScreen() {
         // In a real app, this would save to a database
         const newCategory: Category = {
             id: Date.now().toString(),
-            name: newCategoryName,
+            category_name: newCategoryName,
             color: '#4FC3F7', // Default color
         };
 
@@ -127,7 +111,7 @@ export default function NoteDetailScreen() {
         setIsCategoryModalVisible(false);
     };
 
-    const currentCategory = categories.find(cat => cat.id === note.category?.id) || note.category;
+    // const currentCategory = categories.find(cat => cat.id === note.category?.id) || note.category;
 
 
     return (
@@ -165,51 +149,15 @@ export default function NoteDetailScreen() {
             </View>
 
             {/* Color Selection */}
-            <View className="py-3 px-4 bg-white border-b border-gray-200" style={styles.colorSelectionContainer}>
-                <View className="flex-row items-center mb-2" style={styles.colorSelectionTitleContainer}>
-                    <Palette size={20} color="#666" className="mr-2" style={{ marginRight: 8 }} />
-                    <Text className="text-gray-700 font-medium" style={styles.colorSelectionTitle}>Note Color</Text>
-                </View>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} className="max-h-16" style={styles.colorSelectionScrollView}>
-                    <View className="flex-row gap-3" style={styles.colorsSelectionContainer}>
-                        {noteColors.map((color, index) => (
-                            <TouchableOpacity
-                                key={index}
-                                onPress={() => handleColorChange(color)}
-                                className={`w-10 h-10 rounded-full border-2 ${note.color === color ? 'border-blue-500' : 'border-gray-300'}`}
-                                style={{ ...styles.colorCircle, backgroundColor: color, borderColor: note.color === color ? '#3b82f6' : '#d1d5db' }}
-                            // style={{ backgroundColor: color }}
-                            />
-                        ))}
-                    </View>
-                </ScrollView>
-            </View>
+            <ColorSelect currentColor={selectedColor} onSelectColor={setSelectedColor} />
+
 
             {/* Category Selection */}
-            <View className="py-3 px-4 bg-white border-b border-gray-200" style={styles.categorySelectionContainer}>
-                <TouchableOpacity
-                    className="flex-row items-center"
-                    style={styles.categorySelectionTouchable}
-                    onPress={() => setIsCategoryModalVisible(true)}
-                >
-                    <Folder size={20} color="#666" className="mr-2" style={{ marginRight: 8 }} />
-                    <Text className="text-gray-700 font-medium mr-2" style={styles.categorySelectionTitle}>Category</Text>
-                    {currentCategory ? (
-                        <View className="flex-row items-center bg-gray-100 rounded-full px-3 py-1" style={styles.selectedCategoryContainer}>
-                            <View
-                                className="w-3 h-3 rounded-full mr-2"
-                                style={{ ...styles.selectedCategory, backgroundColor: currentCategory.color }}
-                            />
-                            <Text className="text-gray-800" style={styles.selectedCategoryName}>{currentCategory.name}</Text>
-                        </View>
-                    ) : (
-                        <Text className="text-gray-400" style={styles.noCategorySelectedText}>None selected</Text>
-                    )}
-                </TouchableOpacity>
-            </View>
+            <CategorySelect currentCategory={selectedCategory} onSelectCategory={setSelectedCategory} />
+
 
             <View style={{ backgroundColor: 'black', borderRadius: 12, overflow: 'hidden', flex: 1 }}>
-                <RichEditor setPlainText={setPlainText} setEditorState={setEditorState} editorBackgroundColor={note.color} />
+                <RichEditor setPlainText={setPlainText} setEditorState={setEditorState} editorBackgroundColor={selectedColor as string} />
             </View>
 
             {/* Footer with metadata */}
@@ -224,79 +172,6 @@ export default function NoteDetailScreen() {
                 </View>
             </View>
 
-            {/* Category Selection Modal */}
-            {/* <Modal
-                animationType="slide"
-                transparent={true}
-                visible={isCategoryModalVisible}
-                onRequestClose={() => setIsCategoryModalVisible(false)}
-            >
-                <View className="flex-1 justify-end bg-black/50" style={styles.categoryModalOverlay}>
-                    <View className="bg-white rounded-t-2xl p-4" style={styles.categoryModalContainer}>
-                        <View className="flex-row justify-between items-center mb-4" style={styles.categoryModalHeaderContainer}>
-                            <Text className="text-xl font-bold text-gray-800" style={styles.categoryModalTitle}>Select Category</Text>
-                            <TouchableOpacity onPress={() => setIsCategoryModalVisible(false)}>
-                                <X size={24} color="#666" />
-                            </TouchableOpacity>
-                        </View>
-
-                        None Option
-                        <TouchableOpacity
-                            className="flex-row items-center py-3 border-b border-gray-100"
-                            style={styles.categoryModalNoneOptionContainer}
-                            onPress={() => handleCategorySelect(null)}
-                        >
-                            <View
-                                className="w-6 h-6 rounded-full border-2 border-gray-300 mr-3 items-center justify-center"
-                                style={styles.categoryModalNoneOptionCheck}
-                            >
-                                {!note.category && <Check size={16} color="#4A90E2" />}
-                            </View>
-                            <Text className="text-gray-700" style={styles.categoryModalNoneText}>None</Text>
-                        </TouchableOpacity>
-
-                        Category List
-                        {categories.map((category) => (
-                            <TouchableOpacity
-                                key={category.id}
-                                className="flex-row items-center py-3 border-b border-gray-100"
-                                style={{ ...styles.categoryModalListContainer, backgroundColor: note.category?.id === category.id ? `${category.color}20` : undefined }}
-                                onPress={() => handleCategorySelect(category)}
-                            >
-                                <View
-                                    className="w-6 h-6 rounded-full mr-3 items-center justify-center"
-                                    style={{ ...styles.categoryModalOptionCheck, backgroundColor: `${category.color}20` }}
-                                >
-                                    {note.category?.id === category.id && <Check size={16} color={category.color} />}
-                                </View>
-                                <View
-                                    className="w-3 h-3 rounded-full mr-3"
-                                    style={{ width: 12, height: 12, borderRadius: 9999, marginRight: 12, backgroundColor: category.color }}
-                                />
-                                <Text className="text-gray-700" style={styles.categoryModalListName}>{category.name}</Text>
-                            </TouchableOpacity>
-                        ))}
-
-                        Add New Category
-                        <View className="flex-row items-center py-3 mt-2" style={styles.addNewCategoryContainer}>
-                            <TextInput
-                                className="flex-1 border border-gray-300 rounded-lg p-2 mr-2"
-                                style={styles.addNewCategoryInput}
-                                placeholder="New category"
-                                value={newCategoryName}
-                                onChangeText={setNewCategoryName}
-                            />
-                            <TouchableOpacity
-                                className="bg-blue-500 rounded-lg p-2"
-                                style={styles.addNewCategoryAddButton}
-                                onPress={handleAddCategory}
-                            >
-                                <Plus size={20} color="white" />
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
-            </Modal> */}
         </View>
     );
 }

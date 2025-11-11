@@ -1,6 +1,9 @@
 import { Check, Folder, X } from "lucide-react-native";
 import { useState } from "react";
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Searchbar } from "react-native-paper";
+import { useCategoriesInfiniteQuery } from "../../features/categories/category.query";
+import { useDebounce } from "../../hooks/debounce";
 
 
 
@@ -16,14 +19,6 @@ type CategorySelectProps = {
     onSelectCategory?: (category: Category | null) => void;
 }
 
-// Mock categories data - in a real app this would come from a database
-const categories: Category[] = [
-    { id: '1', category_name: 'Personal', color: '#FFD54F' },
-    { id: '2', category_name: 'Work', color: '#4FC3F7' },
-    { id: '3', category_name: 'Ideas', color: '#81C784' },
-    { id: '4', category_name: 'Shopping', color: '#E57373' },
-];
-
 
 export default function CategorySelect({
     currentCategory,
@@ -33,6 +28,15 @@ export default function CategorySelect({
     const styles = makeStyles();
 
     const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
+
+    const [searchQuery, setSearchQuery] = useState('');
+    const debouncedSearch = useDebounce(searchQuery);
+
+
+    const { data } = useCategoriesInfiniteQuery({ debouncedSearch: debouncedSearch.trim() });
+
+    const categoryList: Category[] = data?.pages[0]?.flatMap((page: any) => page) || []
+
 
     const handleCategorySelect = (category: Category | null) => {
         onSelectCategory?.(category); // ⬅️ Notify parent
@@ -81,6 +85,15 @@ export default function CategorySelect({
                             </TouchableOpacity>
                         </View>
 
+                        {/* Searchbar */}
+                        <View>
+                            <Searchbar
+                                placeholder="Search"
+                                onChangeText={setSearchQuery}
+                                value={searchQuery}
+                            />
+                        </View>
+
                         {/* None Option */}
                         <TouchableOpacity
                             className="flex-row items-center py-3 border-b border-gray-100"
@@ -98,7 +111,36 @@ export default function CategorySelect({
                         </TouchableOpacity>
 
                         {/* Category List */}
-                        {categories.map((category) => (
+                        <FlatList
+                            data={categoryList}
+                            renderItem={({item}) => (
+                                <TouchableOpacity
+                                    key={item.id}
+                                    className="flex-row items-center py-3 border-b border-gray-100"
+                                    style={{ ...styles.categoryModalListContainer, backgroundColor: currentCategory?.id === item.id ? `${item.color}20` : undefined }}
+                                    onPress={() => handleCategorySelect(item)}
+                                >
+                                    <View
+                                        className="w-6 h-6 rounded-full mr-3 items-center justify-center"
+                                        style={{ ...styles.categoryModalOptionCheck, backgroundColor: `${item.color}20` }}
+                                    >
+                                        {/* {note.category?.id === category.id && <Check size={16} color={category.color} />} */}
+                                        {currentCategory?.id === item.id && <Check size={16} color={item.color} />}
+                                    </View>
+                                    <View
+                                        className="w-3 h-3 rounded-full mr-3"
+                                        style={{ width: 12, height: 12, borderRadius: 9999, marginRight: 12, backgroundColor: item.color }}
+                                    />
+                                    <Text className="text-gray-700" style={styles.categoryModalListName}>{item.category_name}</Text>
+                                </TouchableOpacity>
+                            )}
+                            keyExtractor={(item) => item.id}
+                            showsVerticalScrollIndicator={false}
+                            contentContainerStyle={{ paddingBottom: 20 }}
+                            style={{ maxHeight: 60 * 6 }}
+                        />
+
+                        {/* {categoryList.map((category) => (
                             <TouchableOpacity
                                 key={category.id}
                                 className="flex-row items-center py-3 border-b border-gray-100"
@@ -109,7 +151,7 @@ export default function CategorySelect({
                                     className="w-6 h-6 rounded-full mr-3 items-center justify-center"
                                     style={{ ...styles.categoryModalOptionCheck, backgroundColor: `${category.color}20` }}
                                 >
-                                    {/* {note.category?.id === category.id && <Check size={16} color={category.color} />} */}
+                                    {note.category?.id === category.id && <Check size={16} color={category.color} />}
                                     {currentCategory?.id === category.id && <Check size={16} color={category.color} />}
                                 </View>
                                 <View
@@ -118,7 +160,7 @@ export default function CategorySelect({
                                 />
                                 <Text className="text-gray-700" style={styles.categoryModalListName}>{category.category_name}</Text>
                             </TouchableOpacity>
-                        ))}
+                        ))} */}
 
                         {/* Add New Category */}
                         {/* <View className="flex-row items-center py-3 mt-2" style={styles.addNewCategoryContainer}>
@@ -211,6 +253,7 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         paddingVertical: 12,
         borderBottomWidth: 1,           // Tailwind's default width
         borderBottomColor: '#e5e7eb',
+        marginTop: 8,
     },
     categoryModalNoneOptionCheck: {
         width: 24,

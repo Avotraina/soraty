@@ -45,6 +45,7 @@ function AppInner() {
               {/* <Rootstack /> */}
               <Stack
                 initialRouteName="(note)/new-note"
+                // initialRouteName="(category)/category-list"
                 screenOptions={{
                   headerShown: true,
                   headerStyle: {
