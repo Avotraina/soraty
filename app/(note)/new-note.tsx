@@ -56,6 +56,7 @@ export default function NoteDetailScreen() {
 
     const [editorState, setEditorState] = useState<string | null>(null);
     const [plainText, setPlainText] = useState("");
+    const [json, setJson] = useState(null);
 
 
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
@@ -79,7 +80,11 @@ export default function NoteDetailScreen() {
 
     const onSubmit = async (data: any) => {
 
-        addNote({ note_title: data.note_title, color: data.color, note_content: data.note_content, category_id: data.category_id }, {
+        console.log("JSON", json)
+        // return
+
+        // addNote({ note_title: data.note_title, color: data.color, note_content: data.note_content, category_id: data.category_id }, {
+        addNote({ note_title: data.note_title, color: data.color, note_content: JSON.stringify(json), category_id: data.category_id }, {
             onSuccess: async () => {
                 showSnackbar("New Note Added", 'success')
                 reset()
@@ -180,7 +185,7 @@ export default function NoteDetailScreen() {
                     name="note_content"
                     rules={{}}
                     render={({ field: { onChange, value } }) => (
-                        <RichEditor setPlainText={setPlainText} setEditorState={setEditorState} editorBackgroundColor={selectedColor} onChange={onChange} value={value} />
+                        <RichEditor setPlainText={setPlainText} setEditorState={setEditorState} editorBackgroundColor={selectedColor} onChange={onChange} value={value} setJson={setJson}/>
                     )}
                 />
 

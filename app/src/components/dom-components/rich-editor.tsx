@@ -16,6 +16,7 @@ import { $createParagraphNode, $createTextNode, $getRoot } from "lexical";
 import React, { useEffect, useRef, useState } from "react";
 import ExampleTheme from "./example-theme";
 import ToolbarPlugin from "./plugins/toolbar-plugins";
+import TreeViewPlugin from "./plugins/tree-view";
 
 const placeholder = "Enter some rich text...";
 
@@ -104,13 +105,15 @@ export default function RichEditor({
   setEditorState,
   editorBackgroundColor,
   onChange,
-  value
+  value,
+  setJson,
 }: {
   setPlainText: React.Dispatch<React.SetStateAction<string>>;
   setEditorState: React.Dispatch<React.SetStateAction<string | null>>;
   editorBackgroundColor?: string;
   onChange?: (text: string) => void;
   value?: string;
+  setJson: React.Dispatch<React.SetStateAction<any>>
 }) {
 
   const skipNextChange = useRef(false); // at top of RichEditor
@@ -154,6 +157,7 @@ export default function RichEditor({
             <RichTextPlugin
               contentEditable={
                 <ContentEditable
+                  allowFullScreen
                   className="editor-input"
                   aria-placeholder={placeholder}
                   placeholder={
@@ -177,11 +181,17 @@ export default function RichEditor({
                   editorState.read(() => {
                     const root = $getRoot();
                     const textContent = root.getTextContent();
+                    const jsonState = editorState.toJSON(); // for saving to DB
                     setPlainText(textContent);
                     onChange?.(textContent); // notify React Hook Form
-                    setEditorContent(textContent);
+                    setEditorState(JSON.stringify(jsonState));
+                    setJson(jsonState)
+
                   });
-                  setEditorState(JSON.stringify(editorState.toJSON()));
+                  const jsonState = editorState.toJSON(); // for saving to DB
+                  setEditorState(JSON.stringify(jsonState));
+
+                  // setEditorState(JSON.stringify(editorState.toJSON()));
                 }}
                 ignoreHistoryMergeTagChange
                 ignoreSelectionChange
@@ -194,7 +204,7 @@ export default function RichEditor({
             <HistoryPlugin />
             <AutoFocusPlugin />
             <ListPlugin /> {/* <-- add this line */}
-            {/* <TreeViewPlugin /> */}
+            <TreeViewPlugin />
           </div>
         </div>
       </LexicalComposer>

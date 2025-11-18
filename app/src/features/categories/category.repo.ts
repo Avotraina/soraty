@@ -3,7 +3,7 @@ import { v7 as uuidv7 } from 'uuid';
 
 
 export type T_Category = {
-    id?: string;
+    id: string;
     category_name: string;
     is_synced?: number;
     color: string;
@@ -17,6 +17,7 @@ export const CategoryRepo = {
 
     async getAll(): Promise<T_Category[]> {
         return getAll<T_Category>('SELECT * FROM categories ORDER BY id DESC');
+        // return getAll<T_Category | any>('SELECT * FROM categories ORDER BY id DESC');
     },
 
     async getById(id: number): Promise<T_Category | null> {

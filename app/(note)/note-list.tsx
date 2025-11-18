@@ -1,7 +1,11 @@
 import { useRouter } from 'expo-router';
-import { Calendar, Filter, Folder, Plus, Save, Search, Settings, Trash2, X } from 'lucide-react-native';
+import { Folder, Plus, Settings, Trash2 } from 'lucide-react-native';
 import React, { useMemo, useState } from 'react';
-import { FlatList, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import NoteFilters from '../src/components/note/note-filters';
+import RichViewer from '../src/components/shared/components/rich-viewer';
+import { useNotesInfiniteQuery } from '../src/features/notes/note.query';
+import { useDebounce } from '../src/hooks/debounce';
 
 // Define types
 type Note = {
@@ -10,7 +14,12 @@ type Note = {
   content: string;
   color: string;
   createdAt: Date;
-  categoryId?: string
+  categoryId?: string;
+  category_name?: string,
+  category_id?: string;
+  category_color?: string;
+  note_title?: string;
+  note_content?: string;
 };
 
 type Category = {
@@ -30,12 +39,7 @@ const NOTE_COLORS = [
 ];
 
 // Predefined categories
-const CATEGORIES: Category[] = [
-  { id: '1', name: 'Personal', color: '#FFD54F' },
-  { id: '2', name: 'Work', color: '#4FC3F7' },
-  { id: '3', name: 'Ideas', color: '#81C784' },
-  { id: '4', name: 'Shopping', color: '#E57373' },
-];
+
 
 export default function PostItListScreen() {
 
@@ -105,34 +109,13 @@ export default function PostItListScreen() {
     // },
   ]);
 
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedColor, setSelectedColor] = useState('#FFF9C4');
-  const [newNote, setNewNote] = useState({ title: '', content: '' });
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-
   // Search and filter states
   const [searchQuery, setSearchQuery] = useState('');
   const [filterColor, setFilterColor] = useState<string | null>(null);
   const [filterDate, setFilterDate] = useState<string | null>(null);
   const [filterCategory, setFilterCategory] = useState<string | null>(null);
-  const [showFilters, setShowFilters] = useState(false);
+  const debouncedSearch = useDebounce(searchQuery);
 
-  const handleAddNote = () => {
-    if (newNote.title.trim() || newNote.content.trim()) {
-      const note: Note = {
-        id: Date.now().toString(),
-        title: newNote.title,
-        content: newNote.content,
-        color: selectedColor,
-        createdAt: new Date(),
-        categoryId: selectedCategory || undefined,
-      };
-      setNotes([note, ...notes]);
-      setNewNote({ title: '', content: '' });
-      setSelectedCategory(null);
-      setModalVisible(false);
-    }
-  };
 
   const handleDeleteNote = (id: string) => {
     setNotes(notes.filter(note => note.id !== id));
@@ -157,8 +140,38 @@ export default function PostItListScreen() {
     });
   }, [notes, searchQuery, filterColor, filterDate, filterCategory]);
 
+
+  const [filters, setFilters] = useState<
+    {
+      search: string;
+      color?: string | null | undefined;
+      category?: string | null | undefined;
+      startDate?: string | undefined;
+      endDate?: string | undefined;
+    }
+  >({
+    search: "",
+    color: null,
+    category: null,
+    startDate: undefined,
+    endDate: undefined,
+  });
+
+  const { data } = useNotesInfiniteQuery(filters);
+  const noteList = data?.pages[0]?.flatMap((page: any) => page) || []
+
+
+  console.log(filters)
+  // console.log("START DATEs", new Date(filters.startDate as any))
+
+
+  console.log("NOTE LIST", data)
+
+
+
+
   const renderNoteItem = ({ item }: { item: Note }) => {
-    const category = item.categoryId ? CATEGORIES.find(cat => cat.id === item.categoryId) : null;
+    // const category = item.categoryId
 
     return (
       <TouchableOpacity
@@ -169,33 +182,46 @@ export default function PostItListScreen() {
       >
         <View className="flex-row justify-between items-start" style={styles.noteHeaderContainer}>
           <Text className="text-lg font-bold text-gray-800 mb-2" style={styles.noteHeaderTitle} numberOfLines={1}>
-            {item.title || 'Untitled'}
+            {item.note_title || 'Untitled'}
           </Text>
           <TouchableOpacity onPress={() => handleDeleteNote(item.id)} style={styles.noteHeaderIconsContainer}>
             <Trash2 size={18} color="#666" />
           </TouchableOpacity>
         </View>
 
-        {category && (
+        {item.category_id && (
           <View
             className="flex-row items-center self-start rounded-full px-2 py-1 mb-2"
-            style={{ ...styles.noteCategoryContainer, backgroundColor: `${category.color}40` }}
+            style={{ ...styles.noteCategoryContainer, backgroundColor: `${item.category_color}40` }}
           >
-            <Folder size={12} color={category.color} />
+            <Folder size={12} color={item?.category_color} />
             <Text
               className="text-xs font-medium ml-1"
-              style={{ ...styles.noteCategoryText, color: category.color }}
+              style={{ ...styles.noteCategoryText, color: item.category_color }}
             >
-              {category.name}
+              {item.category_name}
             </Text>
           </View>
         )}
 
-        <Text className="text-gray-700 mb-3" numberOfLines={4} style={styles.noteContentText}>
-          {item.content}
-        </Text>
+        {/* <Text className="text-gray-700 mb-3" numberOfLines={4} style={styles.noteContentText}>
+          {item.note_content}
+        </Text> */}
+        {/* <Text className="text-gray-700 mb-3" numberOfLines={4} style={styles.noteContentText}>
+                    <RichViewer value={item.note_content as any} />
+
+        </Text> */}
+
+        {/* <View style={{ marginBottom: 12 }}> */}
+          {/* <RichViewer value={item.note_content} /> */}
+          <RichViewer value={item.note_content as any} />
+        {/* </View> */}
+
+        {/* <RichViewer value={item.note_content} /> */}
+        {/* <Text className="text-gray-700 mb-3" numberOfLines={4} style={styles.noteContentText}>
+        </Text> */}
         <Text className="text-xs text-gray-500 mt-auto" style={styles.noteFooterText}>
-          {item.createdAt.toLocaleDateString()}
+          {/* {item.createdAt.toLocaleDateString()} */}
         </Text>
       </TouchableOpacity>
     )
@@ -218,7 +244,7 @@ export default function PostItListScreen() {
             </TouchableOpacity>
             <TouchableOpacity
               className="p-2 rounded-full bg-blue-100"
-              onPress={() => setModalVisible(true)}
+              // onPress={() => setModalVisible(true)}
               style={{ ...styles.headerButtonContainer }}
             >
               <Plus size={20} color="#4A90E2" />
@@ -228,199 +254,12 @@ export default function PostItListScreen() {
       </View>
 
       {/* Search and Filters */}
-      <View className="bg-white py-3 px-4" style={styles.searchFilterContainer}>
-        {/* Search Bar */}
-        <View className="flex-row items-center bg-gray-100 rounded-xl px-3 mb-3" style={styles.searchContainer}>
-          <Search size={20} color="#999" />
-          <TextInput
-            className="flex-1 py-3 px-2"
-            style={styles.searchInput}
-            placeholder="Search notes..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-          {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <X size={20} color="#999" />
-            </TouchableOpacity>
-          )}
-        </View>
+      <NoteFilters onFiltersChange={setFilters} />
 
-        {/* Filter Button */}
-        <View className="flex-row justify-between items-center" style={styles.filtersContainer}>
-          <TouchableOpacity
-            className="flex-row items-center bg-gray-100 rounded-lg px-3 py-2"
-            style={styles.filterButton}
-            onPress={() => setShowFilters(!showFilters)}
-          >
-            <Filter size={18} color="#666" />
-            <Text className="ml-2 text-gray-700" style={styles.filterButtonText}>Filters</Text>
-          </TouchableOpacity>
-
-          {/* Active Filters Indicator */}
-          {(filterColor || filterDate || filterCategory) && (
-            <View className="flex-row" style={styles.activeFiltersContainer}>
-              {filterColor && (
-                <View
-                  className="flex-row items-center bg-blue-100 rounded-full px-3 py-1 mr-2"
-                  style={styles.activeColorFilterContainer}
-                >
-                  <View
-                    className="w-3 h-3 rounded-full mr-1"
-                    style={{ ...styles.activeColorCircle, backgroundColor: filterColor }}
-
-                  />
-                  <Text className="text-xs text-blue-800" style={styles.activeColorText}>Color</Text>
-                </View>
-              )}
-              {filterCategory && (
-                <View
-                  className="flex-row items-center bg-purple-100 rounded-full px-3 py-1"
-                  style={styles.activeCategoryFilterContainer}
-                >
-                  <Folder size={12} color="#7e22ce" />
-                  <Text className="text-xs text-purple-800 ml-1" style={styles.activeCategoryFilterText}>Category</Text>
-                </View>
-              )}
-              {/* {filterCategory && (
-                <View
-                  className="flex-row items-center bg-blue-100 rounded-full px-3 py-1 mr-2"
-                  style={styles.activeCategoryFilterContainer}
-                >
-                  <View
-                    className="w-3 h-3 rounded-full mr-1"
-                    style={{ ...styles.activeColorCircle, backgroundColor: filterCategory }}
-
-                  />
-                  <Text className="text-xs text-blue-800">Color</Text>
-                </View>
-              )} */}
-              {filterDate && (
-                <View
-                  className="flex-row items-center bg-green-100 rounded-full px-3 py-1"
-                  style={styles.activeDateFilterContainer}
-                >
-                  <Calendar size={12} color="#065f46" />
-                  <Text className="text-xs text-green-800 ml-1" style={styles.activeDateFilterText}>Date</Text>
-                </View>
-              )}
-            </View>
-          )}
-        </View>
-
-        {/* Filter Options */}
-        {showFilters && (
-          <View className="mt-3" style={styles.filtersOptionsContainer}>
-            {/* Color Filters */}
-            <Text className="font-semibold text-gray-700 mb-2" style={styles.colorFilterHeaderText}>Filter by Color:</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-3" style={styles.colorFilterOptionsScrollContainer}>
-              <View className="flex-row" style={{ flexDirection: 'row' }}>
-                <TouchableOpacity
-                  className={`rounded-full px-3 py-1 mr-2 ${!filterColor ? 'bg-blue-500' : 'bg-gray-200'}`}
-                  style={{ ...styles.colorFilterAllOptionContainer, backgroundColor: !filterColor ? '#3b82f6' : '#e5e7eb' }}
-                  onPress={() => setFilterColor(null)}
-                >
-                  <Text className={!filterColor ? 'text-white' : 'text-gray-700'} style={{ color: !filterColor ? '#fff' : '#4b5563' }}>All</Text>
-                </TouchableOpacity>
-
-                {NOTE_COLORS.map((color) => (
-                  <TouchableOpacity
-                    key={color.value}
-                    className={`flex-row items-center rounded-full px-3 py-1 mr-2 ${filterColor === color.value ? 'bg-blue-500' : 'bg-gray-200'}`}
-                    style={{ ...styles.colorFilterOptionsContainer, backgroundColor: filterColor === color.value ? '#3b82f6' : '#e5e7eb' }}
-                    onPress={() => setFilterColor(filterColor === color.value ? null : color.value)}
-                  >
-                    <View
-                      className="w-3 h-3 rounded-full mr-1"
-                      style={{ ...styles.colorFilterOptionsCircle, backgroundColor: color?.value }}
-                    />
-                    <Text className={filterColor === color.value ? 'text-white' : 'text-gray-700'} style={{ color: filterColor === color.value ? '#fff' : '#4b5563' }}>
-                      {color.name}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </ScrollView>
-
-            {/* Category Filters */}
-            <Text className="font-semibold text-gray-700 mb-2" style={styles.categoryFilterHeaderText}>Filter by Category:</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-3" style={styles.categoryFilterOptionsScrollContainer}>
-              <View className="flex-row" style={{ flexDirection: 'row' }}>
-                <TouchableOpacity
-                  className={`rounded-full px-3 py-1 mr-2 ${!filterCategory ? 'bg-blue-500' : 'bg-gray-200'}`}
-                  style={{ ...styles.categoryFilterAllOptionContainer, backgroundColor: !filterCategory ? '#3b82f6' : '#e5e7eb' }}
-                  onPress={() => setFilterCategory(null)}
-                >
-                  <Text className={!filterCategory ? 'text-white' : 'text-gray-700'} style={{ color: !filterCategory ? '#fff' : '#4b5563' }}>All</Text>
-                </TouchableOpacity>
-
-                {CATEGORIES.map((category) => (
-                  <TouchableOpacity
-                    key={category.id}
-                    className={`flex-row items-center rounded-full px-3 py-1 mr-2 ${filterCategory === category.id ? 'bg-blue-500' : 'bg-gray-200'}`}
-                    style={{ ...styles.categoryFilterOptionsContainer, backgroundColor: filterCategory === category.id ? '#3b82f6' : '#e5e7eb' }}
-                    onPress={() => setFilterCategory(filterCategory === category.id ? null : category.id)}
-                  >
-                    <Folder size={12} color={category.color} className="mr-1" style={{ marginRight: 4 }} />
-                    <Text className={filterCategory === category.id ? 'text-white' : 'text-gray-700'} style={{ color: filterCategory === category.id ? '#fff' : '#4b5563' }}>
-                      {category.name}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </ScrollView>
-
-            {/* Date Filters */}
-            <Text className="font-semibold text-gray-700 mb-2" style={styles.dateFilterHeaderText}>Filter by Date:</Text>
-            <View className="flex-row flex-wrap" style={styles.dateFilterHeaderContainer}>
-              <TouchableOpacity
-                className={`rounded-full px-3 py-1 mr-2 mb-2 ${!filterDate ? 'bg-blue-500' : 'bg-gray-200'}`}
-                style={{ ...styles.colorDateAllOptionContainer, backgroundColor: !filterDate ? '#3b82f6' : '#e5e7eb' }}
-                onPress={() => setFilterDate(null)}
-              >
-                <Text className={!filterDate ? 'text-white' : 'text-gray-700'} style={{ color: !filterDate ? '#fff' : '#4b5563' }}>All Dates</Text>
-              </TouchableOpacity>
-
-              {[...new Set(notes.map(note => note.createdAt.toDateString()))]
-                .map(dateStr => new Date(dateStr))
-                .sort((a, b) => b.getTime() - a.getTime())
-                .slice(0, 5)
-                .map((date, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    className={`rounded-full px-3 py-1 mr-2 mb-2 ${filterDate === date.toDateString() ? 'bg-blue-500' : 'bg-gray-200'}`}
-                    style={{ ...styles.dateFilterOptionsContainer, backgroundColor: filterDate === date.toDateString() ? '#3b82f6' : '#e5e7eb' }}
-                    onPress={() => setFilterDate(filterDate === date.toDateString() ? null : date.toDateString())}
-                  >
-                    <Text className={filterDate === date.toDateString() ? 'text-white' : 'text-gray-700'} style={{ color: filterDate === date.toDateString() ? '#fff' : '#4b5563' }}>
-                      {date.toLocaleDateString()}
-                    </Text>
-                  </TouchableOpacity>
-                ))
-              }
-            </View>
-
-            {/* Clear Filters Button */}
-            {(filterColor || filterDate || filterCategory) && (
-              <TouchableOpacity
-                className="self-start bg-red-100 rounded-full px-3 py-1 mt-2"
-                style={styles.clearFilterButton}
-                onPress={() => {
-                  setFilterColor(null);
-                  setFilterDate(null);
-                  setFilterCategory(null);
-                }}
-              >
-                <Text className="text-red-700" style={styles.clearFilterButtonText}>Clear Filters</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        )}
-      </View>
 
       {/* Notes List */}
       <FlatList
-        data={filteredNotes}
+        data={noteList}
         renderItem={renderNoteItem}
         keyExtractor={(item) => item.id}
         numColumns={2}
@@ -437,66 +276,6 @@ export default function PostItListScreen() {
         }
       />
 
-      {/* Add Note Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View className="flex-1 justify-center items-center bg-black/50" style={styles.addNoteModalOverlay}>
-          <View className="bg-white rounded-xl p-6 w-11/12 max-w-md" style={styles.addNoteModalContainer}>
-            <Text className="text-xl font-bold text-gray-800 mb-4" style={styles.addNoteModalHeaderText}>New Note</Text>
-
-            <TextInput
-              className="border border-gray-300 rounded-lg p-3 mb-4"
-              placeholder="Title"
-              value={newNote.title}
-              onChangeText={(text) => setNewNote({ ...newNote, title: text })}
-            />
-
-            <TextInput
-              className="border border-gray-300 rounded-lg p-3 mb-4 h-32"
-              placeholder="Content"
-              multiline
-              textAlignVertical="top"
-              value={newNote.content}
-              onChangeText={(text) => setNewNote({ ...newNote, content: text })}
-            />
-
-            <Text className="font-semibold text-gray-700 mb-2">Color</Text>
-            <View className="flex-row flex-wrap mb-6">
-              {NOTE_COLORS.map((color) => (
-                <TouchableOpacity
-                  key={color.value}
-                  className="w-10 h-10 rounded-full m-1 border-2"
-                  style={{
-                    backgroundColor: color?.value,
-                    borderColor: selectedColor === color.value ? '#4A90E2' : 'transparent'
-                  }}
-                  onPress={() => setSelectedColor(color.value)}
-                />
-              ))}
-            </View>
-
-            <View className="flex-row justify-end">
-              <TouchableOpacity
-                className="bg-gray-200 rounded-lg px-4 py-2 mr-2"
-                onPress={() => setModalVisible(false)}
-              >
-                <Text className="text-gray-700">Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                className="bg-blue-500 rounded-lg px-4 py-2 flex-row items-center"
-                onPress={handleAddNote}
-              >
-                <Save size={16} color="white" className="mr-1" />
-                <Text className="text-white">Save</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 }
@@ -542,190 +321,6 @@ const makeStyles = (colors?: any) => StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
-  },
-  searchFilterContainer: {
-    backgroundColor: 'white',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-    borderRadius: 25,
-    paddingHorizontal: 12,
-    marginBottom: 12,
-  },
-  searchInput: {
-    flex: 1,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    fontSize: 16,
-    color: '#333',
-  },
-  filtersContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  filterButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    gap: 6,
-    justifyContent: 'space-between'
-  },
-  filterButtonText: {
-    fontSize: 14,
-    color: '#333',
-  },
-  activeFiltersContainer: {
-    flexDirection: 'row',
-    // alignItems: 'center',
-    // paddingVertical: 8,
-    // paddingHorizontal: 12,
-    // backgroundColor: '#f0f0f0',
-    // borderRadius: 20,
-  },
-  activeColorFilterContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#dbeafe',
-    borderRadius: 9999,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    marginRight: 8,
-  },
-  activeColorCircle: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: '#4A90E2',
-    marginRight: 8,
-  },
-  activeColorText: {
-    fontSize: 12,
-    color: '#1E40AF',
-  },
-  activeCategoryFilterContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f3e8ff', // Tailwind bg-purple-100
-    borderRadius: 9999,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    marginRight: 8,
-  },
-  activeCategoryFilterText: {
-    fontSize: 12,             // Tailwind 'text-xs'
-    color: '#6b21a8',         // Tailwind 'text-purple-800'
-    marginLeft: 4,            // Tailwind 'ml-1' (0.25rem = 4px)
-  },
-  activeDateFilterContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#d1fae5',
-    borderRadius: 9999,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-  },
-  activeDateFilterText: {
-    fontSize: 12,
-    color: '#065f46',
-    marginLeft: 4,
-  },
-  filtersOptionsContainer: {
-    marginTop: 12,
-  },
-  colorFilterHeaderText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-  },
-  colorFilterOptionsScrollContainer: {
-    marginBottom: 12,
-  },
-  colorFilterAllOptionContainer: {
-    borderRadius: 9999,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    marginRight: 8,
-  },
-  colorFilterOptionsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 9999,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    marginRight: 8,
-  },
-  colorFilterOptionsCircle: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginRight: 8,
-  },
-  categoryFilterHeaderText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-  },
-  categoryFilterOptionsScrollContainer: {
-    marginBottom: 12,
-  },
-  categoryFilterAllOptionContainer: {
-    borderRadius: 9999,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    marginRight: 8,
-  },
-  categoryFilterOptionsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 9999,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    marginRight: 8,
-  },
-  dateFilterHeaderText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-  },
-  dateFilterHeaderContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  colorDateAllOptionContainer: {
-    borderRadius: 9999,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    marginRight: 8,
-    marginBottom: 8,
-  },
-  dateFilterOptionsContainer: {
-    borderRadius: 9999,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    marginRight: 8,
-    marginBottom: 8,
-  },
-  clearFilterButton: {
-    borderRadius: 9999,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    marginTop: 8,
-    backgroundColor: '#fee2e2',
-    alignSelf: 'flex-start',
-  },
-  clearFilterButtonText: {
-    color: '#b91c1c',
   },
   noteListEmptyContainer: {
     flex: 1,

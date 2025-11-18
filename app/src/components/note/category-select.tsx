@@ -115,7 +115,7 @@ export default function CategorySelect({
                         {/* Category List */}
                         <FlatList
                             data={categoryList}
-                            renderItem={({item}) => (
+                            renderItem={({ item }) => (
                                 <TouchableOpacity
                                     key={item.id}
                                     className="flex-row items-center py-3 border-b border-gray-100"

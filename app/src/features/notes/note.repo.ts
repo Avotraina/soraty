@@ -25,6 +25,78 @@ export const NoteRepo = {
         return getAll<T_Note>('SELECT * FROM categories ORDER BY id DESC');
     },
 
+    // Fetch paginated notes with offset and limit
+    // async getPaginated(page: number = 0, limit: number = PAGE_SIZE): Promise<T_Note[]> {
+    async getPaginated(page: number = 0, limit: number = PAGE_SIZE, filters?: {
+        search: string;
+        color?: string | null | undefined;
+        category?: string | null | undefined;
+        startDate?: string | undefined;
+        endDate?: string | undefined;
+    }): Promise<any> {
+        const offset = page * limit;
+        const like = `%${filters?.search}%`
+        console.log("SEARCH", filters?.search)
+
+        // Build dynamic conditions
+        const conditions: string[] = [];
+        const params: any[] = [];
+
+        // Search filter (title OR content OR category name)
+        if (filters?.search) {
+            conditions.push(`(n.note_title LIKE ? OR n.note_content LIKE ? OR c.category_name LIKE ?)`);
+            params.push(like, like, like);
+        }
+
+        // Color filter
+        if (filters?.color) {
+            conditions.push(`n.color = ?`);
+            params.push(filters.color);
+        }
+
+        // Category filter
+        if (filters?.category) {
+            conditions.push(`c.id = ?`);
+            params.push(filters.category);
+        }
+
+        // Date range filter
+        if (filters?.startDate) {
+            conditions.push(`n.created_at >= ?`);
+            params.push(filters.startDate);
+        }
+        if (filters?.endDate) {
+            conditions.push(`n.created_at <= ?`);
+            params.push(filters.endDate);
+        }
+
+        // Combine conditions with AND
+        const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
+        const query = `
+            SELECT
+            n.id,
+            n.note_title,
+            n.note_content,
+            n.color,
+            n.created_at,
+            c.id as category_id,
+            c.category_name,
+            c.color as category_color
+            FROM notes n
+            LEFT JOIN categories c ON n.category_id = c.id
+            ${whereClause}
+            GROUP BY n.id
+            ORDER BY n.created_at DESC
+            LIMIT ? OFFSET ?;
+        `;
+
+        params.push(limit, offset);
+
+        // const like = `%`
+        return getAll<any>(query, params);
+    },
+
     async getById(id: number): Promise<T_Note | null> {
         return getFirst<T_Note>('SELECT * FROM categories WHERE id = ?', id);
     },
@@ -35,7 +107,7 @@ export const NoteRepo = {
 
 
     // Create a new category
-    async create({note_title, note_content, color, category_id}: {note_title: string, note_content: string, color: string, category_id: string | null}): Promise<void> {
+    async create({ note_title, note_content, color, category_id }: { note_title: string, note_content: string, color: string, category_id: string | null }): Promise<void> {
         const id = uuidv7();
         await runQuery('INSERT INTO notes (id, note_title, note_content, color, category_id) VALUES (?, ?, ?, ?, ?)', id, note_title, note_content, color, category_id);
     },

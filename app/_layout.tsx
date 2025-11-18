@@ -44,7 +44,9 @@ function AppInner() {
             <SnackbarProvider>
               {/* <Rootstack /> */}
               <Stack
-                initialRouteName="(note)/new-note"
+                initialRouteName="(note)/note-list"
+                // initialRouteName="(note)/new-note"
+                // initialRouteName="(category)/category-list"
                 // initialRouteName="(category)/category-list"
                 screenOptions={{
                   headerShown: true,
@@ -63,6 +65,8 @@ function AppInner() {
                 <Stack.Screen name="(category)/category-list" options={{ title: 'Categories' }} />
                 <Stack.Screen name="(note)/note-list" options={{ title: 'Notes' }} />
                 <Stack.Screen name="(note)/new-note" options={{ title: 'Notes' }} />
+                <Stack.Screen name="(note)/test-date" options={{ title: 'Notes' }} />
+                {/* <Stack.Screen name="(note)/test-paper-date" options={{ title: 'Notes' }} /> */}
               </Stack>
             </SnackbarProvider>
           </ToastProvider>
