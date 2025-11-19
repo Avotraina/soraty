@@ -1,4 +1,4 @@
-import { getAll, getFirst, runQuery } from "@/src/app/src/database/database";
+import { getAll, getFirst, runQuery } from "@/src/app/database/database";
 import { v7 as uuidv7 } from 'uuid';
 
 

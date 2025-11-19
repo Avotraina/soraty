@@ -1,9 +1,9 @@
+import { useCategoriesInfiniteQuery } from "@/src/app/features/categories/category.query";
+import { useDebounce } from "@/src/app/hooks/debounce";
 import { Check, Folder, X } from "lucide-react-native";
 import { useState } from "react";
 import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Searchbar } from "react-native-paper";
-import { useCategoriesInfiniteQuery } from "../../features/categories/category.query";
-import { useDebounce } from "../../hooks/debounce";
 
 
 

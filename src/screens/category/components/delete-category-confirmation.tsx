@@ -1,7 +1,7 @@
+import { useSnackbar } from "@/src/app/contexts/snackbar-provider";
+import { useDeleteCategoryMutation } from "@/src/app/features/categories/category.query";
 import { CircleAlert, Delete } from "lucide-react-native";
 import { ActivityIndicator, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useSnackbar } from "../../contexts/snackbar-provider";
-import { useDeleteCategoryMutation } from "../../features/categories/category.query";
 
 type EditCategoryModalProps = {
     isVisible: boolean;

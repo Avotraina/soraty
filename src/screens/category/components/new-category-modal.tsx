@@ -1,5 +1,5 @@
-import { useSnackbar } from "@/src/app/src/contexts/snackbar-provider";
-import { useAddCategoryMutation } from "@/src/app/src/features/categories/category.query";
+import { useSnackbar } from "@/src/app/contexts/snackbar-provider";
+import { useAddCategoryMutation } from "@/src/app/features/categories/category.query";
 import { Check, Save } from "lucide-react-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";

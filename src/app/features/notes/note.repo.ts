@@ -1,5 +1,5 @@
 import { v7 as uuidv7 } from 'uuid';
-import { getAll, getFirst, runQuery } from "../../database/database";
+import { getAll, getFirst, runQuery } from "../../../database/database";
 
 
 export const PAGE_SIZE = 20;

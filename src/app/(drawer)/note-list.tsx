@@ -1,11 +1,11 @@
+import { useNotesInfiniteQuery } from '@/src/app/features/notes/note.query';
+import { useDebounce } from '@/src/app/hooks/debounce';
+import NoteFilters from '@/src/screens/note/components/note-filters';
 import { useRouter } from 'expo-router';
 import { Folder, Plus, Settings, Trash2 } from 'lucide-react-native';
 import React, { useMemo, useState } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import NoteFilters from '../src/components/note/note-filters';
-import RichViewer from '../src/components/shared/components/rich-viewer';
-import { useNotesInfiniteQuery } from '../src/features/notes/note.query';
-import { useDebounce } from '../src/hooks/debounce';
+import RichViewer from '../components/rich-viewer';
 
 // Define types
 type Note = {
