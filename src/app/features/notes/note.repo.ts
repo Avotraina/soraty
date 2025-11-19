@@ -16,6 +16,7 @@ export type T_Note = {
         color?: string;
     };
     category_id: string | null;
+    created_at: Date | string;
 };
 
 
@@ -63,11 +64,14 @@ export const NoteRepo = {
         // Date range filter
         if (filters?.startDate) {
             conditions.push(`n.created_at >= ?`);
-            params.push(filters.startDate);
+            // params.push(filters.startDate);
+            params.push((new Date(filters.startDate)).toISOString());
         }
         if (filters?.endDate) {
             conditions.push(`n.created_at <= ?`);
-            params.push(filters.endDate);
+            // params.push(filters.endDate);
+            params.push((new Date(filters.endDate)).toISOString());
+
         }
 
         // Combine conditions with AND
@@ -107,9 +111,9 @@ export const NoteRepo = {
 
 
     // Create a new category
-    async create({ note_title, note_content, color, category_id }: { note_title: string, note_content: string, color: string, category_id: string | null }): Promise<void> {
+    async create({ note_title, note_content, color, category_id, created_at }: { note_title: string, note_content: string, color: string, category_id: string | null, created_at: Date | string }): Promise<void> {
         const id = uuidv7();
-        await runQuery('INSERT INTO notes (id, note_title, note_content, color, category_id) VALUES (?, ?, ?, ?, ?)', id, note_title, note_content, color, category_id);
+        await runQuery('INSERT INTO notes (id, note_title, note_content, color, category_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)', id, note_title, note_content, color, category_id, created_at, created_at);
     },
 
 }

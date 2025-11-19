@@ -35,8 +35,9 @@ export const useNotesInfiniteQuery = (filters: {
 
 export const useAddNoteMutation = () => {
     const qc = useQueryClient();
+    const created_at = new Date().toISOString()
     return useMutation({
-        mutationFn: ({ note_title, note_content, color, category_id }: T_Note) => NoteRepo.create({ note_title, note_content, color, category_id }),
+        mutationFn: ({ note_title, note_content, color, category_id, created_at }: T_Note) => NoteRepo.create({ note_title, note_content, color, category_id, created_at }),
         onSuccess: () => qc.invalidateQueries({ queryKey: ['notes'] }),
         onError: (error) => console.log("ERror", error)
     });

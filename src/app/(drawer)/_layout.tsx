@@ -100,16 +100,16 @@ function MainDrawer() {
             <SnackbarProvider>
               <StatusBar style="inverted" translucent={true} />
               <Drawer screenOptions={{}} defaultStatus="open">
-                <Drawer.Screen name="category-list" options={{
-                  title: 'Categories',
-                  drawerLabel: 'Categories',
-                  headerShown: true,
-                  
-                }} />
                 <Drawer.Screen name="note-list" options={{
                   title: 'Notes',
                   drawerLabel: 'Notes',
                   headerShown: true,
+                }} />
+                <Drawer.Screen name="category-list" options={{
+                  title: 'Categories',
+                  drawerLabel: 'Categories',
+                  headerShown: true,
+
                 }} />
               </Drawer>
             </SnackbarProvider>
