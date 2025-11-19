@@ -6,12 +6,14 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { Drawer } from 'expo-router/drawer';
 import { SQLiteProvider } from "expo-sqlite";
+import { StatusBar } from "expo-status-bar";
 import 'react-native-get-random-values';
 import { PaperProvider } from "react-native-paper";
 import { ToastProvider } from 'react-native-paper-toast';
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-export default function RootLayout() {
+// export default function RootLayout() {
+export default function DrawerLayout() {
   return (
     // <SQLiteProvider databaseName="soraty.db" onInit={migrateDbIfNeeded}>
     //   <QueryClientProvider client={queryClient}>
@@ -22,7 +24,7 @@ export default function RootLayout() {
     <ThemeProvider>
       <SafeAreaProvider>
         {/* <AppInner /> */}
-        <MainDrawer/>
+        <MainDrawer />
       </SafeAreaProvider>
     </ThemeProvider>
     // </Portal.Provider>
@@ -96,10 +98,18 @@ function MainDrawer() {
           {/* <NavigationContainer theme={theme}> */}
           <ToastProvider>
             <SnackbarProvider>
+              <StatusBar style="inverted" translucent={true} />
               <Drawer screenOptions={{}} defaultStatus="open">
-                <Drawer.Screen name="(category)/category-list" options={{
+                <Drawer.Screen name="category-list" options={{
                   title: 'Categories',
-                  drawerLabel: 'Categories'
+                  drawerLabel: 'Categories',
+                  headerShown: true,
+                  
+                }} />
+                <Drawer.Screen name="note-list" options={{
+                  title: 'Notes',
+                  drawerLabel: 'Notes',
+                  headerShown: true,
                 }} />
               </Drawer>
             </SnackbarProvider>

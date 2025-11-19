@@ -1,5 +1,5 @@
-import { useCategoriesQuery } from "@/src/app/src/features/categories/category.query";
-import { T_Category } from "@/src/app/src/features/categories/category.repo";
+import { useCategoriesQuery } from "@/src/app/features/categories/category.query";
+import { T_Category } from "@/src/app/features/categories/category.repo";
 import { Folder } from "lucide-react-native";
 import { useState } from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
