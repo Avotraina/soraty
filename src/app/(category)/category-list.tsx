@@ -1,5 +1,5 @@
-import NewCategoryModal from '@/app/src/components/category/new-category-modal';
-import { useCategoriesInfiniteQuery } from '@/app/src/features/categories/category.query';
+import NewCategoryModal from '@/src/app/src/components/category/new-category-modal';
+import { useCategoriesInfiniteQuery } from '@/src/app/src/features/categories/category.query';
 import { Edit3, Folder, Plus, Trash2, X } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';

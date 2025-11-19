@@ -1,9 +1,10 @@
-import { SnackbarProvider } from "@/app/src/contexts/snackbar-provider";
-import { migrateDbIfNeeded } from "@/app/src/database/migrations/init-database";
-import { ThemeProvider, useThemeContext } from "@/app/src/theme/theme-context";
-import { queryClient } from "@/app/src/utils/query-client";
+import { SnackbarProvider } from "@/src/app/src/contexts/snackbar-provider";
+import { migrateDbIfNeeded } from "@/src/app/src/database/migrations/init-database";
+import { ThemeProvider, useThemeContext } from "@/src/app/src/theme/theme-context";
+import { queryClient } from "@/src/app/src/utils/query-client";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
+import { Drawer } from 'expo-router/drawer';
 import { SQLiteProvider } from "expo-sqlite";
 import 'react-native-get-random-values';
 import { PaperProvider } from "react-native-paper";
@@ -20,7 +21,8 @@ export default function RootLayout() {
     // <Portal.Provider>
     <ThemeProvider>
       <SafeAreaProvider>
-        <AppInner />
+        {/* <AppInner /> */}
+        <MainDrawer/>
       </SafeAreaProvider>
     </ThemeProvider>
     // </Portal.Provider>
@@ -76,6 +78,35 @@ function AppInner() {
 
     </PaperProvider>
 
+  );
+
+}
+
+
+function MainDrawer() {
+
+  const { theme } = useThemeContext();
+
+  return (
+
+    <PaperProvider theme={theme}>
+      <SQLiteProvider databaseName="soraty.db" onInit={migrateDbIfNeeded}>
+        <QueryClientProvider client={queryClient}>
+          {/* <NavigationContainer theme={theme} onReady={() => BootSplash.hide({ fade: true })}> */}
+          {/* <NavigationContainer theme={theme}> */}
+          <ToastProvider>
+            <SnackbarProvider>
+              <Drawer screenOptions={{}} defaultStatus="open">
+                <Drawer.Screen name="(category)/category-list" options={{
+                  title: 'Categories',
+                  drawerLabel: 'Categories'
+                }} />
+              </Drawer>
+            </SnackbarProvider>
+          </ToastProvider>
+        </QueryClientProvider>
+      </SQLiteProvider>
+    </PaperProvider>
   );
 
 }

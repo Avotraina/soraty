@@ -1,19 +1,19 @@
-import RichEditor, { default as Editor } from '@/app/src/components/dom-components/rich-editor';
+import RichEditor, { default as Editor } from '@/src/app/src/components/dom-components/rich-editor';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
-    ArrowLeft,
-    Save
+  ArrowLeft,
+  Save
 } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { Controller, useForm } from 'react-hook-form';
 import { TextInput } from 'react-native-paper';
-import ColorSelect, { COLORS } from '../src/components/color/color-select';
-import ExampleTheme from "../src/components/dom-components/example-theme";
-import CategorySelect from '../src/components/note/category-select';
-import { useSnackbar } from '../src/contexts/snackbar-provider';
-import { useAddNoteMutation } from '../src/features/notes/note.query';
+import ColorSelect, { COLORS } from '../../src/components/color/color-select';
+import ExampleTheme from "../../src/components/dom-components/example-theme";
+import CategorySelect from '../../src/components/note/category-select';
+import { useSnackbar } from '../../src/contexts/snackbar-provider';
+import { useAddNoteMutation } from '../../src/features/notes/note.query';
 
 const placeholder = "Enter some rich text...";
 
@@ -47,7 +47,7 @@ type Category = {
     color: string;
 };
 
-export default function NoteDetailScreen() {
+export default function EditNoteScreen() {
 
     const styles = makeStyles();
 
