@@ -99,7 +99,7 @@ function MainDrawer() {
           <ToastProvider>
             <SnackbarProvider>
               <StatusBar style="inverted" translucent={true} />
-              <Drawer screenOptions={{}} defaultStatus="open">
+              <Drawer screenOptions={{}} defaultStatus="closed">
                 <Drawer.Screen name="note-list" options={{
                   title: 'Notes',
                   drawerLabel: 'Notes',

@@ -1,10 +1,11 @@
 import { useNotesInfiniteQuery } from '@/src/app/features/notes/note.query';
 import { useDebounce } from '@/src/app/hooks/debounce';
-import NoteFilters from '@/src/screens/note/components/note-filters';
-import { useRouter } from 'expo-router';
+import NoteFilters from '@/src/app/screens/note/components/note-filters';
+import { Link, useRouter } from 'expo-router';
 import { Folder, Plus, Settings, Trash2 } from 'lucide-react-native';
 import React, { useMemo, useState } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useTheme } from 'react-native-paper';
 import RichViewer from '../components/rich-viewer';
 
 // Define types
@@ -170,7 +171,7 @@ export default function PostItListScreen() {
 
 
 
-  const renderNoteItem = ({ item }: { item: Note }) => {
+  const renderNoteItem = ({ item, index }: { item: Note, index: number }) => {
     // const category = item.categoryId
 
     return (
@@ -178,7 +179,8 @@ export default function PostItListScreen() {
         className="rounded-xl p-4 m-2 shadow-md"
         activeOpacity={0.9}
         // style={{ backgroundColor: item.color, minHeight: 150 }}
-        style={{ ...styles.noteContainer, backgroundColor: item.color, minHeight: 150 }}
+        // style={{ ...styles.noteContainer, backgroundColor: item.color, minHeight: 150 }}
+        style={[styles.noteContainer, { backgroundColor: item.color, minHeight: 150 }, index >= noteList.length - (noteList.length % 2 || 2) ? { marginBottom: 90 } : {}]}
       >
         <View className="flex-row justify-between items-start" style={styles.noteHeaderContainer}>
           <Text className="text-lg font-bold text-gray-800 mb-2" style={styles.noteHeaderTitle} numberOfLines={1}>
@@ -213,8 +215,8 @@ export default function PostItListScreen() {
         </Text> */}
 
         {/* <View style={{ marginBottom: 12 }}> */}
-          {/* <RichViewer value={item.note_content} /> */}
-          <RichViewer value={item.note_content as any} />
+        {/* <RichViewer value={item.note_content} /> */}
+        <RichViewer value={item.note_content as any} />
         {/* </View> */}
 
         {/* <RichViewer value={item.note_content} /> */}
@@ -276,8 +278,39 @@ export default function PostItListScreen() {
         }
       />
 
+      <FAB />
+
     </View>
   );
+}
+
+function FAB() {
+
+  const { colors } = useTheme();
+
+  const styles = makeStyles(colors);
+
+  return (
+    <Link href="/screens/note/new-note" asChild >
+      <TouchableOpacity style={{
+        position: 'absolute',
+        bottom: 32,
+        right: 32,
+        backgroundColor: colors.primary,
+        width: 56,
+        height: 56,
+        borderRadius: 28,
+        alignItems: 'center',
+        justifyContent: 'center',
+        elevation: 4
+      }}>
+        <Plus size={24} color={colors.background} />
+
+      </TouchableOpacity>
+    </Link>
+  );
+
+
 }
 
 
