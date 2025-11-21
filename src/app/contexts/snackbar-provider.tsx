@@ -96,7 +96,6 @@ export const SnackbarProvider = ({ children }: { children: ReactNode }) => {
     return (
         <SnackbarContext.Provider value={{ showSnackbar }}>
             {children}
-            {/* <Portal> */}
             {visible && (
                 <Animated.View
                     style={{

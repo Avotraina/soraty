@@ -1,6 +1,6 @@
+import NoteFilters from '@/src/app/(drawer)/screens/note/components/note-filters';
 import { useNotesInfiniteQuery } from '@/src/app/features/notes/note.query';
 import { useDebounce } from '@/src/app/hooks/debounce';
-import NoteFilters from '@/src/app/screens/note/components/note-filters';
 import { Link, useRouter } from 'expo-router';
 import { Folder, Plus, Settings, Trash2 } from 'lucide-react-native';
 import React, { useMemo, useState } from 'react';

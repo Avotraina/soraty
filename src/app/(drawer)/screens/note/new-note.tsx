@@ -7,11 +7,11 @@ import {
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
+import CategorySelect from '@/src/app/(drawer)/screens/note/components/category-select';
 import ColorSelect, { COLORS } from '@/src/app/components/color/color-select';
 import ExampleTheme from "@/src/app/components/dom-components/example-theme";
 import { useSnackbar } from '@/src/app/contexts/snackbar-provider';
 import { useAddNoteMutation } from '@/src/app/features/notes/note.query';
-import CategorySelect from '@/src/app/screens/note/components/category-select';
 import { Controller, useForm } from 'react-hook-form';
 import { TextInput } from 'react-native-paper';
 

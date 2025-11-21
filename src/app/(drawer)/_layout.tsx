@@ -1,6 +1,6 @@
 import { SnackbarProvider } from "@/src/app/contexts/snackbar-provider";
 import { migrateDbIfNeeded } from "@/src/app/database/migrations/init-database";
-import { ThemeProvider, useThemeContext } from "@/src/app/theme/theme-context";
+import { useThemeContext } from "@/src/app/theme/theme-context";
 import { queryClient } from "@/src/app/utils/query-client";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
@@ -10,28 +10,45 @@ import { StatusBar } from "expo-status-bar";
 import 'react-native-get-random-values';
 import { PaperProvider } from "react-native-paper";
 import { ToastProvider } from 'react-native-paper-toast';
-import { SafeAreaProvider } from "react-native-safe-area-context";
 
 // export default function RootLayout() {
-export default function DrawerLayout() {
-  return (
-    // <SQLiteProvider databaseName="soraty.db" onInit={migrateDbIfNeeded}>
-    //   <QueryClientProvider client={queryClient}>
-    //     <AppInner />
-    //   </QueryClientProvider>
-    // </SQLiteProvider>
-    // <Portal.Provider>
-    <ThemeProvider>
-      <SafeAreaProvider>
-        {/* <AppInner /> */}
-        <MainDrawer />
-      </SafeAreaProvider>
-    </ThemeProvider>
-    // </Portal.Provider>
+// export default function DrawerLayout() {
+//   return (
+//     // <SQLiteProvider databaseName="soraty.db" onInit={migrateDbIfNeeded}>
+//     //   <QueryClientProvider client={queryClient}>
+//     //     <AppInner />
+//     //   </QueryClientProvider>
+//     // </SQLiteProvider>
+//     // <Portal.Provider>
+//     <ThemeProvider>
+//       <SafeAreaProvider>
+//         {/* <AppInner /> */}
+//         <MainDrawer />
+//       </SafeAreaProvider>
+//     </ThemeProvider>
+//     // </Portal.Provider>
 
+//   );
+// }
+
+
+export default function DrawerLayout() {
+return (
+    <Drawer defaultStatus="closed">
+      <Drawer.Screen name="note-list" options={{
+        title: 'Notes',
+        drawerLabel: 'Notes',
+        headerShown: true,
+      }} />
+      <Drawer.Screen name="category-list" options={{
+        title: 'Categories',
+        drawerLabel: 'Categories',
+        headerShown: true,
+
+      }} />
+    </Drawer>
   );
 }
-
 
 
 function AppInner() {

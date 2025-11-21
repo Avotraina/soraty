@@ -12,9 +12,9 @@ import { Controller, useForm } from 'react-hook-form';
 import { TextInput } from 'react-native-paper';
 // import CategorySelect from '@/src/app/components/note/category-select';
 import ExampleTheme from "@//src/app/components/dom-components/example-theme";
+import CategorySelect from '@/src/app/(drawer)/screens/note/components/category-select';
 import { useSnackbar } from '@/src/app/contexts/snackbar-provider';
 import { useAddNoteMutation } from '@/src/app/features/notes/note.query';
-import CategorySelect from '@/src/app/screens/note/components/category-select';
 
 const placeholder = "Enter some rich text...";
 
