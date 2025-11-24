@@ -1,4 +1,5 @@
-import NoteFilters from '@/src/app/(drawer)/screens/note/components/note-filters';
+import NoteFilters from '@/src/app/components/note/note-filters';
+import RichViewer from '@/src/app/components/rich-viewer';
 import { useNotesInfiniteQuery } from '@/src/app/features/notes/note.query';
 import { useDebounce } from '@/src/app/hooks/debounce';
 import { Link, useRouter } from 'expo-router';
@@ -6,7 +7,7 @@ import { Folder, Plus, Settings, Trash2 } from 'lucide-react-native';
 import React, { useMemo, useState } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from 'react-native-paper';
-import RichViewer from '../components/rich-viewer';
+// import RichViewer from '../components/rich-viewer';
 
 // Define types
 type Note = {

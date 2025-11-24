@@ -1,11 +1,11 @@
-import DeleteCategoryConfirmation from '@/src/app/(drawer)/screens/category/components/delete-category-confirmation';
-import NewCategoryModal from '@/src/app/(drawer)/screens/category/components/new-category-modal';
+import DeleteCategoryConfirmation from '@/src/app/components/category/delete-category-confirmation';
+import NewCategoryModal from '@/src/app/components/category/new-category-modal';
 import { useCategoriesInfiniteQuery } from '@/src/app/features/categories/category.query';
 import { useDebounce } from '@/src/app/hooks/debounce';
 import { Edit3, Folder, Plus, Trash2, X } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import EditCategoryModal from './screens/category/components/edit-category-modal';
+import EditCategoryModal from '../../../components/category/edit-category-modal';
 
 type Category = {
     id: string;

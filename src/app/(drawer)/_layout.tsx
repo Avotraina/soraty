@@ -1,15 +1,5 @@
-import { SnackbarProvider } from "@/src/app/contexts/snackbar-provider";
-import { migrateDbIfNeeded } from "@/src/app/database/migrations/init-database";
-import { useThemeContext } from "@/src/app/theme/theme-context";
-import { queryClient } from "@/src/app/utils/query-client";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { Stack } from "expo-router";
 import { Drawer } from 'expo-router/drawer';
-import { SQLiteProvider } from "expo-sqlite";
-import { StatusBar } from "expo-status-bar";
 import 'react-native-get-random-values';
-import { PaperProvider } from "react-native-paper";
-import { ToastProvider } from 'react-native-paper-toast';
 
 // export default function RootLayout() {
 // export default function DrawerLayout() {
@@ -35,12 +25,24 @@ import { ToastProvider } from 'react-native-paper-toast';
 export default function DrawerLayout() {
 return (
     <Drawer defaultStatus="closed">
-      <Drawer.Screen name="note-list" options={{
+      <Drawer.Screen name="screens/note/note-list" options={{
         title: 'Notes',
         drawerLabel: 'Notes',
         headerShown: true,
       }} />
-      <Drawer.Screen name="category-list" options={{
+      <Drawer.Screen name="screens/note/new-note" options={{
+        title: 'New note',
+        drawerLabel: 'New note',
+        headerShown: true,
+        drawerItemStyle: { display: 'none'}
+      }} />
+      <Drawer.Screen name="screens/note/[note_id]" options={{
+        title: 'New note',
+        drawerLabel: 'New note',
+        headerShown: true,
+        drawerItemStyle: { display: 'none'}
+      }} />
+      <Drawer.Screen name="screens/category/category-list" options={{
         title: 'Categories',
         drawerLabel: 'Categories',
         headerShown: true,
@@ -51,89 +53,86 @@ return (
 }
 
 
-function AppInner() {
-  const { theme } = useThemeContext();
+// function AppInner() {
+//   const { theme } = useThemeContext();
 
-  return (
+//   return (
 
-    <PaperProvider theme={theme}>
-      <SQLiteProvider databaseName="soraty.db" onInit={migrateDbIfNeeded}>
-        <QueryClientProvider client={queryClient}>
-          {/* <NavigationContainer theme={theme} onReady={() => BootSplash.hide({ fade: true })}> */}
-          {/* <NavigationContainer theme={theme}> */}
-          <ToastProvider>
-            <SnackbarProvider>
-              {/* <Rootstack /> */}
-              <Stack
-                initialRouteName="(note)/note-list"
-                // initialRouteName="(note)/new-note"
-                // initialRouteName="(category)/category-list"
-                // initialRouteName="(category)/category-list"
-                screenOptions={{
-                  headerShown: true,
-                  headerStyle: {
-                    backgroundColor: '#f4511e',
-                  },
-                  headerTintColor: '#fff',
-                  headerTitleStyle: {
-                    fontWeight: 'bold',
-                  },
-                }}>
-                {/* Optionally configure static options outside the route.*/}
-                <Stack.Screen name="old-list" options={{ title: 'List' }} />
-                <Stack.Screen name="list" options={{ title: 'List' }} />
-                <Stack.Screen name="new" options={{ title: 'New' }} />
-                <Stack.Screen name="(category)/category-list" options={{ title: 'Categories' }} />
-                <Stack.Screen name="(note)/note-list" options={{ title: 'Notes' }} />
-                <Stack.Screen name="(note)/new-note" options={{ title: 'Notes' }} />
-                <Stack.Screen name="(note)/test-date" options={{ title: 'Notes' }} />
-                {/* <Stack.Screen name="(note)/test-paper-date" options={{ title: 'Notes' }} /> */}
-              </Stack>
-            </SnackbarProvider>
-          </ToastProvider>
-          {/* </NavigationContainer> */}
-        </QueryClientProvider>
-      </SQLiteProvider>
+//     <PaperProvider theme={theme}>
+//       <SQLiteProvider databaseName="soraty.db" onInit={migrateDbIfNeeded}>
+//         <QueryClientProvider client={queryClient}>
+//           {/* <NavigationContainer theme={theme} onReady={() => BootSplash.hide({ fade: true })}> */}
+//           {/* <NavigationContainer theme={theme}> */}
+//           <ToastProvider>
+//             <SnackbarProvider>
+//               {/* <Rootstack /> */}
+//               <Stack
+//                 initialRouteName="(note)/note-list"
+//                 // initialRouteName="(note)/new-note"
+//                 // initialRouteName="(category)/category-list"
+//                 // initialRouteName="(category)/category-list"
+//                 screenOptions={{
+//                   headerShown: true,
+//                   headerStyle: {
+//                     backgroundColor: '#f4511e',
+//                   },
+//                   headerTintColor: '#fff',
+//                   headerTitleStyle: {
+//                     fontWeight: 'bold',
+//                   },
+//                 }}>
+//                 {/* Optionally configure static options outside the route.*/}
+//                 <Stack.Screen name="old-list" options={{ title: 'List' }} />
+//                 <Stack.Screen name="list" options={{ title: 'List' }} />
+//                 <Stack.Screen name="new" options={{ title: 'New' }} />
+//                 <Stack.Screen name="(category)/category-list" options={{ title: 'Categories' }} />
+//                 <Stack.Screen name="(note)/note-list" options={{ title: 'Notes' }} />
+//                 <Stack.Screen name="(note)/new-note" options={{ title: 'Notes' }} />
+//                 <Stack.Screen name="(note)/test-date" options={{ title: 'Notes' }} />
+//                 {/* <Stack.Screen name="(note)/test-paper-date" options={{ title: 'Notes' }} /> */}
+//               </Stack>
+//             </SnackbarProvider>
+//           </ToastProvider>
+//           {/* </NavigationContainer> */}
+//         </QueryClientProvider>
+//       </SQLiteProvider>
 
-    </PaperProvider>
+//     </PaperProvider>
 
-  );
+//   );
 
-}
+// }
 
 
-function MainDrawer() {
+// function MainDrawer() {
 
-  const { theme } = useThemeContext();
+//   const { theme } = useThemeContext();
 
-  return (
+//   return (
 
-    <PaperProvider theme={theme}>
-      <SQLiteProvider databaseName="soraty.db" onInit={migrateDbIfNeeded}>
-        <QueryClientProvider client={queryClient}>
-          {/* <NavigationContainer theme={theme} onReady={() => BootSplash.hide({ fade: true })}> */}
-          {/* <NavigationContainer theme={theme}> */}
-          <ToastProvider>
-            <SnackbarProvider>
-              <StatusBar style="inverted" translucent={true} />
-              <Drawer screenOptions={{}} defaultStatus="closed">
-                <Drawer.Screen name="note-list" options={{
-                  title: 'Notes',
-                  drawerLabel: 'Notes',
-                  headerShown: true,
-                }} />
-                <Drawer.Screen name="category-list" options={{
-                  title: 'Categories',
-                  drawerLabel: 'Categories',
-                  headerShown: true,
+//     <PaperProvider theme={theme}>
+//       <SQLiteProvider databaseName="soraty.db" onInit={migrateDbIfNeeded}>
+//         <QueryClientProvider client={queryClient}>
+//           <ToastProvider>
+//             <SnackbarProvider>
+//               <Drawer defaultStatus="closed">
+//                 <Drawer.Screen name="screens/note/note-list" options={{
+//                   title: 'Notes',
+//                   drawerLabel: 'Notes',
+//                   headerShown: true,
+//                 }} />
+//                 <Drawer.Screen name="category-list" options={{
+//                   title: 'Categories',
+//                   drawerLabel: 'Categoriess',
+//                   headerShown: true,
 
-                }} />
-              </Drawer>
-            </SnackbarProvider>
-          </ToastProvider>
-        </QueryClientProvider>
-      </SQLiteProvider>
-    </PaperProvider>
-  );
+//                 }} />
+//               </Drawer>
+//             </SnackbarProvider>
+//           </ToastProvider>
+//         </QueryClientProvider>
+//       </SQLiteProvider>
+//     </PaperProvider>
+//   );
 
-}
+// }
