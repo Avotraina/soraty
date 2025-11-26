@@ -5,11 +5,12 @@ import {
     Save
 } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import ColorSelect, { COLORS } from '@/src/app/components/color/color-select';
 import ExampleTheme from "@/src/app/components/dom-components/example-theme";
 import CategorySelect from '@/src/app/components/note/category-select';
+import NoteReminderTimeSelect from '@/src/app/components/note/reminder/note-reminder-select';
 import { useSnackbar } from '@/src/app/contexts/snackbar-provider';
 import { useAddNoteMutation } from '@/src/app/features/notes/note.query';
 import { Controller, useForm } from 'react-hook-form';
@@ -61,6 +62,8 @@ export default function NoteDetailScreen() {
 
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
     const [selectedColor, setSelectedColor] = useState<string | undefined>(COLORS[0]);
+    const [reminderDate, setReminderDate] = useState<string | undefined | any>(undefined);
+    const [reminderTime, setReminderTime] = useState<string | undefined | any>(undefined);
 
 
     const { showSnackbar } = useSnackbar();
@@ -72,7 +75,8 @@ export default function NoteDetailScreen() {
             note_title: "New note",
             note_content: "",
             category_id: null,
-            color: ""
+            color: "",
+            reminder: null,
         }
     })
 
@@ -80,20 +84,22 @@ export default function NoteDetailScreen() {
 
     const onSubmit = async (data: any) => {
 
+        console.log("DATA", data)
+
         console.log("JSON", json)
         // return
 
         // addNote({ note_title: data.note_title, color: data.color, note_content: data.note_content, category_id: data.category_id }, {
-        addNote({ note_title: data.note_title, color: data.color, note_content: JSON.stringify(json), category_id: data.category_id }, {
-            onSuccess: async () => {
-                showSnackbar("New Note Added", 'success')
-                reset()
-            },
-            onError: async (error) => {
-                console.log("Error", error)
-                showSnackbar("Failed to add new note, try again", "error")
-            }
-        })
+        // addNote({ note_title: data.note_title, color: data.color, note_content: JSON.stringify(json), category_id: data.category_id }, {
+        //     onSuccess: async () => {
+        //         showSnackbar("New Note Added", 'success')
+        //         reset()
+        //     },
+        //     onError: async (error) => {
+        //         console.log("Error", error)
+        //         showSnackbar("Failed to add new note, try again", "error")
+        //     }
+        // })
     }
 
 
@@ -178,6 +184,22 @@ export default function NoteDetailScreen() {
             {/* <CategorySelect currentCategory={selectedCategory} onSelectCategory={setSelectedCategory} /> */}
 
 
+            {/* Date and Time Selection */}
+            <Controller
+                control={control}
+                name="reminder"
+                rules={{}}
+                render={({ field: { onChange, value } }) => (
+                    <NoteReminderTimeSelect currentDate={reminderDate} currentTime={reminderTime} onSelectDateTime={(date, time) => {
+                        setReminderDate(date);
+                        setReminderTime(time);
+                        onChange({ date, time });
+                    }} />
+
+                )}
+
+            />
+
             <View style={{ backgroundColor: 'black', borderRadius: 12, overflow: 'hidden', flex: 1 }}>
 
                 <Controller
@@ -185,7 +207,7 @@ export default function NoteDetailScreen() {
                     name="note_content"
                     rules={{}}
                     render={({ field: { onChange, value } }) => (
-                        <RichEditor setPlainText={setPlainText} setEditorState={setEditorState} editorBackgroundColor={selectedColor} onChange={onChange} value={value} setJson={setJson}/>
+                        <RichEditor setPlainText={setPlainText} setEditorState={setEditorState} editorBackgroundColor={selectedColor} onChange={onChange} value={value} setJson={setJson} />
                     )}
                 />
 
@@ -193,16 +215,16 @@ export default function NoteDetailScreen() {
             </View>
 
             {/* Footer with metadata */}
-            <View className="bg-white py-3 px-4 border-t border-gray-200" style={styles.footerContainer}>
+            {/* <View className="bg-white py-3 px-4 border-t border-gray-200" style={styles.footerContainer}>
                 <View className="flex-row justify-between" style={styles.footer}>
                     <Text className="text-gray-500 text-sm" style={styles.createdAtText}>
-                        {/* Created: {new Date(note.createdAt).toLocaleDateString()} */}
+                        Created: {new Date(note.createdAt).toLocaleDateString()}
                     </Text>
                     <Text className="text-gray-500 text-sm" style={styles.updatedAtText}>
-                        {/* Last edited: {new Date(note.updatedAt).toLocaleDateString()} */}
+                        Last edited: {new Date(note.updatedAt).toLocaleDateString()}
                     </Text>
                 </View>
-            </View>
+            </View> */}
 
         </View>
     );
@@ -218,7 +240,7 @@ const makeStyles = (colors?: any) => StyleSheet.create({
     },
     headerContainer: {
         backgroundColor: '#3b82f6',
-        paddingVertical: 16,
+        paddingVertical: 8,
         paddingHorizontal: 16,
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
     },

@@ -16,7 +16,7 @@ export type T_Note = {
         color?: string;
     };
     category_id: string | null;
-    created_at: Date | string;
+    created_at?: Date | string;
 };
 
 
@@ -114,6 +114,7 @@ export const NoteRepo = {
     async create({ note_title, note_content, color, category_id, created_at }: { note_title: string, note_content: string, color: string, category_id: string | null, created_at: Date | string }): Promise<void> {
         const id = uuidv7();
         await runQuery('INSERT INTO notes (id, note_title, note_content, color, category_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)', id, note_title, note_content, color, category_id, created_at, created_at);
+        // await runQuery('INSERT INTO notes (id, note_title, note_content, color, category_id) VALUES (?, ?, ?, ?, ?)', id, note_title, note_content, color, category_id);
     },
 
 }

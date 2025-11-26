@@ -16,7 +16,6 @@ import { $createParagraphNode, $createTextNode, $getRoot } from "lexical";
 import React, { useEffect, useRef, useState } from "react";
 import ExampleTheme from "./example-theme";
 import ToolbarPlugin from "./plugins/toolbar-plugins";
-import TreeViewPlugin from "./plugins/tree-view";
 
 const placeholder = "Enter some rich text...";
 
@@ -203,8 +202,8 @@ export default function RichEditor({
             {/* <InitializeValuePlugin value={value} /> */}
             <HistoryPlugin />
             <AutoFocusPlugin />
-            <ListPlugin /> {/* <-- add this line */}
-            <TreeViewPlugin />
+            <ListPlugin /> 
+            {/* <TreeViewPlugin /> */}
           </div>
         </div>
       </LexicalComposer>

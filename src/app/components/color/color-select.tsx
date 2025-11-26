@@ -93,8 +93,8 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         gap: 12,
     },
     colorCircle: {
-        width: 40,
-        height: 40,
+        width: 28,
+        height: 28,
         borderRadius: 20,
         borderWidth: 0.8,
     },

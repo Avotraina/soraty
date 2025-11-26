@@ -4,7 +4,7 @@ import { useNotesInfiniteQuery } from '@/src/app/features/notes/note.query';
 import { useDebounce } from '@/src/app/hooks/debounce';
 import { Link, useRouter } from 'expo-router';
 import { Folder, Plus, Settings, Trash2 } from 'lucide-react-native';
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from 'react-native-paper';
 // import RichViewer from '../components/rich-viewer';
@@ -48,68 +48,68 @@ export default function PostItListScreen() {
   const styles = makeStyles();
 
   const router = useRouter();
-  const [notes, setNotes] = useState<Note[]>([
-    {
-      id: '1',
-      title: 'Meeting Notes',
-      content: 'Discuss project timeline with team',
-      color: '#FFF9C4',
-      createdAt: new Date(2023, 5, 15),
-      categoryId: '2',
-    },
-    {
-      id: '2',
-      title: 'Shopping List',
-      content: 'Milk, Eggs, Bread, Fruits',
-      color: '#BBDEFB',
-      createdAt: new Date(2023, 5, 12),
-      categoryId: '4',
-    },
-    {
-      id: '3',
-      title: 'Ideas',
-      content: 'New app features to implement',
-      color: '#C8E6C9',
-      createdAt: new Date(2023, 5, 10),
-      categoryId: '3',
-    },
-    {
-      id: '4',
-      title: 'Reminders',
-      content: 'Call mom on Sunday',
-      color: '#F8BBD0',
-      createdAt: new Date(2023, 5, 18),
-      categoryId: '1',
-    },
-    {
-      id: '5',
-      title: 'Reminders',
-      content: 'Call mom on Sunday',
-      color: '#F8BBD0',
-      createdAt: new Date(2023, 5, 18),
-    },
-    {
-      id: '6',
-      title: 'Reminders',
-      content: 'Call mom on Sunday',
-      color: '#F8BBD0',
-      createdAt: new Date(2023, 5, 18),
-    },
-    {
-      id: '7',
-      title: 'Reminders',
-      content: 'Call mom on Sunday',
-      color: '#F8BBD0',
-      createdAt: new Date(2023, 5, 18),
-    },
-    // {
-    //   id: '8',
-    //   title: 'Reminders',
-    //   content: 'Call mom on Sunday',
-    //   color: '#F8BBD0',
-    //   createdAt: new Date(2023, 5, 18),
-    // },
-  ]);
+  // const [notes, setNotes] = useState<Note[]>([
+  //   {
+  //     id: '1',
+  //     title: 'Meeting Notes',
+  //     content: 'Discuss project timeline with team',
+  //     color: '#FFF9C4',
+  //     createdAt: new Date(2023, 5, 15),
+  //     categoryId: '2',
+  //   },
+  //   {
+  //     id: '2',
+  //     title: 'Shopping List',
+  //     content: 'Milk, Eggs, Bread, Fruits',
+  //     color: '#BBDEFB',
+  //     createdAt: new Date(2023, 5, 12),
+  //     categoryId: '4',
+  //   },
+  //   {
+  //     id: '3',
+  //     title: 'Ideas',
+  //     content: 'New app features to implement',
+  //     color: '#C8E6C9',
+  //     createdAt: new Date(2023, 5, 10),
+  //     categoryId: '3',
+  //   },
+  //   {
+  //     id: '4',
+  //     title: 'Reminders',
+  //     content: 'Call mom on Sunday',
+  //     color: '#F8BBD0',
+  //     createdAt: new Date(2023, 5, 18),
+  //     categoryId: '1',
+  //   },
+  //   {
+  //     id: '5',
+  //     title: 'Reminders',
+  //     content: 'Call mom on Sunday',
+  //     color: '#F8BBD0',
+  //     createdAt: new Date(2023, 5, 18),
+  //   },
+  //   {
+  //     id: '6',
+  //     title: 'Reminders',
+  //     content: 'Call mom on Sunday',
+  //     color: '#F8BBD0',
+  //     createdAt: new Date(2023, 5, 18),
+  //   },
+  //   {
+  //     id: '7',
+  //     title: 'Reminders',
+  //     content: 'Call mom on Sunday',
+  //     color: '#F8BBD0',
+  //     createdAt: new Date(2023, 5, 18),
+  //   },
+  //   // {
+  //   //   id: '8',
+  //   //   title: 'Reminders',
+  //   //   content: 'Call mom on Sunday',
+  //   //   color: '#F8BBD0',
+  //   //   createdAt: new Date(2023, 5, 18),
+  //   // },
+  // ]);
 
   // Search and filter states
   const [searchQuery, setSearchQuery] = useState('');
@@ -119,28 +119,28 @@ export default function PostItListScreen() {
   const debouncedSearch = useDebounce(searchQuery);
 
 
-  const handleDeleteNote = (id: string) => {
-    setNotes(notes.filter(note => note.id !== id));
-  };
+  // const handleDeleteNote = (id: string) => {
+  //   setNotes(notes.filter(note => note.id !== id));
+  // };
 
   // Filter and search notes
-  const filteredNotes = useMemo(() => {
-    return notes.filter(note => {
-      const matchesSearch =
-        note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        note.content.toLowerCase().includes(searchQuery.toLowerCase());
+  // const filteredNotes = useMemo(() => {
+  //   return notes.filter(note => {
+  //     const matchesSearch =
+  //       note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  //       note.content.toLowerCase().includes(searchQuery.toLowerCase());
 
-      const matchesColor = filterColor ? note.color === filterColor : true;
+  //     const matchesColor = filterColor ? note.color === filterColor : true;
 
-      const matchesDate = filterDate ?
-        note.createdAt.toDateString() === new Date(filterDate).toDateString() :
-        true;
+  //     const matchesDate = filterDate ?
+  //       note.createdAt.toDateString() === new Date(filterDate).toDateString() :
+  //       true;
 
-      const matchesCategory = filterCategory ? note.categoryId === filterCategory : true;
+  //     const matchesCategory = filterCategory ? note.categoryId === filterCategory : true;
 
-      return matchesSearch && matchesColor && matchesDate && matchesCategory;
-    });
-  }, [notes, searchQuery, filterColor, filterDate, filterCategory]);
+  //     return matchesSearch && matchesColor && matchesDate && matchesCategory;
+  //   });
+  // }, [notes, searchQuery, filterColor, filterDate, filterCategory]);
 
 
   const [filters, setFilters] = useState<
@@ -187,7 +187,7 @@ export default function PostItListScreen() {
           <Text className="text-lg font-bold text-gray-800 mb-2" style={styles.noteHeaderTitle} numberOfLines={1}>
             {item.note_title || 'Untitled'}
           </Text>
-          <TouchableOpacity onPress={() => handleDeleteNote(item.id)} style={styles.noteHeaderIconsContainer}>
+          <TouchableOpacity style={styles.noteHeaderIconsContainer}>
             <Trash2 size={18} color="#666" />
           </TouchableOpacity>
         </View>

@@ -57,6 +57,18 @@ export async function migrateDbIfNeeded(db: SQLite.SQLiteDatabase) {
           FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
           FOREIGN KEY (color_id) REFERENCES colors(id) ON DELETE SET NULL
         );
+
+        -- REMINDERS TABLE
+        CREATE TABLE IF NOT EXISTS reminders (
+          id TEXT PRIMARY KEY,
+          note_id TEXT,
+          reminder_date TEXT,
+          reminder_time TEXT,
+          is_synced INTEGER DEFAULT 0,
+          created_at TEXT DEFAULT (datetime('now')),
+          updated_at TEXT DEFAULT (datetime('now')),
+          FOREIGN KEY (note_id) REFERENCES notes(id) ON DELETE SET NULL
+        );
         
         `);
       // -- NOTES TABLE
