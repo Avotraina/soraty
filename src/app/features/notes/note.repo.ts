@@ -17,6 +17,8 @@ export type T_Note = {
     };
     category_id: string | null;
     created_at?: Date | string;
+    reminder_date?: string | null;
+    reminder_time?: string | null;
 };
 
 
@@ -110,10 +112,15 @@ export const NoteRepo = {
     },
 
 
-    // Create a new category
-    async create({ note_title, note_content, color, category_id, created_at }: { note_title: string, note_content: string, color: string, category_id: string | null, created_at: Date | string }): Promise<void> {
+    // Create a new note
+    async create({ note_title, note_content, color, category_id, created_at, reminder_date, reminder_time }: { note_title: string, note_content: string, color: string, category_id: string | null, created_at: Date | string, reminder_date?: string | null, reminder_time?: string | null }): Promise<void> {
         const id = uuidv7();
         await runQuery('INSERT INTO notes (id, note_title, note_content, color, category_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)', id, note_title, note_content, color, category_id, created_at, created_at);
+
+        if (reminder_date && reminder_time) {
+            await runQuery('INSERT INTO reminders (id, note_id, reminder_date, reminder_time, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)', id, id, reminder_date ?? null, reminder_time ?? null, created_at, created_at);
+        }
+        // console.log("Created note", note, id, note.changes);
         // await runQuery('INSERT INTO notes (id, note_title, note_content, color, category_id) VALUES (?, ?, ?, ?, ?)', id, note_title, note_content, color, category_id);
     },
 

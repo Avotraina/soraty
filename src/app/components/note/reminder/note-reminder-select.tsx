@@ -4,41 +4,80 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import ReminderDateSelect from "./date-select";
 import ReminderTimeSelect from "./time-select";
 
+// type ReminderProps = {
+//     currentDate?: string | null | any;
+//     currentTime?: string | null | any;
+//     onSelectDateTime: (date: string | null | undefined, time: string | null | undefined) => void;
+//     // value?: string;
+// }
+
+type ReminderValue = {
+    date?: string | null;
+    time?: string | null;
+};
+
 type ReminderProps = {
-    currentDate?: string | null | any;
-    currentTime?: string | null | any;
-    onSelectDateTime: (date: string | null | undefined, time: string | null | undefined) => void;
-    // value?: string;
-}
+    value: ReminderValue;                                // controlled
+    onChange: (val: ReminderValue) => void; 
+    submitCount: number;
+    error?: any;
+    isSubmitSuccessful?: boolean;
+};
 
-export default function NoteReminderTimeSelect({ currentDate, currentTime, onSelectDateTime }: ReminderProps) {
-
+// export default function NoteReminderTimeSelect({ currentDate, currentTime, onSelectDateTime }: ReminderProps) {
+export default function NoteReminderTimeSelect({ value, onChange, submitCount, error, isSubmitSuccessful }: ReminderProps) {
     const styles = makeStyles();
 
     const [showReminder, setShowReminder] = useState(false);
     const [date, setDate] = useState<string | undefined | null | any>(undefined);
     const [time, setTime] = useState<string | undefined | null | any>(undefined);
 
-    const handleDateTimeSelect = (type: 'date' | 'time', value: string | any | null) => {
+    // const [hasError, setHasError] = useState(false);
 
-        if (type === 'date') {
-            setDate(value);
-            onSelectDateTime(value, time)
-        } else if (type === 'time') {
-            setTime(value);
-            onSelectDateTime(date, value)
+    // const hasError = submitCount > 0 && Boolean(error);
+    const hasError = !isSubmitSuccessful && Boolean(error);
+
+    // useEffect(() => {
+    //     Alert.alert("Submit Count Changed", `submitCount: ${submitCount}, error: ${error ? JSON.stringify(error) : 'none'}`);
+    //     if (submitCount > 0 && error) {
+    //         setHasError(true);
+    //     } else {
+    //         setHasError(false);
+    //     }
+    // }, []);
+
+    const isDateMissing = hasError && value?.time && !value?.date;
+    const isTimeMissing = hasError && value?.date && !value?.time;
+
+    const handleDateTimeSelect = (type: 'date' | 'time', selected: string | any | null) => {
+
+        const updated = {
+            ...value,
+            [type]: selected,
         }
+        onChange(updated);
+
+        // if (type === 'date') {
+        //     setDate(value);
+        //     onSelectDateTime(value, time)
+        // } else if (type === 'time') {
+        //     setTime(value);
+        //     onSelectDateTime(date, value)
+        // }
         // setDate(selectedDate);
         // setTime(selectedTime);
         // onSelectDateTime?.(selectedDate, selectedTime);
     }
 
     const handleClearReminder = () => {
+        onChange({ date: null, time: null });
         // Alert.alert("")
-        setDate(undefined);
-        setTime(undefined);
-        onSelectDateTime(undefined, undefined);
+        // setDate(undefined);
+        // setTime(undefined);
+        // onSelectDateTime(undefined, undefined);
     }
+
+    const hasReminder = Boolean(value?.date || value?.time);
 
     return (
         <>
@@ -46,10 +85,15 @@ export default function NoteReminderTimeSelect({ currentDate, currentTime, onSel
             <View className="flex-row justify-between items-center" style={[styles.reminderContainer, { paddingVertical: showReminder ? 0 : 12 }]}>
                 <TouchableOpacity
                     className="flex-row items-center bg-gray-100 rounded-lg px-3 py-2"
-                    style={styles.reminderButton}
+                    style={[styles.reminderButton, hasError ? { backgroundColor: "#fee2e2" } : {},]}
                     onPress={() => setShowReminder(!showReminder)}
                 >
-                    <BellRing size={18} color={(currentDate || currentTime) ? '#1E40AF' : '#666'} fill={(currentDate || currentTime) ? '#1E40AF' : 'transparent'} />
+                    {/* <BellRing size={18} color={(currentDate || currentTime) ? '#1E40AF' : '#666'} fill={(currentDate || currentTime) ? '#1E40AF' : 'transparent'} /> */}
+                    <BellRing
+                        size={18}
+                        color={hasError ? "#dc2626" : hasReminder ? "#1E40AF" : "#666"}
+                        fill={hasError ? "#dc2626" : hasReminder ? "#1E40AF" : "transparent"}
+                    />
                     <Text className="ml-2 text-gray-700" style={styles.reminderButtonText}>Reminder</Text>
                 </TouchableOpacity>
 
@@ -62,7 +106,7 @@ export default function NoteReminderTimeSelect({ currentDate, currentTime, onSel
                     <Text className="ml-2 text-gray-700" style={styles.reminderButtonText}>Clear</Text>
                 </TouchableOpacity> */}
 
-                {(currentDate || currentTime) && (
+                {(hasReminder) && (
                     <TouchableOpacity
                         className="flex-row items-center bg-gray-100 rounded-lg px-3 py-2"
                         style={styles.clearButton}
@@ -82,8 +126,8 @@ export default function NoteReminderTimeSelect({ currentDate, currentTime, onSel
                     >
                         <Text style={{}}>Date</Text>
                     </TouchableOpacity> */}
-                    <ReminderDateSelect onDateSelect={(value) => handleDateTimeSelect('date', value)} value={date} />
-                    <ReminderTimeSelect onTimeSelect={(value) => handleDateTimeSelect('time', value)} value={time} />
+                    <ReminderDateSelect onDateSelect={(date) => handleDateTimeSelect('date', date)} value={value?.date} error={isDateMissing} />
+                    <ReminderTimeSelect onTimeSelect={(time) => handleDateTimeSelect('time', time)} value={value?.time} error={isTimeMissing} />
                     {/* <TouchableOpacity
                         className={`rounded-full px-3 py-1 mr-2 `}
                         style={{ ...styles.reminderTimeOpener, backgroundColor: '#e5e7eb' }}

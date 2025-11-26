@@ -7,9 +7,10 @@ import { DatePickerModal } from 'react-native-paper-dates';
 type ReminderDateSelectProps = {
     onDateSelect: (date: Date | null | any) => void;
     value?: Date | null | any | undefined;
+    error?: any;
 }
 
-export default function ReminderDateSelect({ onDateSelect, value } : ReminderDateSelectProps) {
+export default function ReminderDateSelect({ onDateSelect, value, error } : ReminderDateSelectProps) {
 
     const styles = makeStyles();
 
@@ -35,11 +36,11 @@ export default function ReminderDateSelect({ onDateSelect, value } : ReminderDat
         <>
             <TouchableOpacity
                 className={`rounded-full px-3 py-1 mr-2 `}
-                style={{ ...styles.reminderDateOpener, backgroundColor: '#e5e7eb' }}
+                style={{ ...styles.reminderDateOpener, backgroundColor: error ? '#fee2e2' : '#e5e7eb' }}
                 onPress={() => setOpen(true)}
             // onPress={() => handleCategorySelect(null)}
             >
-                <Calendar1 />
+                <Calendar1 color={error ? '#dc2626' : '#000'} />
                 {/* <Text>{value ? value : date ? formatDate(date) : "Select Date"}</Text> */}
                 <Text>{value ? formatDate(value) : "Select Date"}</Text>
             </TouchableOpacity>

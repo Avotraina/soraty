@@ -6,9 +6,10 @@ import { TimePickerModal } from 'react-native-paper-dates';
 type ReminderTimeSelectProps = {
     onTimeSelect?: (date: Date | null | any) => void;
     value?: Date | null | any;
+    error?: any;
 }
 
-export default function ReminderTimeSelect({ onTimeSelect, value }: ReminderTimeSelectProps) {
+export default function ReminderTimeSelect({ onTimeSelect, value, error }: ReminderTimeSelectProps) {
 
     const styles = makeStyles();
 
@@ -59,11 +60,11 @@ export default function ReminderTimeSelect({ onTimeSelect, value }: ReminderTime
         <>
             <TouchableOpacity
                 className={`rounded-full px-3 py-1 mr-2 `}
-                style={{ ...styles.reminderDateOpener, backgroundColor: '#e5e7eb' }}
+                style={{ ...styles.reminderDateOpener, backgroundColor: error ? '#fee2e2' : '#e5e7eb' }}
                 onPress={() => setOpen(true)}
             // onPress={() => handleCategorySelect(null)}
             >
-                <Clock />
+                <Clock color={error ? '#dc2626' : '#000'} />
                 {/* <Text>{value ? (value instanceof Date ? formatDate(value) : String(value)) : time ? time : 'Select Time'}</Text> */}
                 <Text>{value ? value : 'Select Time'}</Text>
             </TouchableOpacity>

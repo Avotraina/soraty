@@ -13,7 +13,7 @@ import CategorySelect from '@/src/app/components/note/category-select';
 import NoteReminderTimeSelect from '@/src/app/components/note/reminder/note-reminder-select';
 import { useSnackbar } from '@/src/app/contexts/snackbar-provider';
 import { useAddNoteMutation } from '@/src/app/features/notes/note.query';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useFormState } from 'react-hook-form';
 import { TextInput } from 'react-native-paper';
 
 const placeholder = "Enter some rich text...";
@@ -70,15 +70,18 @@ export default function NoteDetailScreen() {
 
 
 
-    const { control, handleSubmit, formState: { errors }, setError, setFocus, getValues, reset } = useForm({
+    const { control, handleSubmit, formState: { errors, isSubmitted, isSubmitSuccessful }, setError, setFocus, getValues, reset } = useForm({
         defaultValues: {
             note_title: "New note",
             note_content: "",
             category_id: null,
             color: "",
-            reminder: null,
-        }
+            reminder: { date: null, time: null },
+        },
+        mode: 'onSubmit'
     })
+
+    const { submitCount, errors: formStateErrors } = useFormState({ control });
 
     const { mutate: addNote, isPending, isError, isSuccess } = useAddNoteMutation();
 
@@ -90,16 +93,16 @@ export default function NoteDetailScreen() {
         // return
 
         // addNote({ note_title: data.note_title, color: data.color, note_content: data.note_content, category_id: data.category_id }, {
-        // addNote({ note_title: data.note_title, color: data.color, note_content: JSON.stringify(json), category_id: data.category_id }, {
-        //     onSuccess: async () => {
-        //         showSnackbar("New Note Added", 'success')
-        //         reset()
-        //     },
-        //     onError: async (error) => {
-        //         console.log("Error", error)
-        //         showSnackbar("Failed to add new note, try again", "error")
-        //     }
-        // })
+        addNote({ note_title: data.note_title, color: data.color, note_content: JSON.stringify(json), category_id: data.category_id, reminder_date: data?.reminder?.date, reminder_time: data?.reminder?.time }, {
+            onSuccess: async () => {
+                showSnackbar("New Note Added", 'success')
+                reset()
+            },
+            onError: async (error) => {
+                console.log("Error", error)
+                showSnackbar("Failed to add new note, try again", "error")
+            }
+        })
     }
 
 
@@ -188,17 +191,41 @@ export default function NoteDetailScreen() {
             <Controller
                 control={control}
                 name="reminder"
-                rules={{}}
-                render={({ field: { onChange, value } }) => (
-                    <NoteReminderTimeSelect currentDate={reminderDate} currentTime={reminderTime} onSelectDateTime={(date, time) => {
-                        setReminderDate(date);
-                        setReminderTime(time);
-                        onChange({ date, time });
-                    }} />
+                defaultValue={{ date: null, time: null }}
+                rules={{
+                    // validate: {
+                    //     bothRequired: (v: any) =>
+                    //         (v?.date && v?.time) || "Select both date and time",
+                    //     dateRequired: (v: any) =>
+                    //         (v?.date || v?.time) || "Select date or time"
+                    // }
+                    validate: (val: { date: any, time: any }) => {
+                        const hasDate = Boolean(val?.date);
+                        const hasTime = Boolean(val?.time);
 
+                        if (hasDate && !hasTime) return "Time is required when date is selected";
+                        if (hasTime && !hasDate) return "Date is required when time is selected";
+
+                        return true;
+                    },
+                }}
+                render={({ field: { value, onChange }, formState }) => (
+                    <>
+                        <NoteReminderTimeSelect
+                            value={value ?? { date: null, time: null }}
+                            onChange={onChange}
+                            // submitCount={submitCount}
+                            // error={formStateErrors.reminder}
+                            submitCount={formState.submitCount}
+                            error={formState.errors.reminder}
+                            isSubmitSuccessful={formState.isSubmitSuccessful}
+                        />
+                        {/* <Text style={{ color: 'red', paddingHorizontal: 16, }}>{errors.reminder?.message} {formState.isSubmitSuccessful.toString()} {formState.isSubmitted.toString()}</Text> */}
+
+                    </>
                 )}
-
             />
+
 
             <View style={{ backgroundColor: 'black', borderRadius: 12, overflow: 'hidden', flex: 1 }}>
 
