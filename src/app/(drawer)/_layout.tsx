@@ -23,7 +23,7 @@ import 'react-native-get-random-values';
 
 
 export default function DrawerLayout() {
-return (
+  return (
     <Drawer defaultStatus="closed">
       <Drawer.Screen name="screens/note/note-list" options={{
         title: 'Notes',
@@ -34,13 +34,13 @@ return (
         title: 'New note',
         drawerLabel: 'New note',
         headerShown: true,
-        drawerItemStyle: { display: 'none'}
+        drawerItemStyle: { display: 'none' }
       }} />
       <Drawer.Screen name="screens/note/[note_id]" options={{
-        title: 'New note',
-        drawerLabel: 'New note',
+        title: 'Edit note',
+        drawerLabel: 'Edit note',
         headerShown: true,
-        drawerItemStyle: { display: 'none'}
+        drawerItemStyle: { display: 'none' }
       }} />
       <Drawer.Screen name="screens/category/category-list" options={{
         title: 'Categories',
