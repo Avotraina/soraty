@@ -5,16 +5,16 @@ import {
     Save
 } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import ColorSelect, { COLORS } from '@/src/app/components/color/color-select';
-import { Controller, useForm } from 'react-hook-form';
-import { TextInput } from 'react-native-paper';
-// import CategorySelect from '@/src/app/components/note/category-select';
-import ExampleTheme from "@//src/app/components/dom-components/example-theme";
+import ExampleTheme from "@/src/app/components/dom-components/example-theme";
 import CategorySelect from '@/src/app/components/note/category-select';
+import NoteReminderTimeSelect from '@/src/app/components/note/reminder/note-reminder-select';
 import { useSnackbar } from '@/src/app/contexts/snackbar-provider';
 import { useAddNoteMutation } from '@/src/app/features/notes/note.query';
+import { Controller, useForm, useFormState } from 'react-hook-form';
+import { TextInput } from 'react-native-paper';
 
 const placeholder = "Enter some rich text...";
 
@@ -48,7 +48,7 @@ type Category = {
     color: string;
 };
 
-export default function EditNoteScreen() {
+export default function NoteDetailScreen() {
 
     const styles = makeStyles();
 
@@ -62,30 +62,38 @@ export default function EditNoteScreen() {
 
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
     const [selectedColor, setSelectedColor] = useState<string | undefined>(COLORS[0]);
+    const [reminderDate, setReminderDate] = useState<string | undefined | any>(undefined);
+    const [reminderTime, setReminderTime] = useState<string | undefined | any>(undefined);
 
 
     const { showSnackbar } = useSnackbar();
 
 
 
-    const { control, handleSubmit, formState: { errors }, setError, setFocus, getValues, reset } = useForm({
+    const { control, handleSubmit, formState: { errors, isSubmitted, isSubmitSuccessful }, setError, setFocus, getValues, reset } = useForm({
         defaultValues: {
             note_title: "New note",
             note_content: "",
             category_id: null,
-            color: ""
-        }
+            color: "",
+            reminder: { date: null, time: null },
+        },
+        mode: 'onSubmit'
     })
+
+    const { submitCount, errors: formStateErrors } = useFormState({ control });
 
     const { mutate: addNote, isPending, isError, isSuccess } = useAddNoteMutation();
 
     const onSubmit = async (data: any) => {
 
+        console.log("DATA", data)
+
         console.log("JSON", json)
         // return
 
         // addNote({ note_title: data.note_title, color: data.color, note_content: data.note_content, category_id: data.category_id }, {
-        addNote({ note_title: data.note_title, color: data.color, note_content: JSON.stringify(json), category_id: data.category_id }, {
+        addNote({ note_title: data.note_title, color: data.color, note_content: JSON.stringify(json), category_id: data.category_id, reminder_date: data?.reminder?.date, reminder_time: data?.reminder?.time }, {
             onSuccess: async () => {
                 showSnackbar("New Note Added", 'success')
                 reset()
@@ -179,6 +187,46 @@ export default function EditNoteScreen() {
             {/* <CategorySelect currentCategory={selectedCategory} onSelectCategory={setSelectedCategory} /> */}
 
 
+            {/* Date and Time Selection */}
+            <Controller
+                control={control}
+                name="reminder"
+                defaultValue={{ date: null, time: null }}
+                rules={{
+                    // validate: {
+                    //     bothRequired: (v: any) =>
+                    //         (v?.date && v?.time) || "Select both date and time",
+                    //     dateRequired: (v: any) =>
+                    //         (v?.date || v?.time) || "Select date or time"
+                    // }
+                    validate: (val: { date: any, time: any }) => {
+                        const hasDate = Boolean(val?.date);
+                        const hasTime = Boolean(val?.time);
+
+                        if (hasDate && !hasTime) return "Time is required when date is selected";
+                        if (hasTime && !hasDate) return "Date is required when time is selected";
+
+                        return true;
+                    },
+                }}
+                render={({ field: { value, onChange }, formState }) => (
+                    <>
+                        <NoteReminderTimeSelect
+                            value={value ?? { date: null, time: null }}
+                            onChange={onChange}
+                            // submitCount={submitCount}
+                            // error={formStateErrors.reminder}
+                            submitCount={formState.submitCount}
+                            error={formState.errors.reminder}
+                            isSubmitSuccessful={formState.isSubmitSuccessful}
+                        />
+                        {/* <Text style={{ color: 'red', paddingHorizontal: 16, }}>{errors.reminder?.message} {formState.isSubmitSuccessful.toString()} {formState.isSubmitted.toString()}</Text> */}
+
+                    </>
+                )}
+            />
+
+
             <View style={{ backgroundColor: 'black', borderRadius: 12, overflow: 'hidden', flex: 1 }}>
 
                 <Controller
@@ -186,7 +234,7 @@ export default function EditNoteScreen() {
                     name="note_content"
                     rules={{}}
                     render={({ field: { onChange, value } }) => (
-                        <RichEditor setPlainText={setPlainText} setEditorState={setEditorState} editorBackgroundColor={selectedColor} onChange={onChange} value={value} setJson={setJson}/>
+                        <RichEditor setPlainText={setPlainText} setEditorState={setEditorState} editorBackgroundColor={selectedColor} onChange={onChange} value={value} setJson={setJson} />
                     )}
                 />
 
@@ -194,16 +242,16 @@ export default function EditNoteScreen() {
             </View>
 
             {/* Footer with metadata */}
-            <View className="bg-white py-3 px-4 border-t border-gray-200" style={styles.footerContainer}>
+            {/* <View className="bg-white py-3 px-4 border-t border-gray-200" style={styles.footerContainer}>
                 <View className="flex-row justify-between" style={styles.footer}>
                     <Text className="text-gray-500 text-sm" style={styles.createdAtText}>
-                        {/* Created: {new Date(note.createdAt).toLocaleDateString()} */}
+                        Created: {new Date(note.createdAt).toLocaleDateString()}
                     </Text>
                     <Text className="text-gray-500 text-sm" style={styles.updatedAtText}>
-                        {/* Last edited: {new Date(note.updatedAt).toLocaleDateString()} */}
+                        Last edited: {new Date(note.updatedAt).toLocaleDateString()}
                     </Text>
                 </View>
-            </View>
+            </View> */}
 
         </View>
     );
@@ -219,7 +267,7 @@ const makeStyles = (colors?: any) => StyleSheet.create({
     },
     headerContainer: {
         backgroundColor: '#3b82f6',
-        paddingVertical: 16,
+        paddingVertical: 8,
         paddingHorizontal: 16,
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
     },
