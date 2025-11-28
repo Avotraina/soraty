@@ -64,6 +64,7 @@ export async function migrateDbIfNeeded(db: SQLite.SQLiteDatabase) {
           note_id TEXT,
           reminder_date TEXT,
           reminder_time TEXT,
+          notification_id TEXT,
           is_synced INTEGER DEFAULT 0,
           created_at TEXT DEFAULT (datetime('now')),
           updated_at TEXT DEFAULT (datetime('now')),

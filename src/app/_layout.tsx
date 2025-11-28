@@ -1,17 +1,58 @@
 import { ThemeProvider, useThemeContext } from "@/src/app/theme/theme-context";
 import { QueryClientProvider } from "@tanstack/react-query";
+import * as Notifications from 'expo-notifications';
 import { Slot } from "expo-router";
 import { SQLiteProvider } from "expo-sqlite";
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
+import { Platform } from "react-native";
 import { PaperProvider } from "react-native-paper";
 import { ToastProvider } from "react-native-paper-toast";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { SnackbarProvider } from "./contexts/snackbar-provider";
 import { migrateDbIfNeeded } from "./database/migrations/init-database";
+import { registerBackgroundReminderTask } from "./notifications/background";
+import { registerForNotifications } from "./notifications/notification";
+import { scheduleAllReminders } from "./notifications/schedule-all";
 import { queryClient } from "./utils/query-client";
 
+Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+
+        // NEW REQUIRED FIELDS
+        shouldShowBanner: true,   // iOS lock screen banner
+        shouldShowList: true,     // iOS notification center list
+    }),
+});
 
 export default function RootLayout() {
+
+    useEffect(() => {
+        (async () => {
+            await registerForNotifications();
+            await registerBackgroundReminderTask();
+            // schedule all reminders once at app start
+            await scheduleAllReminders();
+        })();
+    }, []);
+
+    useEffect(() => {
+        const setupNotifications = async () => {
+            if (Platform.OS === "android") {
+                await Notifications.setNotificationChannelAsync("reminders", {
+                    name: "Reminders",
+                    importance: Notifications.AndroidImportance.HIGH,
+                    sound: "default",
+                });
+            }
+        };
+
+        setupNotifications();
+    }, []);
+
     return (
         <ThemeProvider>
             <SafeAreaProvider>
@@ -37,10 +78,10 @@ function PaperThemeWrapper() {
     return (
         <PaperProvider theme={theme}>
             <ToastProvider>
-            <SnackbarProvider>
-                <StatusBar style="inverted" translucent />
-                <Slot />
-            </SnackbarProvider>
+                <SnackbarProvider>
+                    <StatusBar style="inverted" translucent />
+                    <Slot />
+                </SnackbarProvider>
             </ToastProvider>
         </PaperProvider>
     );

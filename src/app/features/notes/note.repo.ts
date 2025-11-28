@@ -1,5 +1,7 @@
 import { getAll, getFirst, runQuery } from "@/src/app/database/database";
 import { v7 as uuidv7 } from 'uuid';
+import { scheduleReminderNotification } from "../../notifications/notification";
+import { buildReminderDate } from "../../utils/date-time";
 
 
 export const PAGE_SIZE = 20;
@@ -116,12 +118,21 @@ export const NoteRepo = {
     async create({ note_title, note_content, color, category_id, created_at, reminder_date, reminder_time }: { note_title: string, note_content: string, color: string, category_id: string | null, created_at: Date | string, reminder_date?: string | null, reminder_time?: string | null }): Promise<void> {
         const id = uuidv7();
         await runQuery('INSERT INTO notes (id, note_title, note_content, color, category_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)', id, note_title, note_content, color, category_id, created_at, created_at);
-
         if (reminder_date && reminder_time) {
-            await runQuery('INSERT INTO reminders (id, note_id, reminder_date, reminder_time, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)', id, id, reminder_date ?? null, reminder_time ?? null, created_at, created_at);
+            const reminderDateISO = new Date(reminder_date).toISOString();
+            const notification_id = await scheduleReminderNotification(
+                id.toString(),
+                'Reminder ⏰',
+                note_title || 'You have a task!',
+                new Date(buildReminderDate(reminder_date, reminder_time)),
+                reminder_time
+            );
+            await runQuery('INSERT INTO reminders (id, note_id, reminder_date, reminder_time, notification_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)', id, id, reminderDateISO ?? null, reminder_time ?? null, notification_id ?? null, created_at, created_at);
+
+            // console.log("Date for reminder:", buildReminderDate(reminder_date, reminder_time));
+
+
         }
-        // console.log("Created note", note, id, note.changes);
-        // await runQuery('INSERT INTO notes (id, note_title, note_content, color, category_id) VALUES (?, ?, ?, ?, ?)', id, note_title, note_content, color, category_id);
     },
 
 }

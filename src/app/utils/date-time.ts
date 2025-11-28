@@ -7,3 +7,19 @@ export function formatDate(dateArg: Date | string) {
 
     return `${d}/${m}/${y}`;
 }
+
+export function buildReminderDate(reminder_date: string, reminder_time: string) {
+  // Convert ISO string to local date
+  const base = new Date(reminder_date);
+
+  // Extract Y / M / D
+  const year = base.getFullYear();
+  const month = base.getMonth(); // 0-index
+  const day = base.getDate();
+
+  // Extract hh:mm
+  const [hour, minute] = reminder_time.split(":").map(Number);
+
+  // Build final date
+  return new Date(year, month, day, hour, minute, 0);
+}
