@@ -1,6 +1,7 @@
 import NoteFilters from '@/src/app/components/note/note-filters';
 import RichViewer from '@/src/app/components/rich-viewer';
 import { useNotesInfiniteQuery } from '@/src/app/features/notes/note.query';
+import { T_Note } from '@/src/app/features/notes/note.repo';
 import { useDebounce } from '@/src/app/hooks/debounce';
 import { Link, useRouter } from 'expo-router';
 import { Folder, Plus, Settings, Trash2 } from 'lucide-react-native';
@@ -80,19 +81,31 @@ export default function PostItListScreen() {
 
   console.log("NOTE LIST", data)
 
+  function openNote(note: T_Note) {
+    router.push({
+      pathname: "/(drawer)/screens/note/[note_id]",
+      params: {
+        note_id: note.id as string,
+        note: JSON.stringify(note),  // serialize
+      },
+    });
+  }
+
 
   const renderNoteItem = ({ item, index }: { item: Note, index: number }) => {
     // const category = item.categoryId
 
     return (
-      <Link href={`/screens/note/${item.id}`} asChild>
+      <Link href={`/screens/note/${item.id}`} asChild style={[styles.noteContainer, { backgroundColor: item.color, minHeight: 150 }, index >= noteList.length - (noteList.length % 2 || 2) ? { marginBottom: 90 } : {}]}>
+
         <TouchableOpacity
           className="rounded-xl p-4 m-2 shadow-md"
           activeOpacity={0.9}
-          // style={{ backgroundColor: item.color, minHeight: 150 }}
-          // style={{ ...styles.noteContainer, backgroundColor: item.color, minHeight: 150 }}
-          style={[styles.noteContainer, { backgroundColor: item.color, minHeight: 150 }, index >= noteList.length - (noteList.length % 2 || 2) ? { marginBottom: 90 } : {}]}
+        // style={{ backgroundColor: item.color, minHeight: 150 }}
+        // style={{ ...styles.noteContainer, backgroundColor: item.color, minHeight: 150 }}
+
         >
+
           <View className="flex-row justify-between items-start" style={styles.noteHeaderContainer}>
             <Text className="text-lg font-bold text-gray-800 mb-2" style={styles.noteHeaderTitle} numberOfLines={1}>
               {item.note_title || 'Untitled'}

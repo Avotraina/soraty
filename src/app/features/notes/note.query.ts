@@ -1,14 +1,24 @@
 
 // import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { NoteRepo, PAGE_SIZE, T_Note } from "./note.repo";
 
+
+export const useGetNoteByIdQuery = (id: string) =>
+    // Fetch a single note by ID, enabled only when id is provided
+    useQuery({
+        queryKey: ['note', id],
+        queryFn: async (): Promise<any> => await new Promise((resolve) => resolve(NoteRepo.getById(id))),
+        enabled: !!id,
+    })
+
+
 export const useNotesInfiniteQuery = (filters: {
-        search: string;
-        color?: string | null | undefined;
-        category?: string | null | undefined;
-        startDate?: string | undefined;
-        endDate?: string | undefined;
+    search: string;
+    color?: string | null | undefined;
+    category?: string | null | undefined;
+    startDate?: string | undefined;
+    endDate?: string | undefined;
 }) =>
     useInfiniteQuery<
         any,    // TData: type of a single page
@@ -44,3 +54,16 @@ export const useAddNoteMutation = () => {
         onError: (error) => console.log("ERror", error)
     });
 }
+
+
+// Update Note
+export const useUpdateNoteMutation = () => {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, note_title, note_content, color, category_id, reminder_date, reminder_time }: T_Note) =>
+            NoteRepo.update(id as string, note_title, note_content, color, category_id, reminder_date, reminder_time),
+        onSuccess: () => qc.invalidateQueries({ queryKey: ['notes', 'infinite'] }),
+    });
+};
+
+

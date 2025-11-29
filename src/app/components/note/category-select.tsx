@@ -1,9 +1,8 @@
-import { useCategoriesInfiniteQuery } from "@/src/app/features/categories/category.query";
+import { useCategoriesQuery } from "@/src/app/features/categories/category.query";
 import { useDebounce } from "@/src/app/hooks/debounce";
 import { Check, Folder, X } from "lucide-react-native";
 import { useState } from "react";
 import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Searchbar } from "react-native-paper";
 
 
 
@@ -35,15 +34,20 @@ export default function CategorySelect({
     const debouncedSearch = useDebounce(searchQuery);
 
 
-    const { data } = useCategoriesInfiniteQuery({ debouncedSearch: debouncedSearch.trim() });
+    // const { data } = useCategoriesInfiniteQuery({ debouncedSearch: debouncedSearch.trim() });
+    const { data } = useCategoriesQuery();
 
-    const categoryList: Category[] = data?.pages[0]?.flatMap((page: any) => page) || []
+    // console.log("CATEGORIES DATA", data);
+
+    const categoryList: Category[] = data || []
 
 
     const handleCategorySelect = (category: Category | null) => {
         onSelectCategory?.(category); // ⬅️ Notify parent
         setIsCategoryModalVisible(false);
     };
+
+    console.log("CURRENT CATEGORY", currentCategory);
 
 
     return (
@@ -88,13 +92,13 @@ export default function CategorySelect({
                         </View>
 
                         {/* Searchbar */}
-                        <View>
+                        {/* <View>
                             <Searchbar
                                 placeholder="Search"
                                 onChangeText={setSearchQuery}
                                 value={searchQuery}
                             />
-                        </View>
+                        </View> */}
 
                         {/* None Option */}
                         <TouchableOpacity

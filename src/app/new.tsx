@@ -1,12 +1,12 @@
 import RichEditor, { default as Editor } from '@/src/app/components/dom-components/rich-editor';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
-  ArrowLeft,
-  Check,
-  Folder,
-  Palette,
-  Save,
-  X
+    ArrowLeft,
+    Check,
+    Folder,
+    Palette,
+    Save,
+    X
 } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Alert, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';

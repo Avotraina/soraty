@@ -4,15 +4,15 @@ import {
     ArrowLeft,
     Save
 } from 'lucide-react-native';
-import React, { useState } from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import ColorSelect, { COLORS } from '@/src/app/components/color/color-select';
 import ExampleTheme from "@/src/app/components/dom-components/example-theme";
 import CategorySelect from '@/src/app/components/note/category-select';
 import NoteReminderTimeSelect from '@/src/app/components/note/reminder/note-reminder-select';
 import { useSnackbar } from '@/src/app/contexts/snackbar-provider';
-import { useAddNoteMutation } from '@/src/app/features/notes/note.query';
+import { useAddNoteMutation, useGetNoteByIdQuery } from '@/src/app/features/notes/note.query';
 import { Controller, useForm, useFormState } from 'react-hook-form';
 import { TextInput } from 'react-native-paper';
 
@@ -53,7 +53,7 @@ export default function NoteDetailScreen() {
     const styles = makeStyles();
 
     const router = useRouter();
-    const params = useLocalSearchParams();
+    const { note_id } = useLocalSearchParams();
 
     const [editorState, setEditorState] = useState<string | null>(null);
     const [plainText, setPlainText] = useState("");
@@ -68,18 +68,85 @@ export default function NoteDetailScreen() {
 
     const { showSnackbar } = useSnackbar();
 
+    console.log("PARAMS", note_id);
+
+
+    const { data: noteData, isLoading, isError: isFetchingError, isSuccess: isFetchSuccess } = useGetNoteByIdQuery(note_id as string);
+
+    console.log("NOTE DATA", noteData);
+
 
 
     const { control, handleSubmit, formState: { errors, isSubmitted, isSubmitSuccessful }, setError, setFocus, getValues, reset } = useForm({
+        // start with empty defaults; we'll patch them when the async request resolves
         defaultValues: {
-            note_title: "New note",
-            note_content: "",
+            note_title: '',
+            note_content: '',
             category_id: null,
-            color: "",
+            color: COLORS[0],
             reminder: { date: null, time: null },
         },
         mode: 'onSubmit'
     })
+
+    // Patch form default values when noteData arrives from the server
+    useEffect(() => {
+        if (!noteData) return;
+
+        // prepare values to reset into the form
+        const parsedContent = (() => {
+            try {
+                return JSON.parse(noteData.note_content as string);
+            } catch (e) {
+                return noteData.note_content;
+            }
+        })();
+
+        reset({
+            note_title: noteData.note_title || '',
+            note_content: noteData.note_content || '',
+            category_id: noteData.category_id || null,
+            color: noteData.color || COLORS[0],
+            reminder: { date: noteData.reminder_date ?? null, time: noteData.reminder_time ?? null },
+        });
+
+        // initialize editor/json and selection states
+        setJson(parsedContent);
+        setEditorState(typeof noteData.note_content === 'string' ? noteData.note_content : null);
+        setSelectedColor(noteData.color || COLORS[0]);
+        if (noteData.category_id) {
+            setSelectedCategory({
+                id: noteData.category_id,
+                category_name: noteData.category_name || '',
+                color: noteData.category_color || '#000'
+            });
+        } else {
+            setSelectedCategory(null);
+        }
+    }, [noteData, reset]);
+
+    // useEffect(() => {
+    //     if (noteData) {
+    //         reset({
+    //             note_title: "Titre",
+    //             note_content: "COntent",
+    //             // category_id: noteData.category_id,
+    //             color: noteData.color || COLORS[0],
+    //             reminder: { date: null, time: null },
+    //         });
+    //         // setSelectedCategory(noteData.category);
+    //         // setSelectedColor(noteData.color || COLORS[0]);
+    //     }
+    // }, [noteData, reset]);
+
+
+    // useEffect(() => {
+    //     setSelectedCategory({
+    //         category_name: noteData?.category?.category_name || "",
+    //         id: noteData?.category?.id || "",
+    //         color: noteData?.category?.color || "",
+    //     })
+    // }, []);
 
     const { submitCount, errors: formStateErrors } = useFormState({ control });
 
@@ -103,6 +170,10 @@ export default function NoteDetailScreen() {
                 showSnackbar("Failed to add new note, try again", "error")
             }
         })
+    }
+
+    if (isLoading) {
+        return <View><Text>Loading...</Text></View>
     }
 
 
@@ -177,6 +248,7 @@ export default function NoteDetailScreen() {
                 name="category_id"
                 rules={{}}
                 render={({ field: { onChange, value } }) => (
+                    // <CategorySelect currentCategory={selectedCategory ?? { category_name: noteData?.category_name, id: noteData?.category_id, color: noteData?.category_color } as T_Category} onSelectCategory={(category) => {
                     <CategorySelect currentCategory={selectedCategory} onSelectCategory={(category) => {
                         setSelectedCategory(category);
                         onChange(category?.id || null)

@@ -57,7 +57,7 @@ export const useAddCategoryMutation = () => {
 }
 
 
-// Update user
+// Update Category
 export const useUpdateCategoryMutation = () => {
     const qc = useQueryClient();
     return useMutation({

@@ -1,5 +1,4 @@
 import { Palette } from "lucide-react-native";
-import { useEffect } from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type ColorSelectProps = {
@@ -29,15 +28,17 @@ export default function ColorSelect({
 
     const styles = makeStyles();
 
-    useEffect(() => {
-        if (!currentColor && onSelectColor) {
-            onSelectColor(COLORS[0]); // pick first color by default
-        }
-    }, [currentColor, onSelectColor]);
+    // useEffect(() => {
+    //     if (!currentColor && onSelectColor) {
+    //         onSelectColor(COLORS[0]); // pick first color by default
+    //     }
+    // }, [currentColor, onSelectColor]);
 
     const handleColorSelect = (color: string | undefined) => {
         onSelectColor?.(color);
     };
+
+    console.log("CURRENT COLOR", currentColor);
 
 
     return (

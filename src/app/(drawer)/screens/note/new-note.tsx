@@ -75,11 +75,12 @@ export default function NoteDetailScreen() {
             note_title: "New note",
             note_content: "",
             category_id: null,
-            color: "",
+            color: COLORS[0],
             reminder: { date: null, time: null },
         },
         mode: 'onSubmit'
     })
+
 
     const { submitCount, errors: formStateErrors } = useFormState({ control });
 
@@ -93,16 +94,16 @@ export default function NoteDetailScreen() {
         // return
 
         // addNote({ note_title: data.note_title, color: data.color, note_content: data.note_content, category_id: data.category_id }, {
-        addNote({ note_title: data.note_title, color: data.color, note_content: JSON.stringify(json), category_id: data.category_id, reminder_date: data?.reminder?.date, reminder_time: data?.reminder?.time }, {
-            onSuccess: async () => {
-                showSnackbar("New Note Added", 'success')
-                reset()
-            },
-            onError: async (error) => {
-                console.log("Error", error)
-                showSnackbar("Failed to add new note, try again", "error")
-            }
-        })
+        // addNote({ note_title: data.note_title, color: data.color, note_content: JSON.stringify(json), category_id: data.category_id, reminder_date: data?.reminder?.date, reminder_time: data?.reminder?.time }, {
+        //     onSuccess: async () => {
+        //         showSnackbar("New Note Added", 'success')
+        //         reset()
+        //     },
+        //     onError: async (error) => {
+        //         console.log("Error", error)
+        //         showSnackbar("Failed to add new note, try again", "error")
+        //     }
+        // })
     }
 
 

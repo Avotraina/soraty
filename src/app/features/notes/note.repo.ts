@@ -21,6 +21,8 @@ export type T_Note = {
     created_at?: Date | string;
     reminder_date?: string | null;
     reminder_time?: string | null;
+    category_name?: string;
+    category_color?: string;
 };
 
 
@@ -105,12 +107,28 @@ export const NoteRepo = {
         return getAll<any>(query, params);
     },
 
-    async getById(id: number): Promise<T_Note | null> {
-        return getFirst<T_Note>('SELECT * FROM categories WHERE id = ?', id);
+    async getById(id: string): Promise<T_Note | null> {
+        return getFirst<T_Note>(
+            `
+                SELECT 
+                    n.id,
+                    n.note_title,
+                    n.note_content,
+                    n.color,
+                    n.created_at,
+                    n.category_id,
+                    c.category_name,
+                    c.color as category_color
+                FROM notes n
+                LEFT JOIN categories c ON n.category_id = c.id
+                WHERE n.id = ?
+            `,
+            id
+        );
     },
 
     async getByColor(color: string): Promise<T_Note | null> {
-        return getFirst<T_Note>('SELECT * FROM categories WHERE color = ?', color);
+        return getFirst<T_Note>('SELECT * FROM notes WHERE color = ?', color);
     },
 
 
@@ -134,5 +152,8 @@ export const NoteRepo = {
 
         }
     },
+
+
+
 
 }
