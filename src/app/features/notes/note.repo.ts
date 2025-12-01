@@ -93,8 +93,12 @@ export const NoteRepo = {
             c.id as category_id,
             c.category_name,
             c.color as category_color
+            , r.reminder_date,
+            r.reminder_time,
+            r.notification_id
             FROM notes n
             LEFT JOIN categories c ON n.category_id = c.id
+            LEFT JOIN reminders r ON r.note_id = n.id
             ${whereClause}
             GROUP BY n.id
             ORDER BY n.created_at DESC
@@ -118,9 +122,13 @@ export const NoteRepo = {
                     n.created_at,
                     n.category_id,
                     c.category_name,
-                    c.color as category_color
+                    c.color as category_color,
+                    r.reminder_date,
+                    r.reminder_time,
+                    r.notification_id
                 FROM notes n
                 LEFT JOIN categories c ON n.category_id = c.id
+                LEFT JOIN reminders r ON r.note_id = n.id
                 WHERE n.id = ?
             `,
             id

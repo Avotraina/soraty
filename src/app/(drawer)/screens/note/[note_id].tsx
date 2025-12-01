@@ -77,10 +77,11 @@ export default function NoteDetailScreen() {
 
     const form = useForm({
         defaultValues: {
-            note_title: '',
-            note_content: '',
-            category_id: null as string | null,
-            color: COLORS[0],
+            note_title: noteData?.note_title || '',
+            note_content: noteData?.note_content || '',
+            category_id: noteData?.category_id || null,
+            color: noteData?.color || COLORS[0],
+            reminder: { date: noteData?.reminder_date || null, time: noteData?.reminder_time || null}
         },
         onSubmit: async ({ value }) => {
             console.log("FORM DATA", value);
@@ -91,8 +92,8 @@ export default function NoteDetailScreen() {
                 color: value.color,
                 note_content: JSON.stringify(json),
                 category_id: value.category_id,
-                reminder_date: reminderValue?.date || undefined,
-                reminder_time: reminderValue?.time || undefined,
+                reminder_date: value.reminder?.date || undefined,
+                reminder_time: value.reminder?.time || undefined,
             }, {
                 onSuccess: async () => {
                     showSnackbar("Note saved successfully", 'success');
@@ -123,10 +124,18 @@ export default function NoteDetailScreen() {
         form.setFieldValue('note_content', noteData.note_content || '');
         form.setFieldValue('color', noteData.color || COLORS[0]);
         form.setFieldValue('category_id', noteData.category_id || null);
-        setReminderValue({
+        const reminderPayload = {
             date: noteData.reminder_date || null,
             time: noteData.reminder_time || null,
-        });
+        };
+        setReminderValue(reminderPayload);
+        // Patch the TanStack form `reminder` field so form values reflect DB columns
+        try {
+            form.setFieldValue('reminder', reminderPayload);
+        } catch (e) {
+            // Defensive: if the form isn't ready yet, still keep local reminderValue
+            console.debug('Failed to set form.reminder:', e);
+        }
 
         // Initialize editor/json and selection states
         setJson(parsedContent);
@@ -226,16 +235,34 @@ export default function NoteDetailScreen() {
 
 
             {/* Date and Time Selection */}
-            <NoteReminderTimeSelect
-                value={reminderValue ?? { date: null, time: null }}
-                onChange={(newReminder) => setReminderValue({
-                    date: newReminder?.date ?? null,
-                    time: newReminder?.time ?? null,
-                })}
-                submitCount={0}
-                error={undefined}
-                isSubmitSuccessful={false}
-            />
+            <form.Field
+                name="reminder"
+            >
+                {(field) => (
+                    <NoteReminderTimeSelect
+                        value={field.state.value ?? { date: null, time: null }}
+                        onChange={(newReminder) => {
+                            const payload = {
+                                date: newReminder?.date ?? null,
+                                time: newReminder?.time ?? null,
+                            };
+                            // keep local UI state in sync
+                            setReminderValue(payload);
+                            // update form state so `form.handleSubmit()` gets the value
+                            try {
+                                field.handleChange(payload as any);
+                            } catch (e) {
+                                console.debug('Failed to call field.handleChange for reminder:', e);
+                            }
+                        }}
+                        submitCount={0}
+                        error={undefined}
+                        isSubmitSuccessful={false}
+                    />
+                )}
+
+            </form.Field>
+
 
 
             <View style={{ backgroundColor: 'black', borderRadius: 12, overflow: 'hidden', flex: 1 }}>
