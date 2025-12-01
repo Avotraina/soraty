@@ -107,7 +107,7 @@ export const NoteRepo = {
         return getAll<any>(query, params);
     },
 
-    async getById(id: string): Promise<T_Note | null> {
+    async getById(id: string): Promise<T_Note | any> {
         return getFirst<T_Note>(
             `
                 SELECT 

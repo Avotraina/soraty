@@ -8,7 +8,7 @@ export const useGetNoteByIdQuery = (id: string) =>
     // Fetch a single note by ID, enabled only when id is provided
     useQuery({
         queryKey: ['note', id],
-        queryFn: async (): Promise<any> => await new Promise((resolve) => resolve(NoteRepo.getById(id))),
+        queryFn: async (): Promise<T_Note> => await new Promise((resolve) => resolve(NoteRepo.getById(id))),
         enabled: !!id,
     })
 

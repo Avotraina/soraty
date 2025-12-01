@@ -4,7 +4,7 @@ import {
     ArrowLeft,
     Save
 } from 'lucide-react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import ColorSelect, { COLORS } from '@/src/app/components/color/color-select';
@@ -13,7 +13,7 @@ import CategorySelect from '@/src/app/components/note/category-select';
 import NoteReminderTimeSelect from '@/src/app/components/note/reminder/note-reminder-select';
 import { useSnackbar } from '@/src/app/contexts/snackbar-provider';
 import { useAddNoteMutation, useGetNoteByIdQuery } from '@/src/app/features/notes/note.query';
-import { useForm } from '@tanstack/react-form';
+import { Controller, useForm, useFormState } from 'react-hook-form';
 import { TextInput } from 'react-native-paper';
 
 const placeholder = "Enter some rich text...";
@@ -59,89 +59,118 @@ export default function NoteDetailScreen() {
     const [plainText, setPlainText] = useState("");
     const [json, setJson] = useState(null);
 
+
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
     const [selectedColor, setSelectedColor] = useState<string | undefined>(COLORS[0]);
+    const [reminderDate, setReminderDate] = useState<string | undefined | any>(undefined);
+    const [reminderTime, setReminderTime] = useState<string | undefined | any>(undefined);
+
 
     const { showSnackbar } = useSnackbar();
 
     console.log("PARAMS", note_id);
 
-    const { data: noteData, isLoading } = useGetNoteByIdQuery(note_id as string);
+
+    const { data: noteData, isLoading, isError: isFetchingError, isSuccess: isFetchSuccess } = useGetNoteByIdQuery(note_id as string);
 
     console.log("NOTE DATA", noteData);
 
-    const { mutate: addNote, isPending } = useAddNoteMutation();
 
-    // Initialize TanStack Form with default values
-    const [reminderValue, setReminderValue] = useState<{ date: string | null; time: string | null }>({ date: null, time: null });
 
-    const form = useForm({
+    const { control, handleSubmit, formState: { errors, isSubmitted, isSubmitSuccessful }, setError, setFocus, getValues, reset } = useForm({
+        // start with empty defaults; we'll patch them when the async request resolves
         defaultValues: {
-            note_title: '',
+            note_title: noteData?.note_title,
             note_content: '',
-            category_id: null as string | null,
+            category_id: null,
             color: COLORS[0],
+            reminder: { date: null, time: null },
         },
-        onSubmit: async ({ value }) => {
-            console.log("FORM DATA", value);
-            console.log("EDITOR JSON", json);
+        mode: 'onSubmit'
+    })
 
-            addNote({
-                note_title: value.note_title,
-                color: value.color,
-                note_content: JSON.stringify(json),
-                category_id: value.category_id,
-                reminder_date: reminderValue?.date || undefined,
-                reminder_time: reminderValue?.time || undefined,
-            }, {
-                onSuccess: async () => {
-                    showSnackbar("Note saved successfully", 'success');
-                    form.reset();
-                },
-                onError: async (error) => {
-                    console.log("Error", error);
-                    showSnackbar("Failed to save note, try again", "error");
-                }
-            });
-        },
-    });
+    // Patch form default values when noteData arrives from the server
+    // useEffect(() => {
+    //     if (!noteData) return;
 
-    // Patch form values when noteData arrives from the server
-    useEffect(() => {
-        if (!noteData) return;
+    //     // prepare values to reset into the form
+    //     const parsedContent = (() => {
+    //         try {
+    //             return JSON.parse(noteData.note_content as string);
+    //         } catch (e) {
+    //             return noteData.note_content;
+    //         }
+    //     })();
 
-        const parsedContent = (() => {
-            try {
-                return JSON.parse(noteData.note_content as string);
-            } catch (e) {
-                return noteData.note_content;
+    //     reset({
+    //         note_title: noteData.note_title || '',
+    //         note_content: noteData.note_content || '',
+    //         category_id: noteData.category_id || null,
+    //         color: noteData.color || COLORS[0],
+    //         reminder: { date: noteData.reminder_date ?? null, time: noteData.reminder_time ?? null },
+    //     });
+
+    //     // initialize editor/json and selection states
+    //     setJson(parsedContent);
+    //     setEditorState(typeof noteData.note_content === 'string' ? noteData.note_content : null);
+    //     setSelectedColor(noteData?.color || COLORS[0]);
+    //     if (noteData.category_id) {
+    //         setSelectedCategory({
+    //             id: noteData.category_id,
+    //             category_name: noteData.category_name || '',
+    //             color: noteData.category_color || '#000'
+    //         });
+    //     } else {
+    //         setSelectedCategory(null);
+    //     }
+    // }, [noteData, reset]);
+
+    // useEffect(() => {
+    //     if (noteData) {
+    //         reset({
+    //             note_title: "Titre",
+    //             note_content: "COntent",
+    //             // category_id: noteData.category_id,
+    //             color: noteData.color || COLORS[0],
+    //             reminder: { date: null, time: null },
+    //         });
+    //         // setSelectedCategory(noteData.category);
+    //         // setSelectedColor(noteData.color || COLORS[0]);
+    //     }
+    // }, [noteData, reset]);
+
+
+    // useEffect(() => {
+    //     setSelectedCategory({
+    //         category_name: noteData?.category?.category_name || "",
+    //         id: noteData?.category?.id || "",
+    //         color: noteData?.category?.color || "",
+    //     })
+    // }, []);
+
+    const { submitCount, errors: formStateErrors } = useFormState({ control });
+
+    const { mutate: addNote, isPending, isError, isSuccess } = useAddNoteMutation();
+
+    const onSubmit = async (data: any) => {
+
+        console.log("DATA", data)
+
+        console.log("JSON", json)
+        // return
+
+        // addNote({ note_title: data.note_title, color: data.color, note_content: data.note_content, category_id: data.category_id }, {
+        addNote({ note_title: data.note_title, color: data.color, note_content: JSON.stringify(json), category_id: data.category_id, reminder_date: data?.reminder?.date, reminder_time: data?.reminder?.time }, {
+            onSuccess: async () => {
+                showSnackbar("New Note Added", 'success')
+                reset()
+            },
+            onError: async (error) => {
+                console.log("Error", error)
+                showSnackbar("Failed to add new note, try again", "error")
             }
-        })();
-
-        // Update form field values
-        form.setFieldValue('note_title', noteData.note_title || '');
-        form.setFieldValue('note_content', noteData.note_content || '');
-        form.setFieldValue('color', noteData.color || COLORS[0]);
-        form.setFieldValue('category_id', noteData.category_id || null);
-        setReminderValue({
-            date: noteData.reminder_date || null,
-            time: noteData.reminder_time || null,
-        });
-
-        // Initialize editor/json and selection states
-        setJson(parsedContent);
-        setEditorState(typeof noteData.note_content === 'string' ? noteData.note_content : null);
-        setSelectedColor(noteData?.color || COLORS[0]);
-        if (noteData.category_id) {
-            setSelectedCategory({
-                id: noteData.category_id,
-                category_name: noteData.category_name || '',
-                color: noteData.category_color || '#000'
-            });
-        } else {
-            setSelectedCategory(null);
-        }
-    }, [noteData]);
+        })
+    }
 
     if (isLoading) {
         return <View><Text>Loading...</Text></View>
@@ -163,29 +192,31 @@ export default function NoteDetailScreen() {
                     </TouchableOpacity>
 
                     <View className="flex-1 px-4" style={styles.titleContainer}>
-                        <form.Field
+                        <Controller
+                            control={control}
                             name="note_title"
-                            validators={{
-                                onBlur: ({ value }) =>
-                                    value === '' ? 'Title is required' : undefined,
-                            }}
-                            children={(field) => (
+                            rules={{ required: "Title is required" }}
+                            render={({ field: { onChange, value } }) => (
                                 <TextInput
                                     className="text-white text-xl font-bold bg-transparent"
                                     style={styles.titleInput}
-                                    value={field.state.value}
-                                    onChangeText={(text) => field.handleChange(text)}
-                                    onBlur={field.handleBlur}
+                                    value={value}
+                                    // onChangeText={(text) => setNote({ ...note, title: text })}
+                                    onChangeText={onChange}
                                     placeholder="Note Title"
                                     placeholderTextColor="#e0e0e0"
-                                    error={!!field.state.meta.errors.length}
+                                    error={!!errors.note_title}
                                 />
                             )}
+
                         />
+
                     </View>
 
                     <TouchableOpacity
-                        onPress={() => form.handleSubmit()}
+                        // onPress={handleSave}
+                        // onPress={handleSubmit(handleSave)}
+                        onPress={handleSubmit(onSubmit)}
                         className="p-2 rounded-full bg-blue-600"
                         style={styles.saveButtonContainer}
                     >
@@ -195,63 +226,91 @@ export default function NoteDetailScreen() {
             </View>
 
             {/* Color Selection */}
-            <form.Field
+            <Controller
+                control={control}
                 name="color"
-                children={(field) => (
-                    <ColorSelect
-                        currentColor={field.state.value}
-                        onSelectColor={(color) => {
-                            setSelectedColor(color);
-                            field.handleChange((color as string) || COLORS[0]);
-                        }}
-                        value={field.state.value}
-                    />
+                rules={{}}
+                render={({ field: { onChange, value } }) => (
+                    <ColorSelect currentColor={value} onSelectColor={(color) => {
+                        setSelectedColor(color);  // update local state
+                        onChange(color);          // update React Hook Form
+                    }} value={value} />
                 )}
+
             />
             {/* <ColorSelect currentColor={selectedColor} onSelectColor={setSelectedColor} /> */}
 
             {/* Category Selection */}
-            <form.Field
+
+            {/* Color Selection */}
+            <Controller
+                control={control}
                 name="category_id"
-                children={(field) => (
-                    <CategorySelect
-                        currentCategory={selectedCategory}
-                        onSelectCategory={(category) => {
-                            setSelectedCategory(category);
-                            field.handleChange(category?.id || null);
-                        }}
-                    />
+                rules={{}}
+                render={({ field: { onChange, value } }) => (
+                    // <CategorySelect currentCategory={selectedCategory ?? { category_name: noteData?.category_name, id: noteData?.category_id, color: noteData?.category_color } as T_Category} onSelectCategory={(category) => {
+                    <CategorySelect currentCategory={selectedCategory} onSelectCategory={(category) => {
+                        setSelectedCategory(category);
+                        onChange(category?.id || null)
+                    }} />
+                )}
+
+            />
+            {/* <CategorySelect currentCategory={selectedCategory} onSelectCategory={setSelectedCategory} /> */}
+
+
+            {/* Date and Time Selection */}
+            <Controller
+                control={control}
+                name="reminder"
+                defaultValue={{ date: null, time: null }}
+                rules={{
+                    // validate: {
+                    //     bothRequired: (v: any) =>
+                    //         (v?.date && v?.time) || "Select both date and time",
+                    //     dateRequired: (v: any) =>
+                    //         (v?.date || v?.time) || "Select date or time"
+                    // }
+                    validate: (val: { date: any, time: any }) => {
+                        const hasDate = Boolean(val?.date);
+                        const hasTime = Boolean(val?.time);
+
+                        if (hasDate && !hasTime) return "Time is required when date is selected";
+                        if (hasTime && !hasDate) return "Date is required when time is selected";
+
+                        return true;
+                    },
+                }}
+                render={({ field: { value, onChange }, formState }) => (
+                    <>
+                        <NoteReminderTimeSelect
+                            value={value ?? { date: null, time: null }}
+                            onChange={onChange}
+                            // submitCount={submitCount}
+                            // error={formStateErrors.reminder}
+                            submitCount={formState.submitCount}
+                            error={formState.errors.reminder}
+                            isSubmitSuccessful={formState.isSubmitSuccessful}
+                        />
+                        {/* <Text style={{ color: 'red', paddingHorizontal: 16, }}>{errors.reminder?.message} {formState.isSubmitSuccessful.toString()} {formState.isSubmitted.toString()}</Text> */}
+
+                    </>
                 )}
             />
 
 
-            {/* Date and Time Selection */}
-            <NoteReminderTimeSelect
-                value={reminderValue ?? { date: null, time: null }}
-                onChange={(newReminder) => setReminderValue({
-                    date: newReminder?.date ?? null,
-                    time: newReminder?.time ?? null,
-                })}
-                submitCount={0}
-                error={undefined}
-                isSubmitSuccessful={false}
-            />
-
-
             <View style={{ backgroundColor: 'black', borderRadius: 12, overflow: 'hidden', flex: 1 }}>
-                <form.Field
+
+                <Controller
+                    control={control}
                     name="note_content"
-                    children={(field) => (
-                        <RichEditor
-                            setPlainText={setPlainText}
-                            setEditorState={setEditorState}
-                            editorBackgroundColor={selectedColor}
-                            onChange={(content) => field.handleChange((content as string) || '')}
-                            value={field.state.value}
-                            setJson={setJson}
-                        />
+                    rules={{}}
+                    render={({ field: { onChange, value } }) => (
+                        <RichEditor setPlainText={setPlainText} setEditorState={setEditorState} editorBackgroundColor={selectedColor} onChange={onChange} value={value} setJson={setJson} />
                     )}
                 />
+
+                {/* <RichEditor setPlainText={setPlainText} setEditorState={setEditorState} editorBackgroundColor={selectedColor} /> */}
             </View>
 
             {/* Footer with metadata */}

@@ -59,41 +59,85 @@ function InitializeValuePlugin({ value }: { value?: string }) {
 }
 
 
-function SyncValuePlugin({ value }: { value?: string }) {
+function SyncValuePlugin({ value, skipNextChange }: { value?: string; skipNextChange?: React.MutableRefObject<boolean> }) {
   const [editor] = useLexicalComposerContext();
-  const prevValueRef = useRef<string | undefined>('');
+  const prevValueRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
     if (value === undefined || value === prevValueRef.current) return;
 
+    // Mark that the next OnChange coming from this programmatic update
+    // should be ignored by the editor OnChange handler.
+    if (skipNextChange) {
+      skipNextChange.current = true;
+    }
+
+    // Helper: if the incoming `value` looks like Lexical JSON, try to
+    // extract readable plain text so the simple insertion below shows
+    // the meaningful content instead of raw JSON.
+    const extractText = (raw?: string) => {
+      if (!raw) return "";
+      // quick detection for JSON
+      const trimmed = raw.trim();
+      if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) return raw;
+      try {
+        const parsed = JSON.parse(raw);
+        // Lexical editor state shape: { root: { children: [ ... ] } }
+        const parts: string[] = [];
+        const walk = (node: any) => {
+          if (!node) return;
+          if (Array.isArray(node)) return node.forEach(walk);
+          if (typeof node === "string") return parts.push(node);
+          if (node.text) return parts.push(node.text);
+          if (node.children) return node.children.forEach(walk);
+        };
+        if (parsed.root) {
+          walk(parsed.root.children);
+          return parts.join("\n");
+        }
+        return raw;
+      } catch (e) {
+        return raw;
+      }
+    };
+
+    const textToInsert = extractText(value);
+
+    console.debug("[RichEditor] SyncValuePlugin applying programmatic update", { value, textToInsert });
+
     editor.update(() => {
       const root = $getRoot();
-      const textContent = root.getTextContent();
+      const currentText = root.getTextContent();
 
-      if (textContent !== value) {
-        // Save current selection
-        const selection = editor.getEditorState().read(() => {
-          return editor.getEditorState().read(() => {
-            return editor.getEditorState().toJSON(); // save state snapshot
-          });
-        });
-
+      if (currentText !== textToInsert) {
         root.clear();
         const paragraph = $createParagraphNode();
-        paragraph.append($createTextNode(value));
+        paragraph.append($createTextNode(textToInsert || ""));
         root.append(paragraph);
 
-        // Restore selection via editor.update (optional, approximate)
-        // Lexical doesn’t expose direct selection API in TS; usually you just reset to the end:
+        // Move cursor to end of document
         const nodes = root.getChildren();
         if (nodes.length > 0) {
-          nodes[nodes.length - 1].selectEnd(); // move cursor to end
+          try {
+            nodes[nodes.length - 1].selectEnd();
+          } catch (e) {
+            // ignore selection restore errors
+          }
         }
       }
     });
 
+    // Clear the skip flag shortly after the programmatic update so that
+    // subsequent user edits are handled normally.
+    if (skipNextChange) {
+      // use microtask to avoid racing with the OnChange that fires synchronously
+      setTimeout(() => {
+        skipNextChange.current = false;
+      }, 0);
+    }
+
     prevValueRef.current = value;
-  }, [editor, value]);
+  }, [editor, value, skipNextChange]);
 
   return null;
 }
@@ -133,9 +177,9 @@ export default function RichEditor({
 
   // ✅ Update local state if the prop changes
   useEffect(() => {
-    if (editorBackgroundColor) {
-      setBgColor(editorBackgroundColor);
-    }
+    // Always update bgColor when prop changes (allow falsy values)
+    console.debug("[RichEditor] editorBackgroundColor change ->", editorBackgroundColor);
+    setBgColor(editorBackgroundColor ?? undefined);
   }, [editorBackgroundColor]);
 
   // Sync value prop into editor when form resets
@@ -158,10 +202,11 @@ export default function RichEditor({
                 <ContentEditable
                   allowFullScreen
                   className="editor-input"
-                  aria-placeholder={placeholder}
-                  placeholder={
-                    <div className="editor-placeholder">{placeholder}</div>
-                  }
+                    aria-placeholder={placeholder}
+                    placeholder={
+                      <div className="editor-placeholder">{placeholder}</div>
+                    }
+                    style={{ backgroundColor: bgColor }}
                 />
               }
               ErrorBoundary={LexicalErrorBoundary}
@@ -174,9 +219,11 @@ export default function RichEditor({
                   //   return; // ignore this change to prevent reverse overwrite
                   // }
                   if (skipNextChange.current) {
+                    console.debug("[RichEditor] OnChangePlugin ignoring change due to skipNextChange flag");
                     skipNextChange.current = false;
                     return; // ignore the next change to prevent reverse overwrite
                   }
+                  console.debug("[RichEditor] OnChangePlugin handling user change", { tags });
                   editorState.read(() => {
                     const root = $getRoot();
                     const textContent = root.getTextContent();
