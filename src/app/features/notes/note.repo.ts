@@ -192,7 +192,7 @@ export const NoteRepo = {
                 `
                     INSERT INTO reminders (id, note_id, reminder_date, reminder_time, notification_id, created_at, updated_at)
                     VALUES (?, ?, ?, ?, ?, ?, ?)
-                    ON CONFLICT(note_id) DO UPDATE SET
+                    ON CONFLICT(id) DO UPDATE SET
                         reminder_date = excluded.reminder_date,
                         reminder_time = excluded.reminder_time,
                         notification_id = excluded.notification_id,
@@ -207,26 +207,6 @@ export const NoteRepo = {
                 new Date().toISOString()
 
             )
-
-            // if (reminder.notification_id) {
-
-            //     await runQuery(
-            //         `
-            //             UPDATE reminders SET
-            //                 reminder_date = ?,
-            //                 reminder_time = ?,
-            //                 notification_id = ?,
-            //                 updated_at = ?
-            //             WHERE note_id = ?
-            //         `,
-            //         reminderDateISO,
-            //         reminder.reminder_time,
-            //         notification_id,
-            //         new Date().toISOString(),
-            //         note.id as string
-            //     )
-
-            // }
 
         }
 

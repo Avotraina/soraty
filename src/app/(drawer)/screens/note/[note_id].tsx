@@ -12,7 +12,7 @@ import ExampleTheme from "@/src/app/components/dom-components/example-theme";
 import CategorySelect from '@/src/app/components/note/category-select';
 import NoteReminderTimeSelect from '@/src/app/components/note/reminder/note-reminder-select';
 import { useSnackbar } from '@/src/app/contexts/snackbar-provider';
-import { useAddNoteMutation, useGetNoteByIdQuery } from '@/src/app/features/notes/note.query';
+import { useAddNoteMutation, useGetNoteByIdQuery, useUpdateNoteMutation } from '@/src/app/features/notes/note.query';
 import { useForm } from '@tanstack/react-form';
 import { TextInput } from 'react-native-paper';
 
@@ -72,6 +72,8 @@ export default function NoteDetailScreen() {
 
     const { mutate: addNote, isPending } = useAddNoteMutation();
 
+    const { mutate: updateNote, isSuccess } = useUpdateNoteMutation()
+
     // Initialize TanStack Form with default values
     const [reminderValue, setReminderValue] = useState<{ date: string | null; time: string | null }>({ date: null, time: null });
 
@@ -87,23 +89,34 @@ export default function NoteDetailScreen() {
             console.log("FORM DATA", value);
             console.log("EDITOR JSON", json);
 
-            addNote({
-                note_title: value.note_title,
-                color: value.color,
-                note_content: JSON.stringify(json),
-                category_id: value.category_id,
-                reminder_date: value.reminder?.date || undefined,
-                reminder_time: value.reminder?.time || undefined,
-            }, {
+
+            updateNote(
+                {
+                    note: {
+                        id: note_id as string,
+                        note_title: value.note_title,
+                        // note_content: value.note_content,
+                        note_content: json ? JSON.stringify(json) : '',
+                        color: value.color,
+                        // category: value.category_id,
+                        category_id: value.category_id,
+                    },
+                    reminder: {
+                        reminder_date: value.reminder.date,
+                        reminder_time: value.reminder.time
+                    }
+                }, {
                 onSuccess: async () => {
-                    showSnackbar("Note saved successfully", 'success');
-                    form.reset();
+                    showSnackbar("Note Updated", 'success');
                 },
                 onError: async (error) => {
-                    console.log("Error", error);
-                    showSnackbar("Failed to save note, try again", "error");
+                    console.log("Error", error)
+                    showSnackbar("Failed to edit this note, try again", "error")
                 }
-            });
+            }
+
+            )
+
         },
     });
 
@@ -264,12 +277,12 @@ export default function NoteDetailScreen() {
                                 field.handleChange(payload as any);
                             } catch (e) {
                                 console.debug('Failed to call field.handleChange for reminder:', e);
-                        }
+                            }
                         }}
                         submitCount={field.state.meta.isTouched ? 1 : 0}
                         // error={field.state.meta.errors[0]}
                         error={field.state.meta.errors.length > 0 ? field.state.meta.errors[0] : null}
-                        // isSubmitSuccessful={field.state.meta.isValid}
+                    // isSubmitSuccessful={field.state.meta.isValid}
                     />
                 )}
 

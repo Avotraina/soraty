@@ -57,12 +57,11 @@ export const useAddNoteMutation = () => {
 }
 
 
-// Update Note
 export const useUpdateNoteMutation = () => {
     const qc = useQueryClient();
     return useMutation({
-        mutationFn: ({ id, note_title, note_content, color, category_id, reminder_date, reminder_time }: T_Note) =>
-            NoteRepo.update(id as string, note_title, note_content, color, category_id, reminder_date, reminder_time),
+        mutationFn: ({ note, reminder }: { note: T_Note; reminder?: { reminder_date: string; reminder_time: string; notification_id?: string } }) =>
+            NoteRepo.update(note, reminder),
         onSuccess: () => qc.invalidateQueries({ queryKey: ['notes', 'infinite'] }),
     });
 };

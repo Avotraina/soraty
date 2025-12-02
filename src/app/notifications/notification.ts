@@ -55,7 +55,7 @@ export async function scheduleReminderNotification(
 
     console.log('Scheduled notification:', { notification_id, title, body, scheduledDate });
 
-    return 'notification_id';
+    return notification_id;
   } catch (e) {
     console.log('Error scheduling notification:', e);
   }
