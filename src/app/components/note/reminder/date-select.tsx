@@ -49,7 +49,8 @@ export default function ReminderDateSelect({ onDateSelect, value, error } : Remi
                 mode="single"
                 visible={open}
                 onDismiss={onDismissSingle}
-                date={value ?? date}
+                // date={value ?? date}
+                date={value ? new Date(value) : date}
                 onConfirm={onConfirmSingle}
                 presentationStyle='pageSheet'
             />

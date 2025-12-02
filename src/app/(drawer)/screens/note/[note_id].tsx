@@ -81,7 +81,7 @@ export default function NoteDetailScreen() {
             note_content: noteData?.note_content || '',
             category_id: noteData?.category_id || null,
             color: noteData?.color || COLORS[0],
-            reminder: { date: noteData?.reminder_date || null, time: noteData?.reminder_time || null}
+            reminder: { date: noteData?.reminder_date || null, time: noteData?.reminder_time || null }
         },
         onSubmit: async ({ value }) => {
             console.log("FORM DATA", value);
@@ -237,13 +237,24 @@ export default function NoteDetailScreen() {
             {/* Date and Time Selection */}
             <form.Field
                 name="reminder"
+                validators={{
+                    onChange: (field) => {
+                        const { date, time } = field.value || {};
+                        const hasDate = Boolean(date);
+                        const hasTime = Boolean(time);
+                        if (hasDate && !hasTime) return "Time is required when date is selected";
+                        if (hasTime && !hasDate) return "Date is required when time is selected";
+
+                        // return true;
+                    }
+                }}
             >
                 {(field) => (
                     <NoteReminderTimeSelect
                         value={field.state.value ?? { date: null, time: null }}
                         onChange={(newReminder) => {
                             const payload = {
-                                date: newReminder?.date ?? null,
+                                date: newReminder?.date ? new Date(newReminder.date).toDateString() : null,
                                 time: newReminder?.time ?? null,
                             };
                             // keep local UI state in sync
@@ -253,11 +264,12 @@ export default function NoteDetailScreen() {
                                 field.handleChange(payload as any);
                             } catch (e) {
                                 console.debug('Failed to call field.handleChange for reminder:', e);
-                            }
+                        }
                         }}
-                        submitCount={0}
-                        error={undefined}
-                        isSubmitSuccessful={false}
+                        submitCount={field.state.meta.isTouched ? 1 : 0}
+                        // error={field.state.meta.errors[0]}
+                        error={field.state.meta.errors.length > 0 ? field.state.meta.errors[0] : null}
+                        // isSubmitSuccessful={field.state.meta.isValid}
                     />
                 )}
 

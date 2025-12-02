@@ -12,7 +12,7 @@ import ReminderTimeSelect from "./time-select";
 // }
 
 type ReminderValue = {
-    date?: string | null;
+    date?: string | null | Date;
     time?: string | null;
 };
 
