@@ -161,6 +161,77 @@ export const NoteRepo = {
         }
     },
 
+    async update(note: T_Note, reminder?: { reminder_date: string, reminder_time: string, notification_id?: string }): Promise<void> {
+
+        const noteKeys = Object.keys(note) as (keyof T_Note)[];
+        const fieldsToUpdate = noteKeys.filter(key => key !== 'id' && note[key] !== undefined);
+
+        const setClause = fieldsToUpdate.map(key => `${key} = ?`).join(', ');
+        const params = fieldsToUpdate.map(key => note[key]);
+        params.push(note.id); // for WHERE clause
+
+        const updateQuery = `UPDATE notes SET ${setClause}, updated_at = ? WHERE id = ?`;
+        params.splice(params.length - 1, 0, new Date().toISOString()); // insert updated_at before id
+
+        await runQuery(updateQuery, ...params);
+
+        if (reminder) {
+
+            const reminderDateISO = new Date(reminder.reminder_date).toISOString();
+
+            const notification_id = await scheduleReminderNotification(
+                note.id as string,
+                'Reminder ⏰',
+                note.note_title || 'You have a task!',
+                new Date(buildReminderDate(reminder.reminder_date, reminder.reminder_time)),
+                reminder.reminder_time,
+                reminder.notification_id ?? undefined
+            );
+
+            await runQuery(
+                `
+                    INSERT INTO reminders (id, note_id, reminder_date, reminder_time, notification_id, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(note_id) DO UPDATE SET
+                        reminder_date = excluded.reminder_date,
+                        reminder_time = excluded.reminder_time,
+                        notification_id = excluded.notification_id,
+                        updated_at = excluded.updated_at
+                `,
+                note.id as string,
+                note.id as string,
+                reminderDateISO,
+                reminder.reminder_time,
+                notification_id,
+                new Date().toISOString(),
+                new Date().toISOString()
+
+            )
+
+            // if (reminder.notification_id) {
+
+            //     await runQuery(
+            //         `
+            //             UPDATE reminders SET
+            //                 reminder_date = ?,
+            //                 reminder_time = ?,
+            //                 notification_id = ?,
+            //                 updated_at = ?
+            //             WHERE note_id = ?
+            //         `,
+            //         reminderDateISO,
+            //         reminder.reminder_time,
+            //         notification_id,
+            //         new Date().toISOString(),
+            //         note.id as string
+            //     )
+
+            // }
+
+        }
+
+    },
+
 
 
 
