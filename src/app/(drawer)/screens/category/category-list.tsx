@@ -2,6 +2,7 @@ import DeleteCategoryConfirmation from '@/src/app/components/category/delete-cat
 import NewCategoryModal from '@/src/app/components/category/new-category-modal';
 import { useCategoriesInfiniteQuery } from '@/src/app/features/categories/category.query';
 import { useDebounce } from '@/src/app/hooks/debounce';
+import { Link, router } from 'expo-router';
 import { Edit3, Folder, Plus, Trash2, X } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -51,7 +52,7 @@ export default function CategoriesScreen() {
 
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
 
-    const { data } = useCategoriesInfiniteQuery({ debouncedSearch: debouncedSearch});
+    const { data } = useCategoriesInfiniteQuery({ debouncedSearch: debouncedSearch });
 
     const categoryList = data?.pages[0]?.flatMap((page: any) => page) || []
     // const categoryList = data?.pages || []
@@ -79,37 +80,46 @@ export default function CategoriesScreen() {
     //     category.name.toLowerCase().includes(searchQuery.toLowerCase())
     // );
 
+    const navigateToNoteList = (categoryId: string) => {
+        // navigation.navigate('NoteList', { categoryId });
+        router.push({ pathname: '/screens/note/note-list',
+            params: { category_id: categoryId }
+        });
+    };
+
     const renderCategoryItem = ({ item }: { item: Category }) => (
-        <View className="bg-white rounded-xl p-4 mb-3 shadow-sm flex-row items-center" style={styles.categoryContainer}>
-            <View
-                className="w-12 h-12 rounded-full items-center justify-center mr-4"
-                style={{ ...styles.categoryIcon, backgroundColor: `${item.color}20` }}
-            >
-                <Folder size={24} color={item.color} />
-            </View>
-
-            <View className="flex-1" style={styles.categoryLabelsContainer}>
-                <Text className="text-lg font-semibold text-gray-800" style={styles.categoryName}>{item.category_name}</Text>
-                <Text className="text-gray-500" style={styles.categoryNoteCount}>{item.note_count} notes</Text>
-            </View>
-
-            <View className="flex-row" style={styles.categoryIconsContainer}>
-                <TouchableOpacity
-                    className="p-2 mr-2"
-                    // onPress={() => handleEditCategory(item)}
-                    onPress={() => handleEdit(item)}
+        <Link href={{ pathname: `/screens/note/note-list`, params: { category_id: item.id } }} asChild>
+            <TouchableOpacity activeOpacity={0.8} className="bg-white rounded-xl p-4 mb-3 shadow-sm flex-row items-center" style={styles.categoryContainer}>
+                <View
+                    className="w-12 h-12 rounded-full items-center justify-center mr-4"
+                    style={{ ...styles.categoryIcon, backgroundColor: `${item.color}20` }}
                 >
-                    <Edit3 size={20} color="#666" />
-                </TouchableOpacity>
-                <TouchableOpacity
-                    className="p-2"
-                    // onPress={() => handleDeleteCategory(item.id)}
-                    onPress={() => handleDelete(item)}
-                >
-                    <Trash2 size={20} color="#666" />
-                </TouchableOpacity>
-            </View>
-        </View>
+                    <Folder size={24} color={item.color} />
+                </View>
+
+                <View className="flex-1" style={styles.categoryLabelsContainer}>
+                    <Text className="text-lg font-semibold text-gray-800" style={styles.categoryName}>{item.category_name}</Text>
+                    <Text className="text-gray-500" style={styles.categoryNoteCount}>{item.note_count} notes</Text>
+                </View>
+
+                <View className="flex-row" style={styles.categoryIconsContainer}>
+                    <TouchableOpacity
+                        className="p-2 mr-2"
+                        // onPress={() => handleEditCategory(item)}
+                        onPress={() => handleEdit(item)}
+                    >
+                        <Edit3 size={20} color="#666" />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        className="p-2"
+                        // onPress={() => handleDeleteCategory(item.id)}
+                        onPress={() => handleDelete(item)}
+                    >
+                        <Trash2 size={20} color="#666" />
+                    </TouchableOpacity>
+                </View>
+            </TouchableOpacity>
+        </Link>
     );
 
     return (

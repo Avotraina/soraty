@@ -1,9 +1,10 @@
+import DeleteNoteConfirmation from '@/src/app/components/note/delete-note-confirmation';
 import NoteFilters from '@/src/app/components/note/note-filters';
 import RichViewer from '@/src/app/components/rich-viewer';
 import { useNotesInfiniteQuery } from '@/src/app/features/notes/note.query';
 import { T_Note } from '@/src/app/features/notes/note.repo';
 import { useDebounce } from '@/src/app/hooks/debounce';
-import { Link, useRouter } from 'expo-router';
+import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { Folder, Plus, Settings, Trash2 } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -23,7 +24,10 @@ type Note = {
   category_color?: string;
   note_title?: string;
   note_content?: string;
+  notification_id?: string;
+  reminder_id?: string;
 };
+
 
 type Category = {
   id: string;
@@ -49,12 +53,18 @@ export default function PostItListScreen() {
   const styles = makeStyles();
 
   const router = useRouter();
+  const { note_id, category_id } = useLocalSearchParams();
 
+
+  const [isDeletionConfirmationVisible, setIsDeletionConfirmationVisible] = useState<boolean>(false)
+  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
 
   // Search and filter states
   const [searchQuery, setSearchQuery] = useState('');
 
   const debouncedSearch = useDebounce(searchQuery);
+
+  // Alert.alert("Category ID", category_id as string)
 
 
   const [filters, setFilters] = useState<
@@ -68,7 +78,7 @@ export default function PostItListScreen() {
   >({
     search: "",
     color: null,
-    category: null,
+    category: category_id ? category_id as string : null,
     startDate: undefined,
     endDate: undefined,
   });
@@ -76,6 +86,15 @@ export default function PostItListScreen() {
   const { data } = useNotesInfiniteQuery(filters);
   const noteList = data?.pages[0]?.flatMap((page: any) => page) || []
 
+  // ⚡ Sync category_id from URL into filters
+  React.useEffect(() => {
+    if (category_id) {
+      setFilters((prev) => ({
+        ...prev,
+        category: category_id as string,
+      }));
+    }
+  }, [category_id]);
 
   console.log(filters)
 
@@ -89,6 +108,13 @@ export default function PostItListScreen() {
         note: JSON.stringify(note),  // serialize
       },
     });
+  }
+
+
+  const handleDelete = (item: Note) => {
+    console.log("DELETE", item);
+    setSelectedNote(item);
+    setIsDeletionConfirmationVisible(true);
   }
 
 
@@ -110,7 +136,7 @@ export default function PostItListScreen() {
             <Text className="text-lg font-bold text-gray-800 mb-2" style={styles.noteHeaderTitle} numberOfLines={1}>
               {item.note_title || 'Untitled'}
             </Text>
-            <TouchableOpacity style={styles.noteHeaderIconsContainer}>
+            <TouchableOpacity style={styles.noteHeaderIconsContainer} onPress={() => handleDelete(item)}>
               <Trash2 size={18} color="#666" />
             </TouchableOpacity>
           </View>
@@ -150,6 +176,7 @@ export default function PostItListScreen() {
             {/* {item.createdAt.toLocaleDateString()} */}
           </Text>
         </TouchableOpacity>
+
       </Link>
     )
 
@@ -181,7 +208,7 @@ export default function PostItListScreen() {
       </View>
 
       {/* Search and Filters */}
-      <NoteFilters onFiltersChange={setFilters} />
+      <NoteFilters onFiltersChange={setFilters} defaultValues={{...filters, category: category_id ? category_id as string : null}} />
 
 
       {/* Notes List */}
@@ -204,6 +231,7 @@ export default function PostItListScreen() {
       />
 
       <FAB />
+      <DeleteNoteConfirmation isVisible={isDeletionConfirmationVisible} onClose={() => setIsDeletionConfirmationVisible(false)} noteId={selectedNote?.id as string} reminder={selectedNote?.reminder_id ? { id: selectedNote?.reminder_id as string, notification_id: selectedNote?.notification_id as string } : undefined} isEmpty={false} />
 
     </View>
   );

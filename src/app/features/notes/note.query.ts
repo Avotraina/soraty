@@ -67,3 +67,12 @@ export const useUpdateNoteMutation = () => {
 };
 
 
+export const useDeleteNoteMutation = () => {
+    const qc = useQueryClient();
+
+    return useMutation({
+        mutationFn: (params: {id: string, reminder?: { id: string, notification_id: string }}) => NoteRepo.remove(params.id, params.reminder),
+        onSuccess: () => qc.invalidateQueries({ queryKey: ['notes', 'infinite'] }),
+    });
+
+}

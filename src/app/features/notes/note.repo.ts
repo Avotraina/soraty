@@ -1,6 +1,6 @@
 import { getAll, getFirst, runQuery } from "@/src/app/database/database";
 import { v7 as uuidv7 } from 'uuid';
-import { scheduleReminderNotification } from "../../notifications/notification";
+import { cancelNotification, scheduleReminderNotification } from "../../notifications/notification";
 import { buildReminderDate } from "../../utils/date-time";
 
 
@@ -95,7 +95,8 @@ export const NoteRepo = {
             c.color as category_color
             , r.reminder_date,
             r.reminder_time,
-            r.notification_id
+            r.notification_id,
+            r.id as reminder_id
             FROM notes n
             LEFT JOIN categories c ON n.category_id = c.id
             LEFT JOIN reminders r ON r.note_id = n.id
@@ -125,7 +126,8 @@ export const NoteRepo = {
                     c.color as category_color,
                     r.reminder_date,
                     r.reminder_time,
-                    r.notification_id
+                    r.notification_id,
+                    r.id
                 FROM notes n
                 LEFT JOIN categories c ON n.category_id = c.id
                 LEFT JOIN reminders r ON r.note_id = n.id
@@ -160,6 +162,7 @@ export const NoteRepo = {
 
         }
     },
+
 
     async update(note: T_Note, reminder?: { reminder_date: string, reminder_time: string, notification_id?: string }): Promise<void> {
 
@@ -213,6 +216,16 @@ export const NoteRepo = {
     },
 
 
+    async remove(id: string, reminder?: {id: string, notification_id: string}): Promise<void> {
+        await runQuery('DELETE FROM notes WHERE id = ?', id);
+        if (reminder) {
+            await runQuery('DELETE FROM reminders WHERE id = ?', reminder.id);
+            if (reminder.notification_id) {
+                // Cancel the scheduled notification
+                await cancelNotification(reminder.notification_id);
+            }
+        }
+    }
 
 
 }

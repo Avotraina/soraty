@@ -18,7 +18,7 @@ const NOTE_COLORS = [
 ];
 
 
-export default function NoteFilters({ onFiltersChange, }: {
+export default function NoteFilters({ onFiltersChange, defaultValues }: {
     onFiltersChange: (filters: {
         search: string;
         color?: string | null | undefined;
@@ -26,11 +26,16 @@ export default function NoteFilters({ onFiltersChange, }: {
         startDate?: string | undefined;
         endDate?: string | undefined;
     }) => void;
+    defaultValues?: {
+        search?: string;
+        color?: string | null | undefined;
+        category?: string | null | undefined;
+        startDate?: string | undefined;
+        endDate?: string | undefined;
+    }
 }) {
 
     const styles = makeStyles();
-
-
 
     // Search and filter states
     const [searchQuery, setSearchQuery] = useState('');
@@ -56,14 +61,16 @@ export default function NoteFilters({ onFiltersChange, }: {
 
     }, [colorFilter, categoryFilter, dateFilter, debouncedSearch]);
 
-    // const { data: categoryList, hasNextPage: categoryHasNextPage, fetchNextPage: fetchCategoryNextPage } = useCategoriesInfiniteQuery({ debouncedSearch: '' });
+    useEffect(() => {
+        // Set default values if provided
+        // Verify if an element inside defaultValues is set
+        const anyValuePresent = defaultValues && Object.values(defaultValues).some(value => value !== null && value !== undefined && value.length > 0);
+        // const allValuesPresent = defaultValues && Object.values(defaultValues).every(value => value !== null && value !== undefined);
 
-
-
-
-    // const { data: noteList, hasNextPage: noteHasNextPage, fetchNextPage: fetchNoteNextPage } = useNotesInfiniteQuery({ debouncedSearch: '' });
-    // const notes = noteList?.pages[0]?.flatMap((page: any) => page) || []
-
+        if (anyValuePresent) {
+            setShowFilters(true);
+        }
+    }, [defaultValues]);
 
 
     return (
@@ -98,40 +105,9 @@ export default function NoteFilters({ onFiltersChange, }: {
                     </TouchableOpacity>
 
                     {/* Active Filters Indicator */}
-                    {(filterColor || filterDate || filterCategory || dateFilter?.startDate || categoryFilter || colorFilter) && (
+                    {(filterColor || filterDate || filterCategory || dateFilter?.startDate || categoryFilter || colorFilter || defaultValues) && (
                         <View className="flex-row" style={styles.activeFiltersContainer}>
-                            {/* {filterColor && (
-                                <View
-                                    className="flex-row items-center bg-blue-100 rounded-full px-3 py-1 mr-2"
-                                    style={styles.activeColorFilterContainer}
-                                >
-                                    <View
-                                        className="w-3 h-3 rounded-full mr-1"
-                                        style={{ ...styles.activeColorCircle, backgroundColor: filterColor }}
-
-                                    />
-                                    <Text className="text-xs text-blue-800" style={styles.activeColorText}>Color</Text>
-                                </View>
-                            )}
-                            {filterCategory && (
-                                <View
-                                    className="flex-row items-center bg-purple-100 rounded-full px-3 py-1"
-                                    style={styles.activeCategoryFilterContainer}
-                                >
-                                    <Folder size={12} color="#7e22ce" />
-                                    <Text className="text-xs text-purple-800 ml-1" style={styles.activeCategoryFilterText}>Category</Text>
-                                </View>
-                            )}
-
-                            {filterDate && (
-                                <View
-                                    className="flex-row items-center bg-green-100 rounded-full px-3 py-1"
-                                    style={styles.activeDateFilterContainer}
-                                >
-                                    <Calendar size={12} color="#065f46" />
-                                    <Text className="text-xs text-green-800 ml-1" style={styles.activeDateFilterText}>Date</Text>
-                                </View>
-                            )} */}
+                           
                             {colorFilter && (
                                 <View
                                     className="flex-row items-center bg-blue-100 rounded-full px-3 py-1 mr-2"
@@ -176,7 +152,7 @@ export default function NoteFilters({ onFiltersChange, }: {
 
                         {/* Category Filters */}
                         <Text className="font-semibold text-gray-700 mb-2" style={styles.categoryFilterHeaderText}>Filter by Category:</Text>
-                        <CategorySelectFilter currentCategory={categoryFilter} onSelectCategory={setCategoryFilter} />
+                        <CategorySelectFilter currentCategory={categoryFilter} value={defaultValues?.category ?? ''} onSelectCategory={setCategoryFilter} />
 
 
 
