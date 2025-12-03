@@ -54,7 +54,7 @@ export async function migrateDbIfNeeded(db: SQLite.SQLiteDatabase) {
           color TEXT,
           category_id TEXT,
           color_id TEXT,
-          FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
+          FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
           FOREIGN KEY (color_id) REFERENCES colors(id) ON DELETE SET NULL
         );
 
@@ -107,3 +107,18 @@ export async function migrateDbIfNeeded(db: SQLite.SQLiteDatabase) {
     await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
   }
 }
+
+// -- NOTES TABLE
+//         CREATE TABLE IF NOT EXISTS notes (
+//           id TEXT PRIMARY KEY,
+//           note_title,
+//           note_content TEXT,
+//           is_synced INTEGER DEFAULT 0,
+//           created_at TEXT DEFAULT (datetime('now')),
+//           updated_at TEXT DEFAULT (datetime('now')),
+//           color TEXT,
+//           category_id TEXT,
+//           color_id TEXT,
+//           FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
+//           FOREIGN KEY (color_id) REFERENCES colors(id) ON DELETE SET NULL
+//         );
