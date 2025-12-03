@@ -52,7 +52,7 @@ export default function DeleteCategoryConfirmation({ isVisible, onClose, categor
                     <View style={styles.modalContentContainer}>
                         <CircleAlert color={'red'} />
                         <Text style={styles.modalContentText}>
-                            {isEmpty ? 'Do you really want to delete this category' : 'This Category is not empty, do you really want to delete it with all notes inside?'}
+                            {isEmpty ? 'Do you really want to delete this category' : 'This Category is not empty, do you really want to delete it ?'}
 
                         </Text>
                     </View>

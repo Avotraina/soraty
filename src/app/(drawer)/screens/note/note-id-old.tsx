@@ -48,7 +48,7 @@ type Category = {
     color: string;
 };
 
-export default function NoteDetailScreen() {
+export function NoteDetailScreen() {
 
     const styles = makeStyles();
 
