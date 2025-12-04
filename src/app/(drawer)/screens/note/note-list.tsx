@@ -98,7 +98,7 @@ export default function PostItListScreen() {
 
   console.log(filters)
 
-  console.log("NOTE LIST", data)
+  // console.log("NOTE LIST", data)
 
   function openNote(note: T_Note) {
     router.push({
