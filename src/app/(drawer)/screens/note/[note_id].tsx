@@ -2,7 +2,9 @@ import RichEditor, { default as Editor } from '@/src/app/components/dom-componen
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
     ArrowLeft,
-    Save
+    Check,
+    Save,
+    Trash
 } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -14,7 +16,7 @@ import NoteReminderTimeSelect from '@/src/app/components/note/reminder/note-remi
 import { useSnackbar } from '@/src/app/contexts/snackbar-provider';
 import { useAddNoteMutation, useGetNoteByIdQuery, useUpdateNoteMutation } from '@/src/app/features/notes/note.query';
 import { useForm } from '@tanstack/react-form';
-import { TextInput } from 'react-native-paper';
+import { TextInput, useTheme } from 'react-native-paper';
 
 const placeholder = "Enter some rich text...";
 
@@ -317,7 +319,26 @@ export default function NoteDetailScreen() {
                     </Text>
                 </View>
             </View> */}
+            <FAB />
 
+        </View>
+    );
+}
+
+
+function FAB() {
+    const styles = makeStyles();
+    const { colors } = useTheme();
+
+
+    return (
+        <View style={styles.fabContainer}>
+            <TouchableOpacity style={styles.fabConfirmButton}>
+                <Check size={24} color={colors.background} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.fabDeleteButton}>
+                <Trash size={24} color={colors.background} />
+            </TouchableOpacity>
         </View>
     );
 }
@@ -525,6 +546,22 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         backgroundColor: '#3b82f6', // Tailwind 'bg-blue-500'
         borderRadius: 8,             // Tailwind 'rounded-lg'
         padding: 8,                  // Tailwind 'p-2' (0.5rem = 8px)
-    }
+    },
+    fabContainer: {
+        position: 'absolute',
+        bottom: 32,
+        right: 32,
+        flexDirection: 'row',
+        gap: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+        elevation: 4
+    },
+    fabConfirmButton: {
+
+    },
+    fabDeleteButton: {
+
+    },
 
 })
