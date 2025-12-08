@@ -1,9 +1,7 @@
 import RichEditor, { default as Editor } from '@/src/app/components/dom-components/rich-editor';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
-    ArrowLeft,
     Check,
-    Save,
     Trash
 } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
@@ -214,13 +212,13 @@ export default function NoteDetailScreen() {
             {/* Header */}
             <View className="bg-blue-500 py-4 px-4 shadow-md" style={styles.headerContainer}>
                 <View className="flex-row items-center justify-between" style={styles.header}>
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                         onPress={() => router.back()}
                         className="p-2 rounded-full bg-blue-600"
                         style={styles.backButtonContainer}
                     >
                         <ArrowLeft size={24} color="white" />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
 
                     <View className="flex-1 px-4" style={styles.titleContainer}>
                         <form.Field
@@ -233,24 +231,25 @@ export default function NoteDetailScreen() {
                                 <TextInput
                                     className="text-white text-xl font-bold bg-transparent"
                                     style={styles.titleInput}
+                                    textColor='#333'
                                     value={field.state.value}
                                     onChangeText={(text) => field.handleChange(text)}
                                     onBlur={field.handleBlur}
                                     placeholder="Note Title"
-                                    placeholderTextColor="#e0e0e0"
+                                    placeholderTextColor="#33333350"
                                     error={!!field.state.meta.errors.length}
                                 />
                             )}
                         />
                     </View>
 
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                         onPress={() => form.handleSubmit()}
                         className="p-2 rounded-full bg-blue-600"
                         style={styles.saveButtonContainer}
                     >
                         <Save size={24} color="white" />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
             </View>
 
@@ -394,20 +393,28 @@ const makeStyles = (colors?: any) => StyleSheet.create({
 
     container: {
         flex: 1,
-        backgroundColor: '#f9fafb',
+        // backgroundColor: '#f9fafb',
         // display: 'flex',
         // overflow: 'hidden',
     },
     headerContainer: {
-        backgroundColor: '#3b82f6',
-        paddingVertical: 8,
+        // backgroundColor: '#3b82f6',
+        paddingVertical: 16,
         paddingHorizontal: 16,
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        // boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        // shadowColor: '#000',
+        // shadowOffset: { width: 0, height: 2 },
+        // shadowOpacity: 0.1,
+        // shadowRadius: 4,
+        // elevation: 4,
+        // backgroundColor: 'red',
+
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
+        
     },
     backButtonContainer: {
         padding: 8,
@@ -416,13 +423,14 @@ const makeStyles = (colors?: any) => StyleSheet.create({
     },
     titleContainer: {
         flex: 1,
-        paddingHorizontal: 16,
+        // paddingHorizontal: 16,
     },
     titleInput: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: 'white',
+        // color: 'white',
         backgroundColor: 'transparent',
+        color: '#333'
     },
     saveButtonContainer: {
         padding: 8,
