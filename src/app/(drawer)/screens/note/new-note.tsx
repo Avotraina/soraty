@@ -1,11 +1,7 @@
 import RichEditor, { default as Editor } from '@/src/app/components/dom-components/rich-editor';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import {
-    ArrowLeft,
-    Save
-} from 'lucide-react-native';
 import React, { useState } from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import ColorSelect, { COLORS } from '@/src/app/components/color/color-select';
 import ExampleTheme from "@/src/app/components/dom-components/example-theme";
@@ -113,13 +109,13 @@ export default function NoteDetailScreen() {
             {/* Header */}
             <View className="bg-blue-500 py-4 px-4 shadow-md" style={styles.headerContainer}>
                 <View className="flex-row items-center justify-between" style={styles.header}>
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                         onPress={() => router.back()}
                         className="p-2 rounded-full bg-blue-600"
                         style={styles.backButtonContainer}
                     >
                         <ArrowLeft size={24} color="white" />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
 
                     <View className="flex-1 px-4" style={styles.titleContainer}>
                         <Controller
@@ -130,11 +126,13 @@ export default function NoteDetailScreen() {
                                 <TextInput
                                     className="text-white text-xl font-bold bg-transparent"
                                     style={styles.titleInput}
+                                    textColor='#333'
                                     value={value}
                                     // onChangeText={(text) => setNote({ ...note, title: text })}
                                     onChangeText={onChange}
                                     placeholder="Note Title"
-                                    placeholderTextColor="#e0e0e0"
+                                    placeholderTextColor="#33333350"
+
                                     error={!!errors.note_title}
                                 />
                             )}
@@ -143,7 +141,7 @@ export default function NoteDetailScreen() {
 
                     </View>
 
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                         // onPress={handleSave}
                         // onPress={handleSubmit(handleSave)}
                         onPress={handleSubmit(onSubmit)}
@@ -151,7 +149,7 @@ export default function NoteDetailScreen() {
                         style={styles.saveButtonContainer}
                     >
                         <Save size={24} color="white" />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
             </View>
 
@@ -262,15 +260,13 @@ const makeStyles = (colors?: any) => StyleSheet.create({
 
     container: {
         flex: 1,
-        backgroundColor: '#f9fafb',
+        // backgroundColor: '#f9fafb',
         // display: 'flex',
         // overflow: 'hidden',
     },
     headerContainer: {
-        backgroundColor: '#3b82f6',
-        paddingVertical: 8,
+        paddingVertical: 16,
         paddingHorizontal: 16,
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
     },
     header: {
         flexDirection: 'row',
@@ -284,12 +280,12 @@ const makeStyles = (colors?: any) => StyleSheet.create({
     },
     titleContainer: {
         flex: 1,
-        paddingHorizontal: 16,
+        // paddingHorizontal: 16,
     },
     titleInput: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: 'white',
+        color: '#333',
         backgroundColor: 'transparent',
     },
     saveButtonContainer: {
