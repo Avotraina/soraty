@@ -11,12 +11,12 @@ type EditNoteModalProps = {
     reminder?: {
         id: string;
         notification_id: string;
-    }
+    },
+    onSuccess?: () => void;
     // Add any other props you want to pass
 };
 
-export default function DeleteNoteConfirmation({ isVisible, onClose, noteId, isEmpty, reminder }: EditNoteModalProps) {
-
+export default function DeleteNoteConfirmation({ isVisible, onClose, noteId, isEmpty, reminder, onSuccess }: EditNoteModalProps) {
     const styles = makeStyles();
 
     const { showSnackbar } = useSnackbar();
@@ -28,6 +28,7 @@ export default function DeleteNoteConfirmation({ isVisible, onClose, noteId, isE
         deleteNote({id: noteId, reminder}, {
             onSuccess: async () => {
                 showSnackbar("Deleted", 'success')
+                onSuccess?.()
                 onClose?.()
                 // toaster.show({message: "New Category added", type: "success", position: "middle"})
             },

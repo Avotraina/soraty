@@ -12,10 +12,12 @@ import { Keyboard, StyleSheet, Text, TouchableOpacity, View } from 'react-native
 import ColorSelect, { COLORS } from '@/src/app/components/color/color-select';
 import ExampleTheme from "@/src/app/components/dom-components/example-theme";
 import CategorySelect from '@/src/app/components/note/category-select';
+import DeleteNoteConfirmation from '@/src/app/components/note/delete-note-confirmation';
 import NoteReminderTimeSelect from '@/src/app/components/note/reminder/note-reminder-select';
 import { useSnackbar } from '@/src/app/contexts/snackbar-provider';
-import { useAddNoteMutation, useGetNoteByIdQuery, useUpdateNoteMutation } from '@/src/app/features/notes/note.query';
+import { useGetNoteByIdQuery, useUpdateNoteMutation } from '@/src/app/features/notes/note.query';
 import { CustomColors } from '@/src/app/theme/colors';
+import { formatDate } from '@/src/app/utils/date-time';
 import { useForm } from '@tanstack/react-form';
 import { TextInput, useTheme } from 'react-native-paper';
 import { MD3Colors } from 'react-native-paper/lib/typescript/types';
@@ -83,6 +85,8 @@ export default function NoteDetailScreen() {
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
     const [selectedColor, setSelectedColor] = useState<string | undefined>(COLORS[0]);
 
+    const [notificationId, setNotificationId] = useState<string | null>(null)
+
     const { showSnackbar } = useSnackbar();
 
     console.log("PARAMS", note_id);
@@ -91,9 +95,10 @@ export default function NoteDetailScreen() {
 
     console.log("NOTE DATA", noteData);
 
-    const { mutate: addNote, isPending } = useAddNoteMutation();
+    const [isDeletionConfirmationVisible, setIsDeletionConfirmationVisible] = useState<boolean>(false)
 
-    const { mutate: updateNote, isSuccess } = useUpdateNoteMutation()
+
+    const { mutate: updateNote, isSuccess, mutateAsync } = useUpdateNoteMutation()
 
     // Initialize TanStack Form with default values
     const [reminderValue, setReminderValue] = useState<{ date: string | null; time: string | null }>({ date: null, time: null });
@@ -111,7 +116,8 @@ export default function NoteDetailScreen() {
             console.log("EDITOR JSON", json);
 
 
-            updateNote(
+            // const result = updateNote(
+            const result = await mutateAsync(
                 {
                     note: {
                         id: note_id as string,
@@ -124,7 +130,8 @@ export default function NoteDetailScreen() {
                     },
                     reminder: {
                         reminder_date: value.reminder.date,
-                        reminder_time: value.reminder.time
+                        reminder_time: value.reminder.time,
+                        notification_id: notificationId || undefined,
                     }
                 }, {
                 onSuccess: async () => {
@@ -137,6 +144,12 @@ export default function NoteDetailScreen() {
             }
 
             )
+
+            console.log("UPDATE RESULT", result);
+
+            if (result.notificationId) {
+                setNotificationId(result.notificationId);
+            }
 
         },
     });
@@ -185,6 +198,10 @@ export default function NoteDetailScreen() {
             setSelectedCategory(null);
         }
     }, [noteData]);
+
+    const handleDelete = () => {
+        setIsDeletionConfirmationVisible(true);
+    }
 
     if (isLoading) {
         return <View><Text>Loading...</Text></View>
@@ -328,19 +345,20 @@ export default function NoteDetailScreen() {
             </View>
 
             {/* Footer with metadata */}
-            {/* <View className="bg-white py-3 px-4 border-t border-gray-200" style={styles.footerContainer}>
+            <View className="bg-white py-3 px-4 border-t border-gray-200" style={styles.footerContainer}>
                 <View className="flex-row justify-between" style={styles.footer}>
                     <Text className="text-gray-500 text-sm" style={styles.createdAtText}>
-                        Created: {new Date(note.createdAt).toLocaleDateString()}
+                        Created: {formatDate(noteData?.created_at)}
                     </Text>
                     <Text className="text-gray-500 text-sm" style={styles.updatedAtText}>
-                        Last edited: {new Date(note.updatedAt).toLocaleDateString()}
+                        Last edited: {formatDate(noteData?.updated_at)}
                     </Text>
                 </View>
-            </View> */}
+            </View>
             {!keyboardVisible && (
-                <FAB onConfirm={() => form.handleSubmit()} onDelete={() => { }} />
+                <FAB onConfirm={() => form.handleSubmit()} onDelete={() => handleDelete()} showConfirmButton={form.state.isDirty} />
             )}
+            <DeleteNoteConfirmation isVisible={isDeletionConfirmationVisible} onClose={() => setIsDeletionConfirmationVisible(false)} noteId={noteData?.id as string} reminder={noteData?.reminder_id || notificationId ? { id: noteData?.reminder_id as string || noteData.id as string, notification_id: noteData?.notification_id as string || notificationId as string } : undefined} isEmpty={false} onSuccess={() => router.back()} />
 
         </View>
     );
@@ -349,19 +367,22 @@ export default function NoteDetailScreen() {
 type FABProps = {
     onConfirm?: () => void;
     onDelete?: () => void;
+    showConfirmButton?: boolean;
 };
 
 
-function FAB({ onConfirm, onDelete }: FABProps) {
+function FAB({ onConfirm, onDelete, showConfirmButton = false }: FABProps) {
     const { colors } = useTheme();
     const styles = makeStyles(colors as CustomColors & MD3Colors);
 
 
     return (
         <View style={styles.fabContainer}>
-            <TouchableOpacity style={styles.fabConfirmButton} onPress={onConfirm}>
-                <Check size={24} color={colors.background} />
-            </TouchableOpacity>
+            {showConfirmButton && (
+                <TouchableOpacity style={styles.fabConfirmButton} onPress={onConfirm}>
+                    <Check size={24} color={colors.background} />
+                </TouchableOpacity>
+            )}
             <TouchableOpacity style={styles.fabDeleteButton} onPress={onDelete}>
                 <Trash size={24} color={'#dc2626'} />
             </TouchableOpacity>
@@ -475,7 +496,7 @@ const makeStyles = (colors?: any) => StyleSheet.create({
     },
     footerContainer: {
         backgroundColor: 'white',
-        paddingVertical: 12,
+        paddingVertical: 4,
         paddingHorizontal: 16,
         borderTopWidth: 1,
         borderTopColor: '#e5e7eb',

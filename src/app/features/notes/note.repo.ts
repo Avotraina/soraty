@@ -121,6 +121,7 @@ export const NoteRepo = {
                     n.note_content,
                     n.color,
                     n.created_at,
+                    n.updated_at,
                     n.category_id,
                     c.category_name,
                     c.color as category_color,
@@ -164,7 +165,7 @@ export const NoteRepo = {
     },
 
 
-    async update(note: T_Note, reminder?: { reminder_date: string, reminder_time: string, notification_id?: string }): Promise<void> {
+    async update(note: T_Note, reminder?: { reminder_date: string, reminder_time: string, notification_id?: string }): Promise<{ noteId: string, reminderId?: string, notificationId?: string }> {
 
         const noteKeys = Object.keys(note) as (keyof T_Note)[];
         const fieldsToUpdate = noteKeys.filter(key => key !== 'id' && note[key] !== undefined);
@@ -211,12 +212,17 @@ export const NoteRepo = {
 
             )
 
+            return { noteId: note.id as string, reminderId: note.id as string, notificationId: notification_id ?? undefined };
+
         }
+
+        return { noteId: note.id as string };
+
 
     },
 
 
-    async remove(id: string, reminder?: {id: string, notification_id: string}): Promise<void> {
+    async remove(id: string, reminder?: { id: string, notification_id: string }): Promise<void> {
         await runQuery('DELETE FROM notes WHERE id = ?', id);
         if (reminder) {
             await runQuery('DELETE FROM reminders WHERE id = ?', reminder.id);

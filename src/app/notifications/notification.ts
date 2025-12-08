@@ -51,6 +51,10 @@ export async function scheduleReminderNotification(
     const notification_id = await Notifications.scheduleNotificationAsync({
       content: { title, body, sound: true, data: { reminderId: id } },
       trigger: scheduledDate as unknown as Notifications.NotificationTriggerInput,
+      // trigger: {
+      //   type: 'date',
+      //   value: scheduledDate,
+      // } as unknown as Notifications.NotificationTriggerInput,
     });
 
     console.log('Scheduled notification:', { notification_id, title, body, scheduledDate });
