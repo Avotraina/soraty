@@ -17,7 +17,8 @@ import {
 import { useTheme } from "react-native-paper";
 import { MD3Colors } from "react-native-paper/lib/typescript/types";
 import FontAwesome6Icons from 'react-native-vector-icons/FontAwesome6';
-import { CustomColors } from "../../theme/colors";
+import { CustomColors } from "../theme/colors";
+// import { CustomColors } from "../../theme/colors";
 
 
 type Option = {

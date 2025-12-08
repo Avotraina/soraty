@@ -15,8 +15,10 @@ import CategorySelect from '@/src/app/components/note/category-select';
 import NoteReminderTimeSelect from '@/src/app/components/note/reminder/note-reminder-select';
 import { useSnackbar } from '@/src/app/contexts/snackbar-provider';
 import { useAddNoteMutation, useGetNoteByIdQuery, useUpdateNoteMutation } from '@/src/app/features/notes/note.query';
+import { CustomColors } from '@/src/app/theme/colors';
 import { useForm } from '@tanstack/react-form';
 import { TextInput, useTheme } from 'react-native-paper';
+import { MD3Colors } from 'react-native-paper/lib/typescript/types';
 
 const placeholder = "Enter some rich text...";
 
@@ -52,7 +54,8 @@ type Category = {
 
 export default function NoteDetailScreen() {
 
-    const styles = makeStyles();
+    const { colors } = useTheme();
+    const styles = makeStyles(colors as CustomColors & MD3Colors);
 
     const router = useRouter();
     const { note_id } = useLocalSearchParams();
@@ -327,8 +330,8 @@ export default function NoteDetailScreen() {
 
 
 function FAB() {
-    const styles = makeStyles();
     const { colors } = useTheme();
+    const styles = makeStyles(colors as CustomColors & MD3Colors);
 
 
     return (
@@ -337,7 +340,7 @@ function FAB() {
                 <Check size={24} color={colors.background} />
             </TouchableOpacity>
             <TouchableOpacity style={styles.fabDeleteButton}>
-                <Trash size={24} color={colors.background} />
+                <Trash size={24} color={'#dc2626'} />
             </TouchableOpacity>
         </View>
     );
@@ -551,17 +554,31 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         position: 'absolute',
         bottom: 32,
         right: 32,
-        flexDirection: 'row',
+        flexDirection: 'column',
         gap: 16,
         alignItems: 'center',
         justifyContent: 'center',
-        elevation: 4
+        elevation: 4,
+        // width: 'auto'
     },
     fabConfirmButton: {
-
+        borderRadius: 28,
+        alignItems: 'center',
+        justifyContent: 'center',
+        elevation: 4,
+        // backgroundColor: '#fee2e2',
+        backgroundColor: colors.primary,
+        width: 56,
+        aspectRatio: 1 / 1,
     },
     fabDeleteButton: {
-
+        borderRadius: 28,
+        alignItems: 'center',
+        justifyContent: 'center',
+        elevation: 4,
+        backgroundColor: '#fee2e2',
+        width: 56,
+        aspectRatio: 1 / 1,
     },
 
 })
