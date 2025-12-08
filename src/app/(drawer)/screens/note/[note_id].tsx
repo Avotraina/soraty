@@ -7,7 +7,7 @@ import {
     Trash
 } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Keyboard, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import ColorSelect, { COLORS } from '@/src/app/components/color/color-select';
 import ExampleTheme from "@/src/app/components/dom-components/example-theme";
@@ -59,6 +59,22 @@ export default function NoteDetailScreen() {
 
     const router = useRouter();
     const { note_id } = useLocalSearchParams();
+
+    const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+    useEffect(() => {
+        const showSub = Keyboard.addListener("keyboardDidShow", () =>
+            setKeyboardVisible(true)
+        );
+        const hideSub = Keyboard.addListener("keyboardDidHide", () =>
+            setKeyboardVisible(false)
+        );
+
+        return () => {
+            showSub.remove();
+            hideSub.remove();
+        };
+    }, []);
 
     const [editorState, setEditorState] = useState<string | null>(null);
     const [plainText, setPlainText] = useState("");
@@ -322,24 +338,31 @@ export default function NoteDetailScreen() {
                     </Text>
                 </View>
             </View> */}
-            <FAB />
+            {!keyboardVisible && (
+                <FAB onConfirm={() => form.handleSubmit()} onDelete={() => { }} />
+            )}
 
         </View>
     );
 }
 
+type FABProps = {
+    onConfirm?: () => void;
+    onDelete?: () => void;
+};
 
-function FAB() {
+
+function FAB({ onConfirm, onDelete }: FABProps) {
     const { colors } = useTheme();
     const styles = makeStyles(colors as CustomColors & MD3Colors);
 
 
     return (
         <View style={styles.fabContainer}>
-            <TouchableOpacity style={styles.fabConfirmButton}>
+            <TouchableOpacity style={styles.fabConfirmButton} onPress={onConfirm}>
                 <Check size={24} color={colors.background} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.fabDeleteButton}>
+            <TouchableOpacity style={styles.fabDeleteButton} onPress={onDelete}>
                 <Trash size={24} color={'#dc2626'} />
             </TouchableOpacity>
         </View>
