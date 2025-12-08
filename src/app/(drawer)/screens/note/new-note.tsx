@@ -1,7 +1,7 @@
 import RichEditor, { default as Editor } from '@/src/app/components/dom-components/rich-editor';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import ColorSelect, { COLORS } from '@/src/app/components/color/color-select';
 import ExampleTheme from "@/src/app/components/dom-components/example-theme";
@@ -9,8 +9,11 @@ import CategorySelect from '@/src/app/components/note/category-select';
 import NoteReminderTimeSelect from '@/src/app/components/note/reminder/note-reminder-select';
 import { useSnackbar } from '@/src/app/contexts/snackbar-provider';
 import { useAddNoteMutation } from '@/src/app/features/notes/note.query';
+import { CustomColors } from '@/src/app/theme/colors';
+import { Check } from 'lucide-react-native';
 import { Controller, useForm, useFormState } from 'react-hook-form';
-import { TextInput } from 'react-native-paper';
+import { TextInput, useTheme } from 'react-native-paper';
+import { MD3Colors } from 'react-native-paper/lib/typescript/types';
 
 const placeholder = "Enter some rich text...";
 
@@ -46,7 +49,8 @@ type Category = {
 
 export default function NoteDetailScreen() {
 
-    const styles = makeStyles();
+    const { colors } = useTheme();
+    const styles = makeStyles(colors as CustomColors & MD3Colors);
 
     const router = useRouter();
     const params = useLocalSearchParams();
@@ -240,17 +244,31 @@ export default function NoteDetailScreen() {
                 {/* <RichEditor setPlainText={setPlainText} setEditorState={setEditorState} editorBackgroundColor={selectedColor} /> */}
             </View>
 
-            {/* Footer with metadata */}
-            {/* <View className="bg-white py-3 px-4 border-t border-gray-200" style={styles.footerContainer}>
-                <View className="flex-row justify-between" style={styles.footer}>
-                    <Text className="text-gray-500 text-sm" style={styles.createdAtText}>
-                        Created: {new Date(note.createdAt).toLocaleDateString()}
-                    </Text>
-                    <Text className="text-gray-500 text-sm" style={styles.updatedAtText}>
-                        Last edited: {new Date(note.updatedAt).toLocaleDateString()}
-                    </Text>
-                </View>
-            </View> */}
+            <FAB onConfirm={handleSubmit(onSubmit)} />
+
+
+        </View>
+    );
+}
+
+
+type FABProps = {
+    onConfirm?: () => void;
+    onDelete?: () => void;
+    showConfirmButton?: boolean;
+};
+
+
+function FAB({ onConfirm }: FABProps) {
+    const { colors } = useTheme();
+    const styles = makeStyles(colors as CustomColors & MD3Colors);
+
+
+    return (
+        <View style={styles.fabContainer}>
+            <TouchableOpacity style={styles.fabConfirmButton} onPress={onConfirm}>
+                <Check size={24} color={colors.background} />
+            </TouchableOpacity>
 
         </View>
     );
@@ -457,6 +475,36 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         backgroundColor: '#3b82f6', // Tailwind 'bg-blue-500'
         borderRadius: 8,             // Tailwind 'rounded-lg'
         padding: 8,                  // Tailwind 'p-2' (0.5rem = 8px)
-    }
+    },
+    fabContainer: {
+        position: 'absolute',
+        bottom: 32,
+        right: 32,
+        flexDirection: 'column',
+        gap: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+        elevation: 4,
+        // width: 'auto'
+    },
+    fabConfirmButton: {
+        borderRadius: 28,
+        alignItems: 'center',
+        justifyContent: 'center',
+        elevation: 4,
+        // backgroundColor: '#fee2e2',
+        backgroundColor: colors.primary,
+        width: 56,
+        aspectRatio: 1 / 1,
+    },
+    fabDeleteButton: {
+        borderRadius: 28,
+        alignItems: 'center',
+        justifyContent: 'center',
+        elevation: 4,
+        backgroundColor: '#fee2e2',
+        width: 56,
+        aspectRatio: 1 / 1,
+    },
 
 })

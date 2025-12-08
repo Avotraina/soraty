@@ -1,7 +1,7 @@
 import { ThemeProvider, useThemeContext } from "@/src/app/theme/theme-context";
 import { QueryClientProvider } from "@tanstack/react-query";
 import * as Notifications from 'expo-notifications';
-import { Slot } from "expo-router";
+import { Slot, useRouter } from "expo-router";
 import { SQLiteProvider } from "expo-sqlite";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
@@ -51,6 +51,29 @@ export default function RootLayout() {
         };
 
         setupNotifications();
+    }, []);
+
+    const router = useRouter();
+
+
+    useEffect(() => {
+        // When user taps the notification
+        const subscription = Notifications.addNotificationResponseReceivedListener(
+            (response) => {
+                const data = response.notification.request.content.data;
+
+                // Example: navigate to a note
+                if (data?.noteId) {
+                    // router.push(`/note/${data.noteId}`);
+                    router.push(`/(drawer)/screens/note/${data.noteId}`);
+                }
+
+                // Or navigate to any screen:
+                // router.push("/(drawer)/screens/note/note-list");
+            }
+        );
+
+        return () => subscription.remove();
     }, []);
 
     return (

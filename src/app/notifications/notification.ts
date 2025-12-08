@@ -49,7 +49,7 @@ export async function scheduleReminderNotification(
 
     // Schedule a new one
     const notification_id = await Notifications.scheduleNotificationAsync({
-      content: { title, body, sound: true, data: { reminderId: id } },
+      content: { title, body, sound: true, data: { noteId: id } },
       trigger: scheduledDate as unknown as Notifications.NotificationTriggerInput,
       // trigger: {
       //   type: 'date',
