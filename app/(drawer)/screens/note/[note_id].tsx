@@ -134,6 +134,7 @@ export default function NoteDetailScreen() {
                 }, {
                 onSuccess: async () => {
                     showSnackbar("Note Updated", 'success');
+                    router.back();
                 },
                 onError: async (error) => {
                     console.log("Error", error)
