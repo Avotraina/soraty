@@ -6,7 +6,7 @@ import { T_Note } from '@/app/features/notes/note.repo';
 import { useDebounce } from '@/app/hooks/debounce';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { Folder, Plus, Settings, Trash2 } from 'lucide-react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from 'react-native-paper';
 // import RichViewer from '../components/rich-viewer';
@@ -83,11 +83,12 @@ export default function PostItListScreen() {
     endDate: undefined,
   });
 
+
   const { data } = useNotesInfiniteQuery(filters);
   const noteList = data?.pages[0]?.flatMap((page: any) => page) || []
 
   // ⚡ Sync category_id from URL into filters
-  React.useEffect(() => {
+  useEffect(() => {
     if (category_id) {
       setFilters((prev) => ({
         ...prev,
@@ -208,7 +209,8 @@ export default function PostItListScreen() {
       </View>
 
       {/* Search and Filters */}
-      <NoteFilters onFiltersChange={setFilters} defaultValues={{...filters, category: category_id ? category_id as string : null}} />
+      <NoteFilters onFiltersChange={setFilters} defaultValues={{ ...filters, category: category_id ? category_id as string : null }} />
+      {/* <NoteFilters onFiltersChange={setFilters} defaultValues={{ ...filters }} /> */}
 
 
       {/* Notes List */}

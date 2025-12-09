@@ -82,13 +82,13 @@ export default function CategoriesScreen() {
 
     const navigateToNoteList = (categoryId: string) => {
         // navigation.navigate('NoteList', { categoryId });
-        router.push({ pathname: '/screens/note/note-list',
+        router.navigate({ pathname: '/screens/note/note-list',
             params: { category_id: categoryId }
         });
     };
 
     const renderCategoryItem = ({ item }: { item: Category }) => (
-        <Link href={{ pathname: `/screens/note/note-list`, params: { category_id: item.id } }} asChild>
+        <Link href={{ pathname: `/(drawer)/screens/note/note-list`, params: { category_id: item.id } }} relativeToDirectory push asChild>
             <TouchableOpacity activeOpacity={0.8} className="bg-white rounded-xl p-4 mb-3 shadow-sm flex-row items-center" style={styles.categoryContainer}>
                 <View
                     className="w-12 h-12 rounded-full items-center justify-center mr-4"

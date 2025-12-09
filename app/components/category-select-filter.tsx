@@ -1,5 +1,6 @@
 import { useCategoriesQuery } from "@/app/features/categories/category.query";
 import { T_Category } from "@/app/features/categories/category.repo";
+import { useRouter } from "expo-router";
 import { Folder } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -33,6 +34,8 @@ export default function CategorySelectFilter({
 
     const styles = makeStyles();
 
+    const router = useRouter()
+
     const { data: categoryList } = useCategoriesQuery();
     const categories: T_Category[] = categoryList || []
 
@@ -47,7 +50,7 @@ export default function CategorySelectFilter({
     const handleCategorySelect = (category: Category | null) => {
         setSelectedCategory(category),
             onSelectCategory?.(category); // ⬅️ Notify parent
-            setDefaultValue(null);
+        setDefaultValue(null);
     };
 
     const itemBackgroundColor = (category: T_Category) => {
@@ -64,7 +67,7 @@ export default function CategorySelectFilter({
                 return { backgroundColor: '#e5e7eb' }
             }
         }
-       
+
     }
 
     const itemTextColor = (category: T_Category) => {
@@ -115,7 +118,7 @@ export default function CategorySelectFilter({
                         className={`rounded-full px-3 py-1 mr-2 ${!currentCategory ? 'bg-blue-500' : 'bg-gray-200'}`}
                         style={{ ...styles.categoryFilterAllOptionContainer, backgroundColor: !currentCategory ? '#3b82f6' : '#e5e7eb' }}
                         // style={{ ...styles.categoryFilterAllOptionContainer, ...allButtonBackgroundColor() }}
-                        onPress={() => handleCategorySelect(null)}
+                        onPress={() => { handleCategorySelect(null); router.setParams({ category_id: undefined }) }}
                     >
                         <Text className={!currentCategory ? 'text-white' : 'text-gray-700'} style={{ color: !currentCategory ? '#fff' : '#4b5563' }}>All</Text>
                         {/* <Text className={!currentCategory ? 'text-white' : 'text-gray-700'} style={{ ...allButtonTextColor() }}>All</Text> */}
@@ -127,11 +130,11 @@ export default function CategorySelectFilter({
                             className={`flex-row items-center rounded-full px-3 py-1 mr-2 ${currentCategory?.id === category.id ? 'bg-blue-500' : 'bg-gray-200'}`}
                             style={{ ...styles.categoryFilterOptionsContainer, backgroundColor: currentCategory && currentCategory?.id === category.id ? '#3b82f6' : '#e5e7eb' }}
                             // style={{ ...styles.categoryFilterOptionsContainer, ...itemBackgroundColor(category) }}
-                            onPress={() => handleCategorySelect(selectedCategory?.id === category.id ? null : category)}
+                            onPress={() => { router.setParams({ category_id: category.id }); handleCategorySelect(selectedCategory?.id === category.id ? null : category);}}
                         >
                             <Folder size={12} color={category.color} className="mr-1" style={{ marginRight: 4 }} />
                             <Text className={selectedCategory?.id === category.id ? 'text-white' : 'text-gray-700'} style={{ color: currentCategory?.id === category.id ? '#fff' : '#4b5563' }}>
-                            {/* <Text className={selectedCategory?.id === category.id ? 'text-white' : 'text-gray-700'} style={{ ...itemTextColor(category) }}> */}
+                                {/* <Text className={selectedCategory?.id === category.id ? 'text-white' : 'text-gray-700'} style={{ ...itemTextColor(category) }}> */}
                                 {category.category_name}
                             </Text>
                         </TouchableOpacity>
