@@ -1,7 +1,7 @@
 import { BellRing, X } from "lucide-react-native";
 import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import ReminderDateSelect from "./date-select";
+import CustomReminderDateSelect from "./custom-reminder-date-select";
 import ReminderTimeSelect from "./time-select";
 
 // type ReminderProps = {
@@ -126,7 +126,8 @@ export default function NoteReminderTimeSelect({ value, onChange, submitCount, e
                     >
                         <Text style={{}}>Date</Text>
                     </TouchableOpacity> */}
-                    <ReminderDateSelect onDateSelect={(date) => handleDateTimeSelect('date', date)} value={value?.date} error={isDateMissing} />
+                    {/* <ReminderDateSelect onDateSelect={(date) => handleDateTimeSelect('date', date)} value={value?.date} error={isDateMissing} /> */}
+                    <CustomReminderDateSelect onDateSelect={(date) => handleDateTimeSelect('date', date)} value={value?.date} error={isDateMissing} />
                     <ReminderTimeSelect onTimeSelect={(time) => handleDateTimeSelect('time', time)} value={value?.time} error={isTimeMissing} />
                     {/* <TouchableOpacity
                         className={`rounded-full px-3 py-1 mr-2 `}

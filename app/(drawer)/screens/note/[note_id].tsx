@@ -377,11 +377,14 @@ function FAB({ onConfirm, onDelete, showConfirmButton = false }: FABProps) {
 
     return (
         <View style={styles.fabContainer}>
-            {showConfirmButton && (
+            {/* {showConfirmButton && (
                 <TouchableOpacity style={styles.fabConfirmButton} onPress={onConfirm}>
                     <Check size={24} color={colors.background} />
                 </TouchableOpacity>
-            )}
+            )} */}
+            <TouchableOpacity style={styles.fabConfirmButton} onPress={onConfirm}>
+                    <Check size={24} color={colors.background} />
+                </TouchableOpacity>
             <TouchableOpacity style={styles.fabDeleteButton} onPress={onDelete}>
                 <Trash size={24} color={'#dc2626'} />
             </TouchableOpacity>
