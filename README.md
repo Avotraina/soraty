@@ -48,3 +48,10 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+
+Expo Go to Development Build
+npx expo prebuild --clean      # Generates android/ios folders if not present
+npx expo run:android   # Builds and installs development build on Android
+npx expo run:ios       # Same for iOS
+OR npx expo start --dev-client
