@@ -1,7 +1,8 @@
+// import { DatePicker, DatePickerHandle } from "@s77rt/react-native-date-picker";
 import React, { isValidElement, ReactElement, ReactNode, useCallback } from "react";
 import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { Button } from 'react-native-paper';
-import { DatePickerModal } from 'react-native-paper-dates';
+import { DatePickerModal } from "react-native-paper-dates";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 type DateRangeSelectProps = {
@@ -27,6 +28,8 @@ export default function CustomPaperDateRangePicker({
 }: DateRangeSelectProps) {
     const [range, setRange] = React.useState({ startDate: currentRange?.startDate, endDate: currentRange?.endDate });
     const [open, setOpen] = React.useState(false);
+    // const datePicker = useRef<DatePickerHandle>(null);
+
 
     const onDismiss = React.useCallback(() => {
         setOpen(false);
@@ -48,6 +51,7 @@ export default function CustomPaperDateRangePicker({
                 {
                     ...((children as ReactElement<any>).props || {}),
                     onPress: () => setOpen(true),
+                    // onPress: () => datePicker.current?.showPicker(),
                 }
             )
             : children;
@@ -60,9 +64,20 @@ export default function CustomPaperDateRangePicker({
                     childWithPress
                 ) : (
                     <Button onPress={() => setOpen(true)} uppercase={false} mode="outlined">
+                    {/* // <Button onPress={() => datePicker.current?.showPicker()} uppercase={false} mode="outlined"> */}
                         Pick range
                     </Button>
                 )}
+
+                {/* <DatePicker
+                    ref={datePicker}
+                    style={{ backgroundColor: 'red' }}
+                    type="date"
+                    multiple={true}
+                    collapsable
+                    // value={value ? new Date(value) : date || new Date()}
+                    // onChange={onConfirmSingle}
+                /> */}
 
                 <DatePickerModal
                     locale="en"
@@ -74,7 +89,7 @@ export default function CustomPaperDateRangePicker({
                     onConfirm={onConfirm}
                     allowEditing
                     startYear={1990}
-                // presentationStyle="formSheet"
+                    presentationStyle="pageSheet"
                 />
             </View>
         </SafeAreaProvider>
