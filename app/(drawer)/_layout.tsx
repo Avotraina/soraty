@@ -1,5 +1,9 @@
+import { useRouter } from 'expo-router';
 import { Drawer } from 'expo-router/drawer';
+import { ArrowLeft } from 'lucide-react-native';
+import { View } from 'react-native';
 import 'react-native-get-random-values';
+import { TouchableRipple } from 'react-native-paper';
 
 // export default function RootLayout() {
 // export default function DrawerLayout() {
@@ -23,8 +27,41 @@ import 'react-native-get-random-values';
 
 
 export default function DrawerLayout() {
+
+  const router = useRouter();
+
   return (
-    <Drawer defaultStatus="closed">
+    <Drawer defaultStatus="closed"
+      screenOptions={({ navigation }) => ({
+        headerRight: () => (
+          navigation.canGoBack() && (<View
+            style={{
+              overflow: "hidden",
+              borderRadius: 28,
+              marginRight: 4,
+            }}
+          >
+            <TouchableRipple
+              borderless
+              rippleColor="rgba(0,0,0,.2)"
+              onPress={() => router.back()}
+            >
+              <View
+                style={{
+                  width: 40,
+                  height: 40,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <ArrowLeft size={24} />
+              </View>
+            </TouchableRipple>
+          </View>)
+
+        )
+      })}
+    >
       <Drawer.Screen name="screens/note/note-list" options={{
         title: 'Notes',
         drawerLabel: 'Notes',

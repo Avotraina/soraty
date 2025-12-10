@@ -8,7 +8,6 @@ import { useEffect } from "react";
 import { Platform } from "react-native";
 import { PaperProvider } from "react-native-paper";
 import { ToastProvider } from "react-native-paper-toast";
-import { SafeAreaProvider } from "react-native-safe-area-context";
 import { SnackbarProvider } from "./contexts/snackbar-provider";
 import { migrateDbIfNeeded } from "./database/migrations/init-database";
 import { registerBackgroundReminderTask } from "./notifications/background";
@@ -78,11 +77,13 @@ export default function RootLayout() {
 
     return (
         <ThemeProvider>
-            <SafeAreaProvider>
+            {/* <GestureHandlerRootView style={{flex: 1}}> */}
+            {/* <SafeAreaProvider> */}
                 <SQLiteProvider databaseName="soraty.db" onInit={migrateDbIfNeeded}>
                     <QueryProviderWrapper />
                 </SQLiteProvider>
-            </SafeAreaProvider>
+            {/* </SafeAreaProvider> */}
+            {/* </GestureHandlerRootView> */}
         </ThemeProvider>
     );
 }
