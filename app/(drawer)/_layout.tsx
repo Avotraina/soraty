@@ -91,6 +91,12 @@ export default function DrawerLayout() {
         headerShown: true,
 
       }} />
+      <Drawer.Screen name="screens/settings" options={{
+        title: 'Settings',
+        drawerLabel: 'Settings',
+        headerShown: true,
+
+      }} />
     </Drawer>
   );
 }
