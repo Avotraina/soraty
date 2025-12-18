@@ -1,4 +1,5 @@
 import ThemeSwitch from "@/app/components/settings/theme-switch";
+import { ThemedInputPassword } from "@/app/components/themed/themed-input-password";
 import { CustomColors } from "@/app/theme/colors";
 import { Cloud, Folder, Lock, Palette, Shield, User } from "lucide-react-native";
 import React, { useState } from "react";
@@ -8,7 +9,6 @@ import {
     StyleSheet,
     Switch,
     Text,
-    TextInput,
     TouchableOpacity,
     View
 } from "react-native";
@@ -18,6 +18,7 @@ import { MD3Colors } from "react-native-paper/lib/typescript/types";
 export default function SettingsScreen() {
     const { colors } = useTheme();
     const styles = makeStyles(colors as CustomColors & MD3Colors);
+    
 
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
@@ -95,7 +96,6 @@ export default function SettingsScreen() {
                     <View style={styles.infoRow}>
                         <ThemeSwitch />
                     </View>
-
                 </View>
 
                 {/* Password Section */}
@@ -107,32 +107,36 @@ export default function SettingsScreen() {
 
                     <View style={styles.inputGroup}>
                         <Text style={styles.inputLabel}>Current Password</Text>
-                        <TextInput
+                        {/* <TextInput
                             style={styles.input}
                             secureTextEntry
                             value={currentPassword}
                             onChangeText={setCurrentPassword}
-                        />
+                        /> */}
+                        {/* <ThemedInput style={styles.input} onChangeText={setCurrentPassword} /> */}
+                        <ThemedInputPassword style={styles.input} onChangeText={setCurrentPassword} />
                     </View>
 
                     <View style={styles.inputGroup}>
                         <Text style={styles.inputLabel}>New Password</Text>
-                        <TextInput
+                        {/* <TextInput
                             style={styles.input}
                             secureTextEntry
                             value={newPassword}
                             onChangeText={setNewPassword}
-                        />
+                        /> */}
+                        <ThemedInputPassword style={styles.input} onChangeText={setNewPassword} />
                     </View>
 
                     <View style={styles.inputGroup}>
                         <Text style={styles.inputLabel}>Confirm New Password</Text>
-                        <TextInput
+                        {/* <TextInput
                             style={styles.input}
                             secureTextEntry
                             value={confirmPassword}
                             onChangeText={setConfirmPassword}
-                        />
+                        /> */}
+                        <ThemedInputPassword style={styles.input} onChangeText={setConfirmPassword} />
                     </View>
 
                     <TouchableOpacity
@@ -273,11 +277,11 @@ const makeStyles = (colors: CustomColors & MD3Colors) => StyleSheet.create({
         marginBottom: 4,
     },
     input: {
-        borderWidth: 1,
+        // borderWidth: 1,
         borderColor: colors.outline,
         borderRadius: 12,
-        paddingHorizontal: 16,
-        paddingVertical: 12,
+        // paddingHorizontal: 16,
+        // paddingVertical: 12,
         fontSize: 16,
         color: colors.onSurface,
     },
