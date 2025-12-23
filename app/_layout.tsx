@@ -1,4 +1,6 @@
 import { ThemeProvider, useThemeContext } from "@/app/theme/theme-context";
+// import { NavigationContainer } from "@react-navigation/native";
+import { ThemeProvider as NavigationThemeProvider } from "@react-navigation/native";
 import { QueryClientProvider } from "@tanstack/react-query";
 import * as Notifications from 'expo-notifications';
 import { Slot, useRouter } from "expo-router";
@@ -79,9 +81,9 @@ export default function RootLayout() {
         <ThemeProvider>
             {/* <GestureHandlerRootView style={{flex: 1}}> */}
             {/* <SafeAreaProvider> */}
-                <SQLiteProvider databaseName="soraty.db" onInit={migrateDbIfNeeded}>
-                    <QueryProviderWrapper />
-                </SQLiteProvider>
+            <SQLiteProvider databaseName="soraty.db" onInit={migrateDbIfNeeded}>
+                <QueryProviderWrapper />
+            </SQLiteProvider>
             {/* </SafeAreaProvider> */}
             {/* </GestureHandlerRootView> */}
         </ThemeProvider>
@@ -89,9 +91,14 @@ export default function RootLayout() {
 }
 
 function QueryProviderWrapper() {
+
+    const { theme } = useThemeContext();
+
     return (
         <QueryClientProvider client={queryClient}>
-            <PaperThemeWrapper />
+            <NavigationThemeProvider value={theme}>
+                <PaperThemeWrapper />
+            </NavigationThemeProvider>
         </QueryClientProvider>
     );
 }
@@ -101,9 +108,9 @@ function PaperThemeWrapper() {
 
     return (
         <PaperProvider theme={theme}>
+            <StatusBar style="auto" translucent networkActivityIndicatorVisible />
             <ToastProvider>
                 <SnackbarProvider>
-                    <StatusBar style="inverted" translucent />
                     <Slot />
                 </SnackbarProvider>
             </ToastProvider>

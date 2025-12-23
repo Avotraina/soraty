@@ -40,12 +40,13 @@ export function ThemedInput({
         <TextInput
             mode={mode}
             style={[
-                styles,
+                // styles,
                 style,
             ]}
             onChangeText={onChangeText}
             // placeholderTextColor={color + '99'}
             {...otherProps}
+            // right={right}
         />
     );
 }

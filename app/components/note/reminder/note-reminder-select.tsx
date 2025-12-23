@@ -1,6 +1,10 @@
+import { CustomColors } from "@/app/theme/colors";
 import { BellRing, X } from "lucide-react-native";
 import { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { useTheme } from "react-native-paper";
+import { MD3Colors } from "react-native-paper/lib/typescript/types";
+import { ThemedText } from "../../themed/themed-text";
 import CustomReminderDateSelect from "./custom-reminder-date-select";
 import ReminderTimeSelect from "./time-select";
 
@@ -18,7 +22,7 @@ type ReminderValue = {
 
 type ReminderProps = {
     value: ReminderValue;                                // controlled
-    onChange: (val: ReminderValue) => void; 
+    onChange: (val: ReminderValue) => void;
     submitCount: number;
     error?: any;
     isSubmitSuccessful?: boolean;
@@ -26,7 +30,9 @@ type ReminderProps = {
 
 // export default function NoteReminderTimeSelect({ currentDate, currentTime, onSelectDateTime }: ReminderProps) {
 export default function NoteReminderTimeSelect({ value, onChange, submitCount, error, isSubmitSuccessful }: ReminderProps) {
-    const styles = makeStyles();
+
+    const { colors } = useTheme();
+    const styles = makeStyles(colors as CustomColors & MD3Colors);
 
     const [showReminder, setShowReminder] = useState(false);
     const [date, setDate] = useState<string | undefined | null | any>(undefined);
@@ -85,16 +91,16 @@ export default function NoteReminderTimeSelect({ value, onChange, submitCount, e
             <View className="flex-row justify-between items-center" style={[styles.reminderContainer, { paddingVertical: showReminder ? 0 : 12 }]}>
                 <TouchableOpacity
                     className="flex-row items-center bg-gray-100 rounded-lg px-3 py-2"
-                    style={[styles.reminderButton, hasError ? { backgroundColor: "#fee2e2" } : {},]}
+                    style={[styles.reminderButton, hasError ? { backgroundColor: colors.errorContainer } : {},]}
                     onPress={() => setShowReminder(!showReminder)}
                 >
                     {/* <BellRing size={18} color={(currentDate || currentTime) ? '#1E40AF' : '#666'} fill={(currentDate || currentTime) ? '#1E40AF' : 'transparent'} /> */}
                     <BellRing
                         size={18}
-                        color={hasError ? "#dc2626" : hasReminder ? "#1E40AF" : "#666"}
-                        fill={hasError ? "#dc2626" : hasReminder ? "#1E40AF" : "transparent"}
+                        color={hasError ? colors.error : hasReminder ? colors.primary : (colors as CustomColors & MD3Colors).primaryText}
+                        fill={hasError ? colors.error : hasReminder ? colors.primary : "transparent"}
                     />
-                    <Text className="ml-2 text-gray-700" style={styles.reminderButtonText}>Reminder</Text>
+                    <ThemedText type="normalSemiBold" className="ml-2 text-gray-700" style={[styles.reminderButtonText, { color: hasError ? colors.error : (colors as CustomColors & MD3Colors).primaryText }]}>Reminder</ThemedText>
                 </TouchableOpacity>
 
                 {/* <TouchableOpacity
@@ -103,7 +109,7 @@ export default function NoteReminderTimeSelect({ value, onChange, submitCount, e
                     onPress={handleClearReminder}
                 >
                     <X size={18} color="#666" />
-                    <Text className="ml-2 text-gray-700" style={styles.reminderButtonText}>Clear</Text>
+                    <ThemedText className="ml-2 text-gray-700" style={styles.reminderButtonText}>Clear</ThemedText>
                 </TouchableOpacity> */}
 
                 {(hasReminder) && (
@@ -112,8 +118,8 @@ export default function NoteReminderTimeSelect({ value, onChange, submitCount, e
                         style={styles.clearButton}
                         onPress={() => handleClearReminder()}
                     >
-                        <X size={18} color="#666" />
-                        <Text className="ml-2 text-gray-700" style={styles.reminderButtonText}>Clear</Text>
+                        <X size={18} color={(colors as CustomColors & MD3Colors).error} />
+                        <ThemedText className="ml-2 text-gray-700" style={styles.reminderButtonText}>Clear</ThemedText>
                     </TouchableOpacity>
                 )}
             </View>
@@ -124,7 +130,7 @@ export default function NoteReminderTimeSelect({ value, onChange, submitCount, e
                         className={`rounded-full px-3 py-1 mr-2 `}
                         style={{ ...styles.reminderDateOpener, backgroundColor: '#e5e7eb' }}
                     >
-                        <Text style={{}}>Date</Text>
+                        <ThemedText style={{}}>Date</ThemedText>
                     </TouchableOpacity> */}
                     {/* <ReminderDateSelect onDateSelect={(date) => handleDateTimeSelect('date', date)} value={value?.date} error={isDateMissing} /> */}
                     <CustomReminderDateSelect onDateSelect={(date) => handleDateTimeSelect('date', date)} value={value?.date} error={isDateMissing} />
@@ -133,7 +139,7 @@ export default function NoteReminderTimeSelect({ value, onChange, submitCount, e
                         className={`rounded-full px-3 py-1 mr-2 `}
                         style={{ ...styles.reminderTimeOpener, backgroundColor: '#e5e7eb' }}
                     >
-                        <Text style={{}}>Time</Text>
+                        <ThemedText style={{}}>Time</ThemedText>
                     </TouchableOpacity> */}
                 </View>
             )}
@@ -143,7 +149,7 @@ export default function NoteReminderTimeSelect({ value, onChange, submitCount, e
 }
 
 
-const makeStyles = (colors?: any) => StyleSheet.create({
+const makeStyles = (colors: CustomColors & MD3Colors) => StyleSheet.create({
 
     reminderContainer: {
         flexDirection: 'row',
@@ -152,14 +158,15 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         paddingTop: 12,
         // paddingVertical: 12,
         paddingHorizontal: 16,
-        backgroundColor: 'white',
+        // backgroundColor: 'white',
         // borderBottomWidth: 1,
         // borderBottomColor: '#e5e7eb',
     },
     reminderButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#f0f0f0',
+        // backgroundColor: '#f0f0f0',
+        backgroundColor: colors?.chipsContainer,
         borderRadius: 20,
         paddingHorizontal: 12,
         paddingVertical: 8,
@@ -168,12 +175,12 @@ const makeStyles = (colors?: any) => StyleSheet.create({
     },
     reminderButtonText: {
         fontSize: 14,
-        color: '#333',
+        color: colors.error,
     },
     colorFilterHeaderText: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#333',
+        color: colors.primaryText,
         marginBottom: 8,
     },
     reminderDateTimeContainer: {

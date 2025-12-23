@@ -1,5 +1,9 @@
+import { CustomColors } from "@/app/theme/colors";
 import { Palette } from "lucide-react-native";
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import { useTheme } from "react-native-paper";
+import { MD3Colors } from "react-native-paper/lib/typescript/types";
+import { ThemedText } from "../themed/themed-text";
 
 type ColorSelectProps = {
     onClose?: () => void;
@@ -26,7 +30,8 @@ export default function ColorSelect({
     value
 }: ColorSelectProps) {
 
-    const styles = makeStyles();
+    const { colors } = useTheme();
+    const styles = makeStyles(colors as CustomColors & MD3Colors);
 
     // useEffect(() => {
     //     if (!currentColor && onSelectColor) {
@@ -46,8 +51,8 @@ export default function ColorSelect({
             {/* Color Selection */}
             <View className="py-3 px-4 bg-white border-b border-gray-200" style={styles.colorSelectionContainer}>
                 <View className="flex-row items-center mb-2" style={styles.colorSelectionTitleContainer}>
-                    <Palette size={20} color="#666" className="mr-2" style={{ marginRight: 8 }} />
-                    <Text className="text-gray-700 font-medium" style={styles.colorSelectionTitle}>Note Color</Text>
+                    <Palette size={20} color={(colors as CustomColors & MD3Colors).secondaryText} className="mr-2" style={{ marginRight: 8 }} />
+                    <ThemedText type="normalSemiBold" className="text-gray-700 font-medium" style={styles.colorSelectionTitle}>Note Color</ThemedText>
                 </View>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} className="max-h-16" style={styles.colorSelectionScrollView}>
                     <View className="flex-row gap-3" style={styles.colorsSelectionContainer}>
@@ -56,7 +61,8 @@ export default function ColorSelect({
                                 key={index}
                                 onPress={() => handleColorSelect(color)}
                                 className={`w-10 h-10 rounded-full border-2 ${currentColor === color ? 'border-blue-500' : 'border-gray-300'}`}
-                                style={{ ...styles.colorCircle, backgroundColor: color, borderColor: currentColor === color ? '#3b82f6' : '#d1d5db' }}
+                                // style={{ ...styles.colorCircle, backgroundColor: color, borderColor: currentColor === color ? '#3b82f6' : '#d1d5db' }}
+                                style={{ ...styles.colorCircle, backgroundColor: color, borderColor: currentColor === color ? colors.primary : (colors as CustomColors & MD3Colors).chipsContainer }}
                             // style={{ backgroundColor: color }}
                             />
                         ))}
@@ -68,13 +74,13 @@ export default function ColorSelect({
 
 }
 
-const makeStyles = (colors?: any) => StyleSheet.create({
+const makeStyles = (colors: CustomColors & MD3Colors) => StyleSheet.create({
 
     colorSelectionContainer: {
         paddingVertical: 12,
         paddingHorizontal: 16,
-        backgroundColor: 'white',
-        borderBottomWidth: 1,
+        // backgroundColor: 'white',
+        // borderBottomWidth: 1,
         borderBottomColor: '#e5e7eb',
     },
     colorSelectionTitleContainer: {
@@ -83,8 +89,8 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         marginBottom: 8,
     },
     colorSelectionTitle: {
-        fontSize: 16,
-        color: '#4b5563',
+        // fontSize: 16,
+        color: colors.secondaryText,
     },
     colorSelectionScrollView: {
         maxHeight: 64,

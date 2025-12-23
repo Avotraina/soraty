@@ -1,5 +1,9 @@
+import { CustomColors } from "@/app/theme/colors";
 import { useState } from "react";
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import { useTheme } from "react-native-paper";
+import { MD3Colors } from "react-native-paper/lib/typescript/types";
+import { ThemedText } from "../themed/themed-text";
 // import { useCategoriesInfiniteQuery } from "../../features/categories/category.query";
 // import { useDebounce } from "../../hooks/debounce";
 
@@ -35,7 +39,8 @@ export default function NoteColorSelectFilter({
 
     const [selectedNote, setSelectedNote] = useState<string | null>(null)
 
-    const styles = makeStyles();
+    const { colors } = useTheme();
+    const styles = makeStyles(colors as CustomColors & MD3Colors);
 
     // const { data: categoryList } = useCategoriesQuery();
     // const categories: T_Category[] = categoryList || []
@@ -52,26 +57,26 @@ export default function NoteColorSelectFilter({
                 <View className="flex-row" style={{ flexDirection: 'row' }}>
                     <TouchableOpacity
                         className={`rounded-full px-3 py-1 mr-2 ${!currentColor ? 'bg-blue-500' : 'bg-gray-200'}`}
-                        style={{ ...styles.colorFilterAllOptionContainer, backgroundColor: !currentColor ? '#3b82f6' : '#e5e7eb' }}
+                        style={{ ...styles.colorFilterAllOptionContainer, backgroundColor: !currentColor ? colors.primary : (colors as CustomColors & MD3Colors).chipsContainer }}
                         onPress={() => handleColorSelect(null)}
                     >
-                        <Text className={!currentColor ? 'text-white' : 'text-gray-700'} style={{ color: !currentColor ? '#fff' : '#4b5563' }}>All</Text>
+                        <ThemedText className={!currentColor ? 'text-white' : 'text-gray-700'} style={{ color: !currentColor ? (colors as CustomColors & MD3Colors).primaryText : (colors as CustomColors & MD3Colors).primaryText }}>All</ThemedText>
                     </TouchableOpacity>
 
                     {NOTE_COLORS.map((color) => (
                         <TouchableOpacity
                             key={color.value}
                             className={`flex-row items-center rounded-full px-3 py-1 mr-2 ${currentColor === color.value ? 'bg-blue-500' : 'bg-gray-200'}`}
-                            style={{ ...styles.colorFilterOptionsContainer, backgroundColor: currentColor === color.value ? '#3b82f6' : '#e5e7eb' }}
+                            style={{ ...styles.colorFilterOptionsContainer, backgroundColor: currentColor === color.value ? colors.primary : (colors as CustomColors & MD3Colors).chipsContainer }}
                             onPress={() => handleColorSelect(selectedNote === color.value ? null : color.value)}
                         >
                             <View
                                 className="w-3 h-3 rounded-full mr-1"
                                 style={{ ...styles.colorFilterOptionsCircle, backgroundColor: color?.value }}
                             />
-                            <Text className={selectedNote === color.value ? 'text-white' : 'text-gray-700'} style={{ color: currentColor === color.value ? '#fff' : '#4b5563' }}>
+                            <ThemedText className={selectedNote === color.value ? 'text-white' : 'text-gray-700'} style={{ color: currentColor === color.value ? (colors as CustomColors & MD3Colors).primaryText : (colors as CustomColors & MD3Colors).primaryText }}>
                                 {color.name}
-                            </Text>
+                            </ThemedText>
                         </TouchableOpacity>
                     ))}
                 </View>
@@ -81,7 +86,7 @@ export default function NoteColorSelectFilter({
 }
 
 
-const makeStyles = (colors?: any) => StyleSheet.create({
+const makeStyles = (colors?: CustomColors & MD3Colors) => StyleSheet.create({
 
     colorFilterHeaderText: {
         fontSize: 16,

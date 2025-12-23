@@ -3,7 +3,11 @@ import { T_Category } from "@/app/features/categories/category.repo";
 import { useRouter } from "expo-router";
 import { Folder } from "lucide-react-native";
 import { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import { useTheme } from "react-native-paper";
+import { MD3Colors } from "react-native-paper/lib/typescript/types";
+import { CustomColors } from "../theme/colors";
+import { ThemedText } from "./themed/themed-text";
 // import { useCategoriesInfiniteQuery } from "../../features/categories/category.query";
 // import { useDebounce } from "../../hooks/debounce";
 
@@ -32,7 +36,8 @@ export default function CategorySelectFilter({
     const [selectedCategory, setSelectedCategory] = useState<T_Category | null | undefined>(currentCategory)
     const [defaultValue, setDefaultValue] = useState<string | null | undefined>(value)
 
-    const styles = makeStyles();
+    const { colors } = useTheme();
+    const styles = makeStyles(colors as CustomColors & MD3Colors);
 
     const router = useRouter()
 
@@ -116,27 +121,27 @@ export default function CategorySelectFilter({
                 <View className="flex-row" style={{ flexDirection: 'row' }}>
                     <TouchableOpacity
                         className={`rounded-full px-3 py-1 mr-2 ${!currentCategory ? 'bg-blue-500' : 'bg-gray-200'}`}
-                        style={{ ...styles.categoryFilterAllOptionContainer, backgroundColor: !currentCategory ? '#3b82f6' : '#e5e7eb' }}
+                        style={{ ...styles.categoryFilterAllOptionContainer, backgroundColor: !currentCategory ? colors.primary : (colors as CustomColors & MD3Colors).chipsContainer }}
                         // style={{ ...styles.categoryFilterAllOptionContainer, ...allButtonBackgroundColor() }}
                         onPress={() => { handleCategorySelect(null); router.setParams({ category_id: undefined }) }}
                     >
-                        <Text className={!currentCategory ? 'text-white' : 'text-gray-700'} style={{ color: !currentCategory ? '#fff' : '#4b5563' }}>All</Text>
-                        {/* <Text className={!currentCategory ? 'text-white' : 'text-gray-700'} style={{ ...allButtonTextColor() }}>All</Text> */}
+                        <ThemedText className={!currentCategory ? 'text-white' : 'text-gray-700'} style={{ color: !currentCategory ? (colors as CustomColors & MD3Colors).primaryText : (colors as CustomColors & MD3Colors).primaryText }}>All</ThemedText>
+                        {/* <ThemedText className={!currentCategory ? 'text-white' : 'text-gray-700'} style={{ ...allButtonTextColor() }}>All</ThemedText> */}
                     </TouchableOpacity>
 
                     {categories.map((category) => (
                         <TouchableOpacity
                             key={category.id}
                             className={`flex-row items-center rounded-full px-3 py-1 mr-2 ${currentCategory?.id === category.id ? 'bg-blue-500' : 'bg-gray-200'}`}
-                            style={{ ...styles.categoryFilterOptionsContainer, backgroundColor: currentCategory && currentCategory?.id === category.id ? '#3b82f6' : '#e5e7eb' }}
+                            style={{ ...styles.categoryFilterOptionsContainer, backgroundColor: currentCategory && currentCategory?.id === category.id ? colors.primary : (colors as CustomColors & MD3Colors).chipsContainer }}
                             // style={{ ...styles.categoryFilterOptionsContainer, ...itemBackgroundColor(category) }}
-                            onPress={() => { router.setParams({ category_id: category.id }); handleCategorySelect(selectedCategory?.id === category.id ? null : category);}}
+                            onPress={() => { router.setParams({ category_id: category.id }); handleCategorySelect(selectedCategory?.id === category.id ? null : category); }}
                         >
-                            <Folder size={12} color={category.color} className="mr-1" style={{ marginRight: 4 }} />
-                            <Text className={selectedCategory?.id === category.id ? 'text-white' : 'text-gray-700'} style={{ color: currentCategory?.id === category.id ? '#fff' : '#4b5563' }}>
-                                {/* <Text className={selectedCategory?.id === category.id ? 'text-white' : 'text-gray-700'} style={{ ...itemTextColor(category) }}> */}
+                            <Folder size={12} color={category.color} fill={currentCategory && currentCategory?.id === category.id ? category.color : 'none'} className="mr-1" style={{ marginRight: 4 }} />
+                            <ThemedText className={selectedCategory?.id === category.id ? 'text-white' : 'text-gray-700'} style={{ color: currentCategory?.id === category.id ? (colors as CustomColors & MD3Colors).primaryText : (colors as CustomColors & MD3Colors).primaryText }}>
+                                {/* <ThemedText className={selectedCategory?.id === category.id ? 'text-white' : 'text-gray-700'} style={{ ...itemTextColor(category) }}> */}
                                 {category.category_name}
-                            </Text>
+                            </ThemedText>
                         </TouchableOpacity>
                     ))}
                 </View>
@@ -146,7 +151,7 @@ export default function CategorySelectFilter({
 }
 
 
-const makeStyles = (colors?: any) => StyleSheet.create({
+const makeStyles = (colors: CustomColors & MD3Colors) => StyleSheet.create({
 
     categoryFilterHeaderText: {
         fontSize: 16,

@@ -1,8 +1,12 @@
 import { useCategoriesQuery } from "@/app/features/categories/category.query";
 import { useDebounce } from "@/app/hooks/debounce";
+import { CustomColors } from "@/app/theme/colors";
 import { Check, Folder, X } from "lucide-react-native";
 import { useState } from "react";
-import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Modal, StyleSheet, TouchableOpacity, View } from "react-native";
+import { useTheme } from "react-native-paper";
+import { MD3Colors } from "react-native-paper/lib/typescript/types";
+import { ThemedText } from "../themed/themed-text";
 
 
 
@@ -26,7 +30,8 @@ export default function CategorySelect({
     value
 }: CategorySelectProps) {
 
-    const styles = makeStyles();
+    const { colors } = useTheme();
+    const styles = makeStyles(colors as CustomColors & MD3Colors);
 
     const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
 
@@ -58,18 +63,18 @@ export default function CategorySelect({
                     style={styles.categorySelectionTouchable}
                     onPress={() => setIsCategoryModalVisible(true)}
                 >
-                    <Folder size={20} color="#666" className="mr-2" style={{ marginRight: 8 }} />
-                    <Text className="text-gray-700 font-medium mr-2" style={styles.categorySelectionTitle}>Category</Text>
+                    <Folder size={20} color={(colors as CustomColors & MD3Colors).secondaryText} className="mr-2" style={{ marginRight: 8 }} />
+                    <ThemedText type="normalSemiBold" className="text-gray-700 font-medium mr-2" style={styles.categorySelectionTitle}>Category</ThemedText>
                     {currentCategory ? (
                         <View className="flex-row items-center bg-gray-100 rounded-full px-3 py-1" style={styles.selectedCategoryContainer}>
                             <View
                                 className="w-3 h-3 rounded-full mr-2"
                                 style={{ ...styles.selectedCategory, backgroundColor: currentCategory.color }}
                             />
-                            <Text className="text-gray-800" style={styles.selectedCategoryName}>{currentCategory.category_name}</Text>
+                            <ThemedText className="text-gray-800" style={styles.selectedCategoryName}>{currentCategory.category_name}</ThemedText>
                         </View>
                     ) : (
-                        <Text className="text-gray-400" style={styles.noCategorySelectedText}>None selected</Text>
+                        <ThemedText className="text-gray-400" style={styles.noCategorySelectedText}>None selected</ThemedText>
                     )}
                 </TouchableOpacity>
             </View>
@@ -85,7 +90,7 @@ export default function CategorySelect({
                 <View className="flex-1 justify-end bg-black/50" style={styles.categoryModalOverlay}>
                     <View className="bg-white rounded-t-2xl p-4" style={styles.categoryModalContainer}>
                         <View className="flex-row justify-between items-center mb-4" style={styles.categoryModalHeaderContainer}>
-                            <Text className="text-xl font-bold text-gray-800" style={styles.categoryModalTitle}>Select Category</Text>
+                            <ThemedText type="subtitle" className="text-xl font-bold text-gray-800" style={styles.categoryModalTitle}>Select Category</ThemedText>
                             <TouchableOpacity onPress={() => setIsCategoryModalVisible(false)}>
                                 <X size={24} color="#666" />
                             </TouchableOpacity>
@@ -100,6 +105,7 @@ export default function CategorySelect({
                             />
                         </View> */}
 
+
                         {/* None Option */}
                         <TouchableOpacity
                             className="flex-row items-center py-3 border-b border-gray-100"
@@ -113,7 +119,7 @@ export default function CategorySelect({
                                 {/* {!note.category && <Check size={16} color="#4A90E2" />} */}
                                 {!currentCategory && <Check size={16} color="#4A90E2" />}
                             </View>
-                            <Text className="text-gray-700" style={styles.categoryModalNoneText}>None</Text>
+                            <ThemedText type="default" className="text-gray-700" style={styles.categoryModalNoneText}>None</ThemedText>
                         </TouchableOpacity>
 
                         {/* Category List */}
@@ -137,7 +143,7 @@ export default function CategorySelect({
                                         className="w-3 h-3 rounded-full mr-3"
                                         style={{ width: 12, height: 12, borderRadius: 9999, marginRight: 12, backgroundColor: item.color }}
                                     />
-                                    <Text className="text-gray-700" style={styles.categoryModalListName}>{item.category_name}</Text>
+                                    <ThemedText type="default" className="text-gray-700" style={styles.categoryModalListName}>{item.category_name}</ThemedText>
                                 </TouchableOpacity>
                             )}
                             keyExtractor={(item) => item.id}
@@ -164,13 +170,13 @@ export default function CategorySelect({
                                     className="w-3 h-3 rounded-full mr-3"
                                     style={{ width: 12, height: 12, borderRadius: 9999, marginRight: 12, backgroundColor: category.color }}
                                 />
-                                <Text className="text-gray-700" style={styles.categoryModalListName}>{category.category_name}</Text>
+                                <ThemedText className="text-gray-700" style={styles.categoryModalListName}>{category.category_name}</ThemedText>
                             </TouchableOpacity>
                         ))} */}
 
                         {/* Add New Category */}
                         {/* <View className="flex-row items-center py-3 mt-2" style={styles.addNewCategoryContainer}>
-                            <TextInput
+                            <ThemedTextInput
                                 className="flex-1 border border-gray-300 rounded-lg p-2 mr-2"
                                 style={styles.addNewCategoryInput}
                                 placeholder="New category"
@@ -193,28 +199,29 @@ export default function CategorySelect({
 }
 
 
-const makeStyles = (colors?: any) => StyleSheet.create({
+const makeStyles = (colors: CustomColors & MD3Colors) => StyleSheet.create({
 
     categorySelectionContainer: {
         paddingVertical: 12,
         paddingHorizontal: 16,
-        backgroundColor: 'white',
-        borderBottomWidth: 1,
-        borderBottomColor: '#e5e7eb',
+        // backgroundColor: 'white',
+        // borderBottomWidth: 1,
+        // borderBottomColor: '#e5e7eb',
     },
     categorySelectionTouchable: {
         flexDirection: 'row',
         alignItems: 'center',
     },
     categorySelectionTitle: {
-        color: '#4b5563',
-        fontSize: 16,
+        // color: '#4b5563',
+        // fontSize: 16,
+        color: colors.secondaryText,
         marginRight: 8,
     },
     selectedCategoryContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#f3f4f6',
+        backgroundColor: colors.primary,
         borderRadius: 9999,
         paddingHorizontal: 12,
         paddingVertical: 4
@@ -226,18 +233,20 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         marginRight: 8,
     },
     selectedCategoryName: {
-        color: '#1f2937'
+        color: colors.primaryText,
     },
     noCategorySelectedText: {
-        color: '#9ca3af',
+        // color: '#9ca3af',
+        color: colors.secondaryText
     },
     categoryModalOverlay: {
         flex: 1,
         justifyContent: 'flex-end',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)'
+        backgroundColor: colors.background + '80', // semi-transparent background
+        
     },
     categoryModalContainer: {
-        backgroundColor: 'white',
+        backgroundColor: colors.card,
         borderTopLeftRadius: 16,
         borderTopRightRadius: 16,
         padding: 16,
@@ -249,16 +258,16 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         marginBottom: 16,
     },
     categoryModalTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#1f2937',
+        // fontSize: 20,
+        // fontWeight: 'bold',
+        color: colors.primaryText
     },
     categoryModalNoneOptionContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 12,
         borderBottomWidth: 1,           // Tailwind's default width
-        borderBottomColor: '#e5e7eb',
+        borderBottomColor: colors.primaryText + '20',
         marginTop: 8,
     },
     categoryModalNoneOptionCheck: {
@@ -266,20 +275,21 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         height: 24,
         borderRadius: 9999,
         borderWidth: 2,              // Tailwind border-2
-        borderColor: '#e5e7eb',
+        borderColor: colors.primaryText,
+
         marginRight: 12,
         alignItems: 'center',
         justifyContent: 'center',
     },
     categoryModalNoneText: {
-        color: '#374151'
+        color: colors.primaryText,
     },
     categoryModalListContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 12,
         borderBottomWidth: 1,           // Tailwind's default width
-        borderBottomColor: '#e5e7eb',
+        borderBottomColor: colors.primaryText + '20',
     },
     categoryModalOptionCheck: {
         width: 24,
@@ -292,7 +302,8 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         justifyContent: 'center',
     },
     categoryModalListName: {
-        color: '#374151'
+        color: colors.primaryText,
+
     },
     addNewCategoryContainer: {
         flexDirection: 'row',

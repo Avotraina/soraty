@@ -1,7 +1,11 @@
+import { CustomColors } from '@/app/theme/colors';
 import { Clock } from 'lucide-react-native';
 import { useCallback, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
+import { useTheme } from 'react-native-paper';
 import { TimePickerModal } from 'react-native-paper-dates';
+import { MD3Colors } from 'react-native-paper/lib/typescript/types';
+import { ThemedText } from '../../themed/themed-text';
 
 type ReminderTimeSelectProps = {
     onTimeSelect?: (date: Date | null | any) => void;
@@ -11,7 +15,8 @@ type ReminderTimeSelectProps = {
 
 export default function ReminderTimeSelect({ onTimeSelect, value, error }: ReminderTimeSelectProps) {
 
-    const styles = makeStyles();
+    const { colors } = useTheme();
+    const styles = makeStyles(colors as CustomColors & MD3Colors);
 
     const [time, setTime] = useState<string | undefined>(undefined);
     const [open, setOpen] = useState(false);
@@ -60,13 +65,13 @@ export default function ReminderTimeSelect({ onTimeSelect, value, error }: Remin
         <>
             <TouchableOpacity
                 className={`rounded-full px-3 py-1 mr-2 `}
-                style={{ ...styles.reminderDateOpener, backgroundColor: error ? '#fee2e2' : '#e5e7eb' }}
+                style={{ ...styles.reminderDateOpener, backgroundColor: error ? colors.errorContainer : (colors as CustomColors & MD3Colors).chipsContainer }}
                 onPress={() => setOpen(true)}
             // onPress={() => handleCategorySelect(null)}
             >
-                <Clock color={error ? '#dc2626' : '#000'} />
+                <Clock color={error ? colors.error : (colors as CustomColors & MD3Colors).primaryText} />
                 {/* <Text>{value ? (value instanceof Date ? formatDate(value) : String(value)) : time ? time : 'Select Time'}</Text> */}
-                <Text>{value ? value : 'Select Time'}</Text>
+                <ThemedText type='default' style={[styles.reminderTimeText, { color: error ? colors.error : (colors as CustomColors & MD3Colors).primaryText }]}>{value ? value : 'Select Time'}</ThemedText>
             </TouchableOpacity>
             <TimePickerModal
                 visible={open}
@@ -100,5 +105,8 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'flex-start',
         gap: 6,
+    },
+    reminderTimeText: {
+        color: colors.primaryText,
     },
 })

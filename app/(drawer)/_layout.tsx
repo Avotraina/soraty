@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import { Drawer } from 'expo-router/drawer';
 import { ArrowLeft } from 'lucide-react-native';
-import { View } from 'react-native';
+import { useColorScheme, View } from 'react-native';
 import 'react-native-get-random-values';
 import { TouchableRipple } from 'react-native-paper';
 
@@ -29,6 +29,7 @@ import { TouchableRipple } from 'react-native-paper';
 export default function DrawerLayout() {
 
   const router = useRouter();
+  const scheme = useColorScheme(); // light | dark
 
   return (
     <Drawer defaultStatus="closed"

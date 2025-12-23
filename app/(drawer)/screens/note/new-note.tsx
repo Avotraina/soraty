@@ -7,12 +7,13 @@ import ColorSelect, { COLORS } from '@/app/components/color/color-select';
 import ExampleTheme from "@/app/components/dom-components/example-theme";
 import CategorySelect from '@/app/components/note/category-select';
 import NoteReminderTimeSelect from '@/app/components/note/reminder/note-reminder-select';
+import { ThemedInput } from '@/app/components/themed/themed-input';
 import { useSnackbar } from '@/app/contexts/snackbar-provider';
 import { useAddNoteMutation } from '@/app/features/notes/note.query';
 import { CustomColors } from '@/app/theme/colors';
 import { Check } from 'lucide-react-native';
 import { Controller, useForm, useFormState } from 'react-hook-form';
-import { TextInput, useTheme } from 'react-native-paper';
+import { useTheme } from 'react-native-paper';
 import { MD3Colors } from 'react-native-paper/lib/typescript/types';
 
 const placeholder = "Enter some rich text...";
@@ -127,10 +128,11 @@ export default function NoteDetailScreen() {
                             name="note_title"
                             rules={{ required: "Title is required" }}
                             render={({ field: { onChange, value } }) => (
-                                <TextInput
+                                <ThemedInput
                                     className="text-white text-xl font-bold bg-transparent"
                                     style={styles.titleInput}
-                                    textColor='#333'
+                                    mode='outlined'
+                                    textColor={(colors as CustomColors & MD3Colors).primaryText}
                                     value={value}
                                     // onChangeText={(text) => setNote({ ...note, title: text })}
                                     onChangeText={onChange}
@@ -144,16 +146,6 @@ export default function NoteDetailScreen() {
                         />
 
                     </View>
-
-                    {/* <TouchableOpacity
-                        // onPress={handleSave}
-                        // onPress={handleSubmit(handleSave)}
-                        onPress={handleSubmit(onSubmit)}
-                        className="p-2 rounded-full bg-blue-600"
-                        style={styles.saveButtonContainer}
-                    >
-                        <Save size={24} color="white" />
-                    </TouchableOpacity> */}
                 </View>
             </View>
 
@@ -230,7 +222,7 @@ export default function NoteDetailScreen() {
             />
 
 
-            <View style={{ backgroundColor: 'black', borderRadius: 12, overflow: 'hidden', flex: 1 }}>
+            <View style={{ borderRadius: 12, overflow: 'hidden', flex: 1 }}>
 
                 <Controller
                     control={control}
@@ -274,7 +266,7 @@ function FAB({ onConfirm }: FABProps) {
     );
 }
 
-const makeStyles = (colors?: any) => StyleSheet.create({
+const makeStyles = (colors: CustomColors & MD3Colors) => StyleSheet.create({
 
     container: {
         flex: 1,

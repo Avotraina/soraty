@@ -2,9 +2,13 @@ import { formatDate } from '@/app/utils/date-time';
 // import { DatePickerHandle } from '@s77rt/react-native-date-picker';
 import { Calendar1 } from 'lucide-react-native';
 import { useCallback, useRef, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 // import { DatePickerModal } from 'react-native-paper-dates';
+import { CustomColors } from '@/app/theme/colors';
 import { DatePicker, type DatePickerHandle } from "@s77rt/react-native-date-picker";
+import { useTheme } from 'react-native-paper';
+import { MD3Colors } from 'react-native-paper/lib/typescript/types';
+import { ThemedText } from '../../themed/themed-text';
 
 type ReminderDateSelectProps = {
     onDateSelect: (date: Date | null | any) => void;
@@ -14,7 +18,8 @@ type ReminderDateSelectProps = {
 
 export default function CustomReminderDateSelect({ onDateSelect, value, error }: ReminderDateSelectProps) {
 
-    const styles = makeStyles();
+    const { colors } = useTheme();
+    const styles = makeStyles(colors as CustomColors & MD3Colors);
 
     const [date, setDate] = useState(undefined);
     const [open, setOpen] = useState(false);
@@ -52,14 +57,14 @@ export default function CustomReminderDateSelect({ onDateSelect, value, error }:
         <>
             <TouchableOpacity
                 className={`rounded-full px-3 py-1 mr-2 `}
-                style={{ ...styles.reminderDateOpener, backgroundColor: error ? '#fee2e2' : '#e5e7eb' }}
+                style={{ ...styles.reminderDateOpener, backgroundColor: error ? colors.errorContainer : (colors as CustomColors & MD3Colors).chipsContainer }}
                 // onPress={() => setOpen(true)}
                 onPress={() => datePicker.current?.showPicker()}
             // onPress={() => handleCategorySelect(null)}
             >
-                <Calendar1 color={error ? '#dc2626' : '#000'} />
+                <Calendar1 color={error ? colors.error : (colors as CustomColors & MD3Colors).primaryText} />
                 {/* <Text>{value ? value : date ? formatDate(date) : "Select Date"}</Text> */}
-                <Text>{value ? formatDate(value) : "Select Date"}</Text>
+                <ThemedText type='default' style={[styles.reminderDateText, { color: error ? colors.error : (colors as CustomColors & MD3Colors).primaryText }]}>{value ? formatDate(value) : "Select Date"}</ThemedText>
             </TouchableOpacity>
 
             {/* <DatePickerModal
@@ -74,7 +79,7 @@ export default function CustomReminderDateSelect({ onDateSelect, value, error }:
             /> */}
             <DatePicker
                 ref={datePicker}
-                style={{backgroundColor: 'red'}}
+                style={{ backgroundColor: 'red' }}
                 type="date"
                 // multiple={true}
                 value={value ? new Date(value) : date || new Date()}
@@ -85,7 +90,7 @@ export default function CustomReminderDateSelect({ onDateSelect, value, error }:
 
 }
 
-const makeStyles = (colors?: any) => StyleSheet.create({
+const makeStyles = (colors: CustomColors & MD3Colors) => StyleSheet.create({
     reminderDateOpener: {
         borderRadius: 9999,
         paddingHorizontal: 12,
@@ -96,5 +101,8 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'flex-start',
         gap: 6,
+    },
+    reminderDateText: {
+        color: colors.primaryText,
     },
 })

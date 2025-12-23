@@ -3,10 +3,17 @@ import CustomPaperDateRangePicker from "@/app/components/custom-paper-date-range
 import NoteColorSelectFilter from "@/app/components/filters/note-color-select-filter";
 import { T_Category } from "@/app/features/categories/category.repo";
 import { useDebounce } from "@/app/hooks/debounce";
+import { CustomColors } from "@/app/theme/colors";
 import { formatDate } from "@/app/utils/date-time";
 import { Calendar, Filter, Folder, Plus, Search, X } from "lucide-react-native";
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { TextInput as PaperTextInput, useTheme } from "react-native-paper";
+import { MD3Colors } from "react-native-paper/lib/typescript/types";
+import { ThemedInput } from "../themed/themed-input";
+import { ThemedText } from "../themed/themed-text";
+
+
 
 const NOTE_COLORS = [
     { name: 'Yellow', value: '#FFF9C4' },
@@ -35,7 +42,8 @@ export default function NoteFilters({ onFiltersChange, defaultValues }: {
     }
 }) {
 
-    const styles = makeStyles();
+    const { colors } = useTheme();
+    const styles = makeStyles(colors as CustomColors & MD3Colors);
 
     // Search and filter states
     const [searchQuery, setSearchQuery] = useState('');
@@ -77,11 +85,31 @@ export default function NoteFilters({ onFiltersChange, defaultValues }: {
         <>
             <View className="bg-white py-3 px-4" style={styles.searchFilterContainer}>
                 {/* Search Bar */}
-                <View className="flex-row items-center bg-gray-100 rounded-xl px-3 mb-3" style={styles.searchContainer}>
+                <ThemedInput
+                    style={styles.searchInput}
+                    outlineStyle={{ borderRadius: 25 }}
+                    // contentStyle={{ paddingVertical: 0, flexDirection: 'row', alignItems: 'center', alignContent: 'center', justifyContent: 'center', backgroundColor: 'blue', marginVertical: 10 }}
+                    mode="outlined"
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                    placeholder="Search notes..."
+                    right={
+                        <PaperTextInput.Icon
+                            icon={() => <X size={20} color="#999" onPress={() => setSearchQuery('')} />}
+                        />
+                    }
+                    left={
+                        <PaperTextInput.Icon
+                            icon={() => <Search size={20} color="#999" />}
+                        />
+                    }
+                />
+                {/* <View className="flex-row items-center bg-gray-100 rounded-xl px-3 mb-3" style={styles.searchContainer}>
+
                     <Search size={20} color="#999" />
-                    <TextInput
+                    <ThemedTextInput
                         className="flex-1 py-3 px-2"
-                        style={styles.searchInput}
+                        style={styles.searchInputs}
                         placeholder="Search notes..."
                         value={searchQuery}
                         onChangeText={setSearchQuery}
@@ -91,7 +119,7 @@ export default function NoteFilters({ onFiltersChange, defaultValues }: {
                             <X size={20} color="#999" />
                         </TouchableOpacity>
                     )}
-                </View>
+                </View> */}
 
                 {/* Filter Button */}
                 <View className="flex-row justify-between items-center" style={styles.filtersContainer}>
@@ -100,14 +128,14 @@ export default function NoteFilters({ onFiltersChange, defaultValues }: {
                         style={styles.filterButton}
                         onPress={() => setShowFilters(!showFilters)}
                     >
-                        <Filter size={18} color="#666" />
-                        <Text className="ml-2 text-gray-700" style={styles.filterButtonText}>Filters</Text>
+                        <Filter size={18} color={colors?.primary} />
+                        <ThemedText type="default" className="ml-2 text-gray-700" style={styles.filterButtonText}>Filters</ThemedText>
                     </TouchableOpacity>
 
                     {/* Active Filters Indicator */}
                     {(filterColor || filterDate || filterCategory || dateFilter?.startDate || categoryFilter || colorFilter || defaultValues) && (
                         <View className="flex-row" style={styles.activeFiltersContainer}>
-                           
+
                             {colorFilter && (
                                 <View
                                     className="flex-row items-center bg-blue-100 rounded-full px-3 py-1 mr-2"
@@ -118,7 +146,7 @@ export default function NoteFilters({ onFiltersChange, defaultValues }: {
                                         style={{ ...styles.activeColorCircle, backgroundColor: colorFilter }}
 
                                     />
-                                    <Text className="text-xs text-blue-800" style={styles.activeColorText}>Color</Text>
+                                    <ThemedText className="text-xs text-blue-800" style={styles.activeColorText}>Color</ThemedText>
                                 </View>
                             )}
                             {categoryFilter && (
@@ -126,8 +154,8 @@ export default function NoteFilters({ onFiltersChange, defaultValues }: {
                                     className="flex-row items-center bg-purple-100 rounded-full px-3 py-1"
                                     style={styles.activeCategoryFilterContainer}
                                 >
-                                    <Folder size={12} color="#7e22ce" />
-                                    <Text className="text-xs text-purple-800 ml-1" style={styles.activeCategoryFilterText}>Category</Text>
+                                    <Folder size={12} color={categoryFilter.color} />
+                                    <ThemedText className="text-xs text-purple-800 ml-1" style={styles.activeCategoryFilterText}>Category</ThemedText>
                                 </View>
                             )}
                             {dateFilter?.startDate && (
@@ -135,8 +163,8 @@ export default function NoteFilters({ onFiltersChange, defaultValues }: {
                                     className="flex-row items-center bg-green-100 rounded-full px-3 py-1"
                                     style={styles.activeDateFilterContainer}
                                 >
-                                    <Calendar size={12} color="#065f46" />
-                                    <Text className="text-xs text-green-800 ml-1" style={styles.activeDateFilterText}>Date</Text>
+                                    <Calendar size={12} color={colors.primary} />
+                                    <ThemedText className="text-xs text-green-800 ml-1" style={styles.activeDateFilterText}>Date</ThemedText>
                                 </View>
                             )}
                         </View>
@@ -147,39 +175,39 @@ export default function NoteFilters({ onFiltersChange, defaultValues }: {
                 {showFilters && (
                     <View className="mt-3" style={styles.filtersOptionsContainer}>
                         {/* Color Filters */}
-                        <Text className="font-semibold text-gray-700 mb-2" style={styles.colorFilterHeaderText}>Filter by Color:</Text>
+                        <ThemedText type="normalSemiBold" className="font-semibold text-gray-700 mb-2" style={styles.colorFilterHeaderText}>Filter by Color:</ThemedText>
                         <NoteColorSelectFilter currentColor={colorFilter} onSelectColor={setColorFilter} />
 
                         {/* Category Filters */}
-                        <Text className="font-semibold text-gray-700 mb-2" style={styles.categoryFilterHeaderText}>Filter by Category:</Text>
+                        <ThemedText type="normalSemiBold"  className="font-semibold text-gray-700 mb-2" style={styles.categoryFilterHeaderText}>Filter by Category:</ThemedText>
                         <CategorySelectFilter currentCategory={categoryFilter} value={defaultValues?.category ?? ''} onSelectCategory={setCategoryFilter} />
 
 
 
                         {/* Date Filters */}
-                        <Text className="font-semibold text-gray-700 mb-2" style={styles.dateFilterHeaderText}>Filter by Date:</Text>
+                        <ThemedText type="normalSemiBold"  className="font-semibold text-gray-700 mb-2" style={styles.dateFilterHeaderText}>Filter by Date:</ThemedText>
                         <View className="flex-row flex-wrap" style={styles.dateFilterHeaderContainer}>
                             <TouchableOpacity
                                 className={`rounded-full px-3 py-1 mr-2 mb-2 ${!dateFilter.startDate ? 'bg-blue-500' : 'bg-gray-200'}`}
-                                style={{ ...styles.colorDateAllOptionContainer, backgroundColor: !dateFilter.startDate ? '#3b82f6' : '#e5e7eb' }}
+                                style={{ ...styles.colorDateAllOptionContainer, backgroundColor: !dateFilter.startDate ? colors.primary : (colors as CustomColors & MD3Colors).chipsContainer }}
                                 onPress={() => { setFilterDate(null); console.log("Date range", dateFilter); setDateFilter({ startDate: undefined, endDate: undefined }) }}
                             >
-                                <Text className={!dateFilter ? 'text-white' : 'text-gray-700'} style={{ color: !dateFilter.startDate ? '#fff' : '#4b5563' }}>All Dates</Text>
+                                <ThemedText className={!dateFilter ? 'text-white' : 'text-gray-700'} style={{ color: !dateFilter.startDate ? (colors as CustomColors & MD3Colors).primaryText : (colors as CustomColors & MD3Colors).primaryText }}>All Dates</ThemedText>
                             </TouchableOpacity>
 
                             <CustomPaperDateRangePicker currentRange={dateFilter} onSelectDateRange={setDateFilter} style={{ justifyContent: 'flex-start', flex: 1, alignItems: 'flex-start' }}>
                                 <TouchableOpacity
                                     className={`rounded-full px-3 py-1 mr-2 mb-2 ${!filterDate ? 'bg-blue-500' : 'bg-gray-200'}`}
-                                    style={{ borderRadius: 9999, paddingHorizontal: 12, paddingVertical: 4, backgroundColor: dateFilter.startDate ? '#3b82f6' : '#e5e7eb' }}
+                                    style={{ borderRadius: 9999, paddingHorizontal: 12, paddingVertical: 4, backgroundColor: dateFilter.startDate ? colors.primary : (colors as CustomColors & MD3Colors).chipsContainer }}
                                     onPress={() => { setFilterDate(null); console.log("Date range", dateFilter) }}
                                 >
 
                                     {dateFilter?.startDate ? (
-                                        <Text className={!dateFilter.startDate ? 'text-white' : 'text-gray-700'} style={{ color: dateFilter.startDate ? '#fff' : '#4b5563' }}>
+                                        <ThemedText className={!dateFilter.startDate ? 'text-white' : 'text-gray-700'} style={{ color: dateFilter.startDate ? (colors as CustomColors & MD3Colors).primaryText : (colors as CustomColors & MD3Colors).primaryText }}>
                                             {`${dateFilter?.startDate ? formatDate(dateFilter.startDate) : ''} ${dateFilter?.endDate ? '-' : ''} ${dateFilter?.endDate ? formatDate(dateFilter.endDate) : ''}`}
-                                        </Text>
+                                        </ThemedText>
                                     ) : (
-                                        <Plus color={dateFilter.startDate ? 'white' : 'black'} size={20} />
+                                        <Plus color={dateFilter.startDate ? (colors as CustomColors & MD3Colors).primaryText : (colors as CustomColors & MD3Colors).primaryText} size={20} />
                                     )}
 
                                 </TouchableOpacity>
@@ -202,7 +230,7 @@ export default function NoteFilters({ onFiltersChange, defaultValues }: {
                                     setColorFilter(null)
                                 }}
                             >
-                                <Text className="text-red-700" style={styles.clearFilterButtonText}>Clear Filters</Text>
+                                <ThemedText  className="text-red-700" style={styles.clearFilterButtonText}>Clear Filters</ThemedText>
                             </TouchableOpacity>
                         )}
                     </View>
@@ -212,9 +240,9 @@ export default function NoteFilters({ onFiltersChange, defaultValues }: {
     )
 }
 
-const makeStyles = (colors?: any) => StyleSheet.create({
+const makeStyles = (colors?: CustomColors & MD3Colors) => StyleSheet.create({
     searchFilterContainer: {
-        backgroundColor: 'white',
+        backgroundColor: colors?.background,
         paddingVertical: 12,
         paddingHorizontal: 16,
     },
@@ -227,6 +255,19 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         marginBottom: 12,
     },
     searchInput: {
+        // flex: 1,
+        borderRadius: 25,
+        // alignItems: 'center',
+        justifyContent: 'center',
+        alignContent: 'center',
+        
+
+        // paddingVertical: 8,
+        paddingHorizontal: 12,
+        fontSize: 16,
+        marginBottom: 12,
+    },
+    searchInputs: {
         flex: 1,
         paddingVertical: 8,
         paddingHorizontal: 12,
@@ -241,7 +282,8 @@ const makeStyles = (colors?: any) => StyleSheet.create({
     filterButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#f0f0f0',
+        // backgroundColor: '#f0f0f0',
+        backgroundColor: colors?.chipsContainer,
         borderRadius: 20,
         paddingHorizontal: 12,
         paddingVertical: 8,
@@ -250,7 +292,8 @@ const makeStyles = (colors?: any) => StyleSheet.create({
     },
     filterButtonText: {
         fontSize: 14,
-        color: '#333',
+        // color: '#333',
+        color: colors?.primaryText,
     },
     activeFiltersContainer: {
         flexDirection: 'row',
@@ -263,7 +306,8 @@ const makeStyles = (colors?: any) => StyleSheet.create({
     activeColorFilterContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#dbeafe',
+        // backgroundColor: '#1E293B',
+        backgroundColor: colors?.chipsContainer,
         borderRadius: 9999,
         paddingHorizontal: 12,
         paddingVertical: 4,
@@ -278,12 +322,14 @@ const makeStyles = (colors?: any) => StyleSheet.create({
     },
     activeColorText: {
         fontSize: 12,
-        color: '#1E40AF',
+        // color: '#1E40AF',
+        color: colors?.text,
     },
     activeCategoryFilterContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#f3e8ff', // Tailwind bg-purple-100
+        // backgroundColor: '#f3e8ff', // Tailwind bg-purple-100
+        backgroundColor: colors?.chipsContainer,
         borderRadius: 9999,
         paddingHorizontal: 12,
         paddingVertical: 4,
@@ -291,29 +337,33 @@ const makeStyles = (colors?: any) => StyleSheet.create({
     },
     activeCategoryFilterText: {
         fontSize: 12,             // Tailwind 'text-xs'
-        color: '#6b21a8',         // Tailwind 'text-purple-800'
+        // color: '#6b21a8',         // Tailwind 'text-purple-800'
+        color: colors?.primaryText,         // Tailwind 'text-purple-800'
         marginLeft: 4,            // Tailwind 'ml-1' (0.25rem = 4px)
     },
     activeDateFilterContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#d1fae5',
+        // backgroundColor: '#d1fae5',
+        backgroundColor: colors?.chipsContainer,
         borderRadius: 9999,
         paddingHorizontal: 12,
         paddingVertical: 4,
     },
     activeDateFilterText: {
         fontSize: 12,
-        color: '#065f46',
+        // color: '#065f46',
+        color: colors?.text,
         marginLeft: 4,
     },
     filtersOptionsContainer: {
         marginTop: 12,
     },
     colorFilterHeaderText: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#333',
+        // fontSize: 16,
+        // fontWeight: '600',
+        // color: '#333',
+        color: colors?.secondaryText,
         marginBottom: 8,
     },
     colorFilterOptionsScrollContainer: {
@@ -340,9 +390,10 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         marginRight: 8,
     },
     categoryFilterHeaderText: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#333',
+        // fontSize: 16,
+        // fontWeight: '600',
+        // color: '#333',
+        color: colors?.secondaryText,
         marginBottom: 8,
     },
     categoryFilterOptionsScrollContainer: {
@@ -363,9 +414,10 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         marginRight: 8,
     },
     dateFilterHeaderText: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#333',
+        // fontSize: 16,
+        // fontWeight: '600',
+        // color: '#333',
+        color: colors?.secondaryText,
         marginBottom: 8,
     },
     dateFilterHeaderContainer: {
@@ -399,5 +451,6 @@ const makeStyles = (colors?: any) => StyleSheet.create({
     },
     clearFilterButtonText: {
         color: '#b91c1c',
+        // fontSize: 2,
     },
 })

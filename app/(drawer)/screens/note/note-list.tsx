@@ -1,14 +1,17 @@
 import DeleteNoteConfirmation from '@/app/components/note/delete-note-confirmation';
 import NoteFilters from '@/app/components/note/note-filters';
 import RichViewer from '@/app/components/rich-viewer';
+import { ThemedText } from '@/app/components/themed/themed-text';
 import { useNotesInfiniteQuery } from '@/app/features/notes/note.query';
 import { T_Note } from '@/app/features/notes/note.repo';
 import { useDebounce } from '@/app/hooks/debounce';
+import { CustomColors } from '@/app/theme/colors';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
-import { Folder, Plus, Settings, Trash2 } from 'lucide-react-native';
+import { Folder, Plus, Trash2 } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useTheme } from 'react-native-paper';
+import { MD3Colors } from 'react-native-paper/lib/typescript/types';
 // import RichViewer from '../components/rich-viewer';
 
 // Define types
@@ -50,7 +53,8 @@ const NOTE_COLORS = [
 
 export default function PostItListScreen() {
 
-  const styles = makeStyles();
+  const { colors } = useTheme();
+  const styles = makeStyles(colors as CustomColors & MD3Colors);
 
   const router = useRouter();
   const { note_id, category_id } = useLocalSearchParams();
@@ -134,9 +138,9 @@ export default function PostItListScreen() {
         >
 
           <View className="flex-row justify-between items-start" style={styles.noteHeaderContainer}>
-            <Text className="text-lg font-bold text-gray-800 mb-2" style={styles.noteHeaderTitle} numberOfLines={1}>
+            <ThemedText className="text-lg font-bold text-gray-800 mb-2" style={styles.noteHeaderTitle} numberOfLines={1}>
               {item.note_title || 'Untitled'}
-            </Text>
+            </ThemedText>
             <TouchableOpacity style={styles.noteHeaderIconsContainer} onPress={() => handleDelete(item)}>
               <Trash2 size={18} color="#666" />
             </TouchableOpacity>
@@ -148,22 +152,22 @@ export default function PostItListScreen() {
               style={{ ...styles.noteCategoryContainer, backgroundColor: `${item.category_color}40` }}
             >
               <Folder size={12} color={item?.category_color} />
-              <Text
+              <ThemedText
                 className="text-xs font-medium ml-1"
                 style={{ ...styles.noteCategoryText, color: item.category_color }}
               >
                 {item.category_name}
-              </Text>
+              </ThemedText>
             </View>
           )}
 
-          {/* <Text className="text-gray-700 mb-3" numberOfLines={4} style={styles.noteContentText}>
+          {/* <ThemedText className="text-gray-700 mb-3" numberOfLines={4} style={styles.noteContentText}>
           {item.note_content}
-        </Text> */}
-          {/* <Text className="text-gray-700 mb-3" numberOfLines={4} style={styles.noteContentText}>
+        </ThemedText> */}
+          {/* <ThemedText className="text-gray-700 mb-3" numberOfLines={4} style={styles.noteContentText}>
                     <RichViewer value={item.note_content as any} />
 
-        </Text> */}
+        </ThemedText> */}
 
           {/* <View style={{ marginBottom: 12 }}> */}
           {/* <RichViewer value={item.note_content} /> */}
@@ -171,11 +175,11 @@ export default function PostItListScreen() {
           {/* </View> */}
 
           {/* <RichViewer value={item.note_content} /> */}
-          {/* <Text className="text-gray-700 mb-3" numberOfLines={4} style={styles.noteContentText}>
-        </Text> */}
-          <Text className="text-xs text-gray-500 mt-auto" style={styles.noteFooterText}>
+          {/* <ThemedText className="text-gray-700 mb-3" numberOfLines={4} style={styles.noteContentText}>
+        </ThemedText> */}
+          <ThemedText className="text-xs text-gray-500 mt-auto" style={styles.noteFooterText}>
             {/* {item.createdAt.toLocaleDateString()} */}
-          </Text>
+          </ThemedText>
         </TouchableOpacity>
 
       </Link>
@@ -188,23 +192,21 @@ export default function PostItListScreen() {
       {/* Header */}
       <View className="bg-white py-4 px-4 shadow-sm" style={styles.headerContainer}>
         <View className="flex-row justify-between items-center" style={styles.header}>
-          <Text className="text-2xl font-bold text-gray-800" style={styles.headerTitle}>My Notes</Text>
-          <View className="flex-row" style={styles.headerButtonsContainer}>
+          <ThemedText type='title' className="text-2xl font-bold text-gray-800" style={styles.headerTitle}>My Notes</ThemedText>
+          {/* <View className="flex-row" style={styles.headerButtonsContainer}>
             <TouchableOpacity
               className="mr-4 p-2 rounded-full bg-blue-100"
-              // onPress={() => router.push('/settings')}
               style={{ ...styles.headerButtonContainer }}
             >
               <Settings size={20} color="#4A90E2" />
             </TouchableOpacity>
             <TouchableOpacity
               className="p-2 rounded-full bg-blue-100"
-              // onPress={() => setModalVisible(true)}
               style={{ ...styles.headerButtonContainer }}
             >
               <Plus size={20} color="#4A90E2" />
             </TouchableOpacity>
-          </View>
+          </View> */}
         </View>
       </View>
 
@@ -226,8 +228,8 @@ export default function PostItListScreen() {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View className="flex-1 justify-center items-center py-10" style={styles.noteListEmptyContainer}>
-            <Text className="text-gray-500 text-lg" style={styles.noteListEmptyTitleText}>No notes found</Text>
-            <Text className="text-gray-400 mt-1" style={styles.noteListEmptySubtitleText}>Try adjusting your search or filters</Text>
+            <ThemedText className="text-gray-500 text-lg" style={styles.noteListEmptyTitleText}>No notes found</ThemedText>
+            <ThemedText className="text-gray-400 mt-1" style={styles.noteListEmptySubtitleText}>Try adjusting your search or filters</ThemedText>
           </View>
         }
       />
@@ -243,7 +245,7 @@ function FAB() {
 
   const { colors } = useTheme();
 
-  const styles = makeStyles(colors);
+  const styles = makeStyles(colors as CustomColors & MD3Colors);
 
   return (
     <Link href="/screens/note/new-note" asChild >
@@ -269,7 +271,7 @@ function FAB() {
 }
 
 
-const makeStyles = (colors?: any) => StyleSheet.create({
+const makeStyles = (colors: CustomColors & MD3Colors) => StyleSheet.create({
 
   container: {
     flex: 1,
@@ -293,7 +295,7 @@ const makeStyles = (colors?: any) => StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: colors?.primaryText,
   },
   headerButtonsContainer: {
     flexDirection: 'row',

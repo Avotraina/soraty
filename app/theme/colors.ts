@@ -36,6 +36,9 @@ export type CustomColors = NavigationColors & PaperColors & {
     infoContainer: string;
     warningContainer: string;
     errorContainer: string;
+
+    chipsContainer?: string;
+
 }
 
 
@@ -75,28 +78,35 @@ export const defaultColors = {
 
     dark: {
         background: '#0F1115',
-        primary: '#A2D2FF',
-        secondary: '#FFAFCC',
-        tertiary: '#CDB4DB',
-        notification: '#FFC8DD',
+        primary: '#818CF8',
+        secondary: '#FF8A8A',
+        tertiary: '#9CA3AF',
+        notification: '#FACC15',
         // surface: '#FFFFFF',
         // surface: '#1E2025',
-        surface: '#232428',
-        text: '#EAEAEA',
+        surface: '#1A1C20',
+        text: '#F3F4F6',
         border: '#D0D0D0',
         error: '#FF4D4D',
         warning: '#F39C12',
         success: '#2ECC71',
         info: '#3498DB',
-        primaryText: '#1A1A1A',
-        secondaryText: '#4A4A4A',
-        placeholderText: '#7A7A7A',
-        card: '#e70f0fff',
+        primaryText: '#F9FAFB',
+        secondaryText: '#9CA3AF',
+        placeholderText: '#6B7280',
+        card: '#16181B', // (Drawer and header background)
         shadow: '#ffffffff',
 
         successContainer: '#d4edda',
         infoContainer: '#cce5ff',
         errorContainer: '#f8d7da',
         warningContainer: '#fff3cd',
+
+
+        chipsContainer: '#1E293B',
+
+
+
+
     } as CustomColors,
 };

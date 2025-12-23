@@ -231,7 +231,7 @@ export default function SettingsScreen() {
 const makeStyles = (colors: CustomColors & MD3Colors) => StyleSheet.create({
     screen: {
         flex: 1,
-        backgroundColor: "#f9fafb",
+        backgroundColor: colors.background,
     },
     scrollContent: {
         padding: 16,
