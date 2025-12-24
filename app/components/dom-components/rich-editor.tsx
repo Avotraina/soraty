@@ -147,6 +147,7 @@ export default function RichEditor({
   setPlainText,
   setEditorState,
   editorBackgroundColor,
+  toolbarStyle,
   onChange,
   value,
   setJson,
@@ -154,6 +155,7 @@ export default function RichEditor({
   setPlainText: React.Dispatch<React.SetStateAction<string>>;
   setEditorState: React.Dispatch<React.SetStateAction<string | null>>;
   editorBackgroundColor?: string;
+  toolbarStyle?: React.CSSProperties;
   onChange?: (text: string) => void;
   value?: string;
   setJson: React.Dispatch<React.SetStateAction<any>>
@@ -195,7 +197,7 @@ export default function RichEditor({
         {/* <div style={{}}> */}
         {/* </div> */}
         <div className="editor-container">
-          <ToolbarPlugin />
+          <ToolbarPlugin style={toolbarStyle} />
           <div className="editor-inner" style={{ backgroundColor: bgColor }}>
             <RichTextPlugin
               contentEditable={

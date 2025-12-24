@@ -78,7 +78,7 @@ h1 {
   scrollbar-color: #bbb transparent;
   overflow: hidden;
 
-  background-color: red;
+  /* background-color: red; */
 }
 
 .editor-inner {

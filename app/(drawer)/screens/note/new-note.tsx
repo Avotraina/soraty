@@ -229,7 +229,7 @@ export default function NoteDetailScreen() {
                     name="note_content"
                     rules={{}}
                     render={({ field: { onChange, value } }) => (
-                        <RichEditor setPlainText={setPlainText} setEditorState={setEditorState} editorBackgroundColor={selectedColor} onChange={onChange} value={value} setJson={setJson} />
+                        <RichEditor toolbarStyle={{backgroundColor: (colors as CustomColors & MD3Colors).chipsContainer, color: (colors as CustomColors & MD3Colors).primaryText}} setPlainText={setPlainText} setEditorState={setEditorState} editorBackgroundColor={selectedColor} onChange={onChange} value={value} setJson={setJson} />
                     )}
                 />
 

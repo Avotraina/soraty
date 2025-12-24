@@ -34,7 +34,13 @@ function Divider() {
   return <div className="divider" />;
 }
 
-export default function ToolbarPlugin() {
+export default function ToolbarPlugin(
+  {
+    style,
+  }: {
+    style?: React.CSSProperties;
+  }
+) {
   const [editor] = useLexicalComposerContext();
   const toolbarRef = useRef(null);
   const [canUndo, setCanUndo] = useState(false);
@@ -159,7 +165,7 @@ export default function ToolbarPlugin() {
   }, [editor, $updateToolbar]);
 
   return (
-    <div className="toolbar" ref={toolbarRef}>
+    <div className="toolbar" style={style} ref={toolbarRef}>
       <button
         disabled={!canUndo}
         onClick={() => {
@@ -167,6 +173,7 @@ export default function ToolbarPlugin() {
         }}
         className="toolbar-item spaced"
         aria-label="Undo"
+        style={{color: style?.color}}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -190,6 +197,7 @@ export default function ToolbarPlugin() {
         }}
         className="toolbar-item"
         aria-label="Redo"
+        style={{color: style?.color}}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -213,6 +221,7 @@ export default function ToolbarPlugin() {
         }}
         className={"toolbar-item spaced " + (isBold ? "active" : "")}
         aria-label="Format Bold"
+        style={{color: style?.color}}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -231,6 +240,7 @@ export default function ToolbarPlugin() {
         }}
         className={"toolbar-item spaced " + (isItalic ? "active" : "")}
         aria-label="Format Italics"
+        style={{color: style?.color}}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -249,6 +259,7 @@ export default function ToolbarPlugin() {
         }}
         className={"toolbar-item spaced " + (isUnderline ? "active" : "")}
         aria-label="Format Underline"
+        style={{color: style?.color}}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -267,6 +278,7 @@ export default function ToolbarPlugin() {
         }}
         className={"toolbar-item spaced " + (isStrikethrough ? "active" : "")}
         aria-label="Format Strikethrough"
+        style={{color: style?.color}}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -286,6 +298,7 @@ export default function ToolbarPlugin() {
         }}
         className="toolbar-item spaced"
         aria-label="Left Align"
+        style={{color: style?.color}}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -307,6 +320,7 @@ export default function ToolbarPlugin() {
         }}
         className="toolbar-item spaced"
         aria-label="Center Align"
+        style={{color: style?.color}}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -328,6 +342,7 @@ export default function ToolbarPlugin() {
         }}
         className="toolbar-item spaced"
         aria-label="Right Align"
+        style={{color: style?.color}}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -349,6 +364,7 @@ export default function ToolbarPlugin() {
         }}
         className="toolbar-item"
         aria-label="Justify Align"
+        style={{color: style?.color}}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -376,6 +392,7 @@ export default function ToolbarPlugin() {
         onClick={() => toggleList("bullet")}
         className={`toolbar-item spaced ${blockType === "bullet" ? "active" : ""}`}
         aria-label="Bulleted List"
+        style={{color: style?.color}}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -399,6 +416,7 @@ export default function ToolbarPlugin() {
         onClick={() => toggleList("number")}
         className="toolbar-item spaced"
         aria-label="Numbered List"
+        style={{color: style?.color}}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
