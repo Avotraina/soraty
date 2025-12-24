@@ -5,7 +5,7 @@ import {
     Trash
 } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { Keyboard, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Keyboard, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import ColorSelect, { COLORS } from '@/app/components/color/color-select';
 import ExampleTheme from "@/app/components/dom-components/example-theme";
@@ -331,7 +331,7 @@ export default function NoteDetailScreen() {
 
 
 
-            <View style={{ borderRadius: 12, overflow: 'hidden', flex: 1 }}>
+            <View style={[{ borderRadius: 12, overflow: 'hidden', flex: 1,  }, keyboardVisible && styles.editorModal,]}>
                 <form.Field
                     name="note_content"
                     children={(field) => (
@@ -403,7 +403,7 @@ const makeStyles = (colors: CustomColors & MD3Colors) => StyleSheet.create({
         flex: 1,
         // backgroundColor: '#f9fafb',
         // display: 'flex',
-        // overflow: 'hidden',
+        // overflow: 'visible',
     },
     headerContainer: {
         // backgroundColor: '#3b82f6',
@@ -640,5 +640,23 @@ const makeStyles = (colors: CustomColors & MD3Colors) => StyleSheet.create({
         width: 56,
         aspectRatio: 1 / 1,
     },
+    editorModal: {
+        position: 'absolute',
+        top: height / 2 - 300, // adjust half of modal height
+        left: width / 2 - (width * 0.9) / 2, // center horizontally
+        width: width * 0.9,
+        height: 600, // fixed height for modal
+        zIndex: 1000,
+        backgroundColor: colors.surface,
+        borderRadius: 16,
+        // padding: 16,
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+    },
 
 })
+
+const { width, height } = Dimensions.get('window');

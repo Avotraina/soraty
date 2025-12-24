@@ -1,7 +1,7 @@
 import RichEditor, { default as Editor } from '@/app/components/dom-components/rich-editor';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Dimensions, Keyboard, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import ColorSelect, { COLORS } from '@/app/components/color/color-select';
 import ExampleTheme from "@/app/components/dom-components/example-theme";
@@ -55,6 +55,22 @@ export default function NoteDetailScreen() {
 
     const router = useRouter();
     const params = useLocalSearchParams();
+
+    const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+    useEffect(() => {
+        const showSub = Keyboard.addListener("keyboardDidShow", () =>
+            setKeyboardVisible(true)
+        );
+        const hideSub = Keyboard.addListener("keyboardDidHide", () =>
+            setKeyboardVisible(false)
+        );
+
+        return () => {
+            showSub.remove();
+            hideSub.remove();
+        };
+    }, []);
 
     const [editorState, setEditorState] = useState<string | null>(null);
     const [plainText, setPlainText] = useState("");
@@ -114,13 +130,6 @@ export default function NoteDetailScreen() {
             {/* Header */}
             <View className="bg-blue-500 py-4 px-4 shadow-md" style={styles.headerContainer}>
                 <View className="flex-row items-center justify-between" style={styles.header}>
-                    {/* <TouchableOpacity
-                        onPress={() => router.back()}
-                        className="p-2 rounded-full bg-blue-600"
-                        style={styles.backButtonContainer}
-                    >
-                        <ArrowLeft size={24} color="white" />
-                    </TouchableOpacity> */}
 
                     <View className="flex-1 px-4" style={styles.titleContainer}>
                         <Controller
@@ -221,22 +230,22 @@ export default function NoteDetailScreen() {
             />
 
 
-            <View style={{ borderRadius: 12, overflow: 'hidden', flex: 1 }}>
-
+            {/* <View style={{ borderRadius: 12, overflow: 'hidden', flex: 1 }}> */}
+            <View style={[{ borderRadius: 12, overflow: 'hidden', flex: 1, }, keyboardVisible && styles.editorModal,]}>
                 <Controller
                     control={control}
                     name="note_content"
                     rules={{}}
                     render={({ field: { onChange, value } }) => (
-                        <RichEditor toolbarStyle={{backgroundColor: (colors as CustomColors & MD3Colors).chipsContainer, color: (colors as CustomColors & MD3Colors).primaryText}} setPlainText={setPlainText} setEditorState={setEditorState} editorBackgroundColor={selectedColor} onChange={onChange} value={value} setJson={setJson} />
+                        <RichEditor toolbarStyle={{ backgroundColor: (colors as CustomColors & MD3Colors).chipsContainer, color: (colors as CustomColors & MD3Colors).primaryText }} setPlainText={setPlainText} setEditorState={setEditorState} editorBackgroundColor={selectedColor} onChange={onChange} value={value} setJson={setJson} />
                     )}
                 />
 
                 {/* <RichEditor setPlainText={setPlainText} setEditorState={setEditorState} editorBackgroundColor={selectedColor} /> */}
             </View>
-
-            <FAB onConfirm={handleSubmit(onSubmit)} />
-
+            {!keyboardVisible && (
+                <FAB onConfirm={handleSubmit(onSubmit)} />
+            )}
 
         </View>
     );
@@ -497,5 +506,23 @@ const makeStyles = (colors: CustomColors & MD3Colors) => StyleSheet.create({
         width: 56,
         aspectRatio: 1 / 1,
     },
+    editorModal: {
+        position: 'absolute',
+        top: height / 2 - 300, // adjust half of modal height
+        left: width / 2 - (width * 0.9) / 2, // center horizontally
+        width: width * 0.9,
+        height: 600, // fixed height for modal
+        zIndex: 1000,
+        backgroundColor: colors.surface,
+        borderRadius: 16,
+        // padding: 16,
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+    },
 
 })
+
+const { width, height } = Dimensions.get('window');
