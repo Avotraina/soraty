@@ -137,8 +137,7 @@ export default function NoteDetailScreen() {
                                     // onChangeText={(text) => setNote({ ...note, title: text })}
                                     onChangeText={onChange}
                                     placeholder="Note Title"
-                                    placeholderTextColor="#33333350"
-
+                                    placeholderTextColor={(colors as CustomColors & MD3Colors).placeholderText}
                                     error={!!errors.note_title}
                                 />
                             )}
@@ -494,7 +493,7 @@ const makeStyles = (colors: CustomColors & MD3Colors) => StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         elevation: 4,
-        backgroundColor: '#fee2e2',
+        backgroundColor: colors.errorContainer,
         width: 56,
         aspectRatio: 1 / 1,
     },

@@ -12,12 +12,14 @@ import ExampleTheme from "@/app/components/dom-components/example-theme";
 import CategorySelect from '@/app/components/note/category-select';
 import DeleteNoteConfirmation from '@/app/components/note/delete-note-confirmation';
 import NoteReminderTimeSelect from '@/app/components/note/reminder/note-reminder-select';
+import { ThemedInput } from '@/app/components/themed/themed-input';
+import { ThemedText } from '@/app/components/themed/themed-text';
 import { useSnackbar } from '@/app/contexts/snackbar-provider';
 import { useGetNoteByIdQuery, useUpdateNoteMutation } from '@/app/features/notes/note.query';
 import { CustomColors } from '@/app/theme/colors';
 import { formatDate } from '@/app/utils/date-time';
 import { useForm } from '@tanstack/react-form';
-import { TextInput, useTheme } from 'react-native-paper';
+import { useTheme } from 'react-native-paper';
 import { MD3Colors } from 'react-native-paper/lib/typescript/types';
 
 const placeholder = "Enter some rich text...";
@@ -229,15 +231,16 @@ export default function NoteDetailScreen() {
                                     value === '' ? 'Title is required' : undefined,
                             }}
                             children={(field) => (
-                                <TextInput
+                                <ThemedInput
                                     className="text-white text-xl font-bold bg-transparent"
                                     style={styles.titleInput}
-                                    textColor='#333'
+                                    mode='outlined'
+                                    textColor={(colors as CustomColors & MD3Colors).primaryText}
                                     value={field.state.value}
                                     onChangeText={(text) => field.handleChange(text)}
                                     onBlur={field.handleBlur}
                                     placeholder="Note Title"
-                                    placeholderTextColor="#33333350"
+                                    placeholderTextColor={(colors as CustomColors & MD3Colors).placeholderText}
                                     error={!!field.state.meta.errors.length}
                                 />
                             )}
@@ -328,11 +331,12 @@ export default function NoteDetailScreen() {
 
 
 
-            <View style={{ backgroundColor: 'black', borderRadius: 12, overflow: 'hidden', flex: 1 }}>
+            <View style={{ borderRadius: 12, overflow: 'hidden', flex: 1 }}>
                 <form.Field
                     name="note_content"
                     children={(field) => (
                         <RichEditor
+                            toolbarStyle={{ backgroundColor: (colors as CustomColors & MD3Colors).chipsContainer, color: (colors as CustomColors & MD3Colors).primaryText }}
                             setPlainText={setPlainText}
                             setEditorState={setEditorState}
                             editorBackgroundColor={selectedColor}
@@ -347,12 +351,12 @@ export default function NoteDetailScreen() {
             {/* Footer with metadata */}
             <View className="bg-white py-3 px-4 border-t border-gray-200" style={styles.footerContainer}>
                 <View className="flex-row justify-between" style={styles.footer}>
-                    <Text className="text-gray-500 text-sm" style={styles.createdAtText}>
+                    <ThemedText type='default' className="text-gray-500 text-sm" style={styles.createdAtText}>
                         Created: {formatDate(noteData?.created_at)}
-                    </Text>
-                    <Text className="text-gray-500 text-sm" style={styles.updatedAtText}>
+                    </ThemedText>
+                    <ThemedText type='default' className="text-gray-500 text-sm" style={styles.updatedAtText}>
                         Last edited: {formatDate(noteData?.updated_at)}
-                    </Text>
+                    </ThemedText>
                 </View>
             </View>
             {!keyboardVisible && (
@@ -384,16 +388,16 @@ function FAB({ onConfirm, onDelete, showConfirmButton = false }: FABProps) {
                 </TouchableOpacity>
             )} */}
             <TouchableOpacity style={styles.fabConfirmButton} onPress={onConfirm}>
-                    <Check size={24} color={colors.background} />
-                </TouchableOpacity>
+                <Check size={24} color={colors.background} />
+            </TouchableOpacity>
             <TouchableOpacity style={styles.fabDeleteButton} onPress={onDelete}>
-                <Trash size={24} color={'#dc2626'} />
+                <Trash size={24} color={colors.error} />
             </TouchableOpacity>
         </View>
     );
 }
 
-const makeStyles = (colors?: any) => StyleSheet.create({
+const makeStyles = (colors: CustomColors & MD3Colors) => StyleSheet.create({
 
     container: {
         flex: 1,
@@ -418,7 +422,7 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        
+
     },
     backButtonContainer: {
         padding: 8,
@@ -507,11 +511,11 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         color: '#9ca3af',
     },
     footerContainer: {
-        backgroundColor: 'white',
+        // backgroundColor: 'white',
         paddingVertical: 4,
         paddingHorizontal: 16,
         borderTopWidth: 1,
-        borderTopColor: '#e5e7eb',
+        // borderTopColor: '#e5e7eb',
     },
     footer: {
         flexDirection: 'row',
@@ -519,11 +523,11 @@ const makeStyles = (colors?: any) => StyleSheet.create({
     },
     createdAtText: {
         fontSize: 12,
-        color: '#6b7280',
+        color: colors.secondaryText,
     },
     updatedAtText: {
         fontSize: 12,
-        color: '#6b7280',
+        color: colors.secondaryText,
     },
     categoryModalOverlay: {
         flex: 1,
@@ -632,7 +636,7 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         elevation: 4,
-        backgroundColor: '#fee2e2',
+        backgroundColor: colors.errorContainer,
         width: 56,
         aspectRatio: 1 / 1,
     },
