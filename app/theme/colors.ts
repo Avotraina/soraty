@@ -104,9 +104,5 @@ export const defaultColors = {
 
 
         chipsContainer: '#1E293B',
-
-
-
-
     } as CustomColors,
 };

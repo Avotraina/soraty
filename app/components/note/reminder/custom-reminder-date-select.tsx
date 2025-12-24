@@ -79,11 +79,44 @@ export default function CustomReminderDateSelect({ onDateSelect, value, error }:
             /> */}
             <DatePicker
                 ref={datePicker}
-                style={{ backgroundColor: 'red' }}
+                
+                // style={{ backgroundColor: 'red' }}
+                style={{ backgroundColor: 'red', borderColor: 'red' }}
+                styles={{
+                    accentColor: colors.primary,
+                    // containerColor: colors.surface,
+                    containerColor: (colors as CustomColors & MD3Colors).elevation.level3,
+                    dividerColor: colors.outlineVariant,
+                    titleContentColor: colors.onSurface,
+                    headlineContentColor: colors.onSurfaceVariant,
+                    weekdayContentColor: colors.onSurfaceVariant,
+                    subheadContentColor: colors.onSurfaceVariant,
+                    navigationContentColor: colors.primary,
+                    selectedDayContainerColor: colors.primary,
+                    selectedDayContentColor: colors.onPrimary,
+                    todayDateBorderColor: colors.primary,
+                    dayContentColor: colors.onSurfaceVariant,
+                    yearContentColor: colors.onSurfaceVariant,
+                    todayContentColor: colors.primary,
+                    disabledDayContentColor: (colors as CustomColors & MD3Colors).placeholderText,
+                    // selectedYearContentColor: colors.error
+                    currentYearContentColor: colors.primary,
+                    periodSelectorSelectedContentColor: 'red'
+                    
+                    
+                    // periodSelectorBorderColor: colors.outlineVariant,
+                }}
                 type="date"
                 // multiple={true}
                 value={value ? new Date(value) : date || new Date()}
+                // value={value ? new Date(value) : date || (() => { const d = new Date(); d.setDate(d.getDate() - 5); return d; })()}
                 onChange={onConfirmSingle}
+                min={new Date()}
+                options={{
+                    mode: 'compact',
+                    showModeToggle: false
+                }}
+
             />
         </>
     );
