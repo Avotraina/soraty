@@ -85,7 +85,8 @@ export default function CustomReminderDateSelect({ onDateSelect, value, error }:
                 styles={{
                     accentColor: colors.primary,
                     // containerColor: colors.surface,
-                    containerColor: (colors as CustomColors & MD3Colors).elevation.level3,
+                    containerColor: (colors as CustomColors & MD3Colors).elevation.level2,
+                    // containerColor: (colors as CustomColors & MD3Colors).onPrimaryContainer,
                     dividerColor: colors.outlineVariant,
                     titleContentColor: colors.onSurface,
                     headlineContentColor: colors.onSurfaceVariant,
