@@ -108,7 +108,7 @@ function PaperThemeWrapper() {
 
     return (
         <PaperProvider theme={theme}>
-            <StatusBar style="auto" translucent networkActivityIndicatorVisible />
+            <StatusBar style={theme.dark ? 'light' : 'dark'} networkActivityIndicatorVisible />
             <ToastProvider>
                 <SnackbarProvider>
                     <Slot />

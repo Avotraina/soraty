@@ -161,22 +161,7 @@ export default function PostItListScreen() {
             </View>
           )}
 
-          {/* <ThemedText className="text-gray-700 mb-3" numberOfLines={4} style={styles.noteContentText}>
-          {item.note_content}
-        </ThemedText> */}
-          {/* <ThemedText className="text-gray-700 mb-3" numberOfLines={4} style={styles.noteContentText}>
-                    <RichViewer value={item.note_content as any} />
-
-        </ThemedText> */}
-
-          {/* <View style={{ marginBottom: 12 }}> */}
-          {/* <RichViewer value={item.note_content} /> */}
           <RichViewer value={item.note_content as any} />
-          {/* </View> */}
-
-          {/* <RichViewer value={item.note_content} /> */}
-          {/* <ThemedText className="text-gray-700 mb-3" numberOfLines={4} style={styles.noteContentText}>
-        </ThemedText> */}
           <ThemedText className="text-xs text-gray-500 mt-auto" style={styles.noteFooterText}>
             {/* {item.createdAt.toLocaleDateString()} */}
           </ThemedText>

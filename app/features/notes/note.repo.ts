@@ -179,7 +179,7 @@ export const NoteRepo = {
 
         await runQuery(updateQuery, ...params);
 
-        if (reminder) {
+        if (reminder && reminder.reminder_date && reminder.reminder_time) {
 
             const reminderDateISO = new Date(reminder.reminder_date).toISOString();
 

@@ -340,9 +340,10 @@ export default function NoteDetailScreen() {
                             toolbarStyle={{ backgroundColor: (colors as CustomColors & MD3Colors).chipsContainer, color: (colors as CustomColors & MD3Colors).primaryText }}
                             setPlainText={setPlainText}
                             setEditorState={setEditorState}
-                            editorBackgroundColor={selectedColor}
+                            // editorBackgroundColor={selectedColor}
+                            editorBackgroundColor={noteData?.color || selectedColor || NOTE_COLORS[0].value}
                             onChange={(content) => field.handleChange((content as string) || '')}
-                            value={field.state.value}
+                            value={noteData?.note_content || field.state.value}
                             setJson={setJson}
                         />
                     )}
@@ -363,7 +364,7 @@ export default function NoteDetailScreen() {
             {!keyboardVisible && (
                 <FAB onConfirm={() => form.handleSubmit()} onDelete={() => handleDelete()} showConfirmButton={form.state.isDirty} />
             )}
-            <DeleteNoteConfirmation isVisible={isDeletionConfirmationVisible} onClose={() => setIsDeletionConfirmationVisible(false)} noteId={noteData?.id as string} reminder={noteData?.reminder_id || notificationId ? { id: noteData?.reminder_id as string || noteData.id as string, notification_id: noteData?.notification_id as string || notificationId as string } : undefined} isEmpty={false} onSuccess={() => router.back()} />
+            <DeleteNoteConfirmation isVisible={isDeletionConfirmationVisible} onClose={() => setIsDeletionConfirmationVisible(false)} noteId={noteData?.id as string} reminder={noteData?.reminder_id || notificationId ? { id: noteData?.reminder_id as string || noteData?.id as string, notification_id: noteData?.notification_id as string || notificationId as string } : undefined} isEmpty={false} onSuccess={() => router.back()} />
 
         </View>
     );
