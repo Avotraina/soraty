@@ -125,7 +125,7 @@ export default function CategorySelectFilter({
                         // style={{ ...styles.categoryFilterAllOptionContainer, ...allButtonBackgroundColor() }}
                         onPress={() => { handleCategorySelect(null); router.setParams({ category_id: undefined }) }}
                     >
-                        <ThemedText className={!currentCategory ? 'text-white' : 'text-gray-700'} style={{ color: !currentCategory ? (colors as CustomColors & MD3Colors).primaryText : (colors as CustomColors & MD3Colors).primaryText }}>All</ThemedText>
+                        <ThemedText className={!currentCategory ? 'text-white' : 'text-gray-700'} style={{ color: !currentCategory ? (colors as CustomColors & MD3Colors).onPrimary : (colors as CustomColors & MD3Colors).primaryText }}>All</ThemedText>
                         {/* <ThemedText className={!currentCategory ? 'text-white' : 'text-gray-700'} style={{ ...allButtonTextColor() }}>All</ThemedText> */}
                     </TouchableOpacity>
 
@@ -138,7 +138,7 @@ export default function CategorySelectFilter({
                             onPress={() => { router.setParams({ category_id: category.id }); handleCategorySelect(selectedCategory?.id === category.id ? null : category); }}
                         >
                             <Folder size={12} color={category.color} fill={currentCategory && currentCategory?.id === category.id ? category.color : 'none'} className="mr-1" style={{ marginRight: 4 }} />
-                            <ThemedText className={selectedCategory?.id === category.id ? 'text-white' : 'text-gray-700'} style={{ color: currentCategory?.id === category.id ? (colors as CustomColors & MD3Colors).primaryText : (colors as CustomColors & MD3Colors).primaryText }}>
+                            <ThemedText className={selectedCategory?.id === category.id ? 'text-white' : 'text-gray-700'} style={{ color: currentCategory?.id === category.id ? (colors as CustomColors & MD3Colors).onPrimary : (colors as CustomColors & MD3Colors).primaryText }}>
                                 {/* <ThemedText className={selectedCategory?.id === category.id ? 'text-white' : 'text-gray-700'} style={{ ...itemTextColor(category) }}> */}
                                 {category.category_name}
                             </ThemedText>

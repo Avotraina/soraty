@@ -1,3 +1,4 @@
+import { NOTE_COLORS } from "@/app/constants/colors";
 import { CustomColors } from "@/app/theme/colors";
 import { useState } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
@@ -22,14 +23,14 @@ type NoteColorSelectProps = {
     value?: string;
 }
 
-const NOTE_COLORS = [
-    { name: 'Yellow', value: '#FFF9C4' },
-    { name: 'Blue', value: '#BBDEFB' },
-    { name: 'Green', value: '#C8E6C9' },
-    { name: 'Pink', value: '#F8BBD0' },
-    { name: 'Purple', value: '#E1BEE7' },
-    { name: 'Orange', value: '#FFE0B2' },
-];
+// const NOTE_COLORS = [
+//     { name: 'Yellow', value: '#FFF9C4' },
+//     { name: 'Blue', value: '#BBDEFB' },
+//     { name: 'Green', value: '#C8E6C9' },
+//     { name: 'Pink', value: '#F8BBD0' },
+//     { name: 'Purple', value: '#E1BEE7' },
+//     { name: 'Orange', value: '#FFE0B2' },
+// ];
 
 export default function NoteColorSelectFilter({
     currentColor,
@@ -60,7 +61,7 @@ export default function NoteColorSelectFilter({
                         style={{ ...styles.colorFilterAllOptionContainer, backgroundColor: !currentColor ? colors.primary : (colors as CustomColors & MD3Colors).chipsContainer }}
                         onPress={() => handleColorSelect(null)}
                     >
-                        <ThemedText className={!currentColor ? 'text-white' : 'text-gray-700'} style={{ color: !currentColor ? (colors as CustomColors & MD3Colors).primaryText : (colors as CustomColors & MD3Colors).primaryText }}>All</ThemedText>
+                        <ThemedText className={!currentColor ? 'text-white' : 'text-gray-700'} style={{ color: !currentColor ? (colors as CustomColors & MD3Colors).onPrimary : (colors as CustomColors & MD3Colors).primaryText }}>All</ThemedText>
                     </TouchableOpacity>
 
                     {NOTE_COLORS.map((color) => (
@@ -74,7 +75,7 @@ export default function NoteColorSelectFilter({
                                 className="w-3 h-3 rounded-full mr-1"
                                 style={{ ...styles.colorFilterOptionsCircle, backgroundColor: color?.value }}
                             />
-                            <ThemedText className={selectedNote === color.value ? 'text-white' : 'text-gray-700'} style={{ color: currentColor === color.value ? (colors as CustomColors & MD3Colors).primaryText : (colors as CustomColors & MD3Colors).primaryText }}>
+                            <ThemedText className={selectedNote === color.value ? 'text-white' : 'text-gray-700'} style={{ color: currentColor === color.value ? (colors as CustomColors & MD3Colors).onPrimary : (colors as CustomColors & MD3Colors).primaryText }}>
                                 {color.name}
                             </ThemedText>
                         </TouchableOpacity>

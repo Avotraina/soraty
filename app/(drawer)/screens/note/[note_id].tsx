@@ -514,7 +514,7 @@ const makeStyles = (colors: CustomColors & MD3Colors) => StyleSheet.create({
         // backgroundColor: 'white',
         paddingVertical: 4,
         paddingHorizontal: 16,
-        borderTopWidth: 1,
+        // borderTopWidth: 1,
         // borderTopColor: '#e5e7eb',
     },
     footer: {

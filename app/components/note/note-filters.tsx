@@ -14,17 +14,6 @@ import { ThemedInput } from "../themed/themed-input";
 import { ThemedText } from "../themed/themed-text";
 
 
-
-const NOTE_COLORS = [
-    { name: 'Yellow', value: '#FFF9C4' },
-    { name: 'Blue', value: '#BBDEFB' },
-    { name: 'Green', value: '#C8E6C9' },
-    { name: 'Pink', value: '#F8BBD0' },
-    { name: 'Purple', value: '#E1BEE7' },
-    { name: 'Orange', value: '#FFE0B2' },
-];
-
-
 export default function NoteFilters({ onFiltersChange, defaultValues }: {
     onFiltersChange: (filters: {
         search: string;
@@ -192,7 +181,7 @@ export default function NoteFilters({ onFiltersChange, defaultValues }: {
                                 style={{ ...styles.colorDateAllOptionContainer, backgroundColor: !dateFilter.startDate ? colors.primary : (colors as CustomColors & MD3Colors).chipsContainer }}
                                 onPress={() => { setFilterDate(null); console.log("Date range", dateFilter); setDateFilter({ startDate: undefined, endDate: undefined }) }}
                             >
-                                <ThemedText className={!dateFilter ? 'text-white' : 'text-gray-700'} style={{ color: !dateFilter.startDate ? (colors as CustomColors & MD3Colors).primaryText : (colors as CustomColors & MD3Colors).primaryText }}>All Dates</ThemedText>
+                                <ThemedText className={!dateFilter ? 'text-white' : 'text-gray-700'} style={{ color: !dateFilter.startDate ? (colors as CustomColors & MD3Colors).onPrimary : (colors as CustomColors & MD3Colors).primaryText }}>All Dates</ThemedText>
                             </TouchableOpacity>
 
                             <CustomPaperDateRangePicker currentRange={dateFilter} onSelectDateRange={setDateFilter} style={{ justifyContent: 'flex-start', flex: 1, alignItems: 'flex-start' }}>
@@ -203,7 +192,7 @@ export default function NoteFilters({ onFiltersChange, defaultValues }: {
                                 >
 
                                     {dateFilter?.startDate ? (
-                                        <ThemedText className={!dateFilter.startDate ? 'text-white' : 'text-gray-700'} style={{ color: dateFilter.startDate ? (colors as CustomColors & MD3Colors).primaryText : (colors as CustomColors & MD3Colors).primaryText }}>
+                                        <ThemedText className={!dateFilter.startDate ? 'text-white' : 'text-gray-700'} style={{ color: dateFilter.startDate ? (colors as CustomColors & MD3Colors).onPrimary : (colors as CustomColors & MD3Colors).primaryText }}>
                                             {`${dateFilter?.startDate ? formatDate(dateFilter.startDate) : ''} ${dateFilter?.endDate ? '-' : ''} ${dateFilter?.endDate ? formatDate(dateFilter.endDate) : ''}`}
                                         </ThemedText>
                                     ) : (

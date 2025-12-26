@@ -44,32 +44,33 @@ export type CustomColors = NavigationColors & PaperColors & {
 
 export const defaultColors = {
     light: {
-        background: '#eef7ffff',
+        background: '#FAFAFA',
         // background: '#BDE0FE',
-        primary: '#A2D2FF', // focused menu item, text on button, Text
-        secondary: '#FFAFCC',
-        tertiary: '#CDB4DB',
-        notification: '#FFC8DD',
+        primary: '#4F46E5', // focused menu item, text on button, Text
+        secondary: '#FF6B6B',
+        tertiary: '#6B7280',
+        notification: '#FACC15',
         surface: '#FFFFFF',
-        text: '#1A1A1A',
+        text: '#111827',
         // border: '#D0D0D0',
-        error: '#FF4D4D',
-        warning: '#F39C12',
-        success: '#2ECC71',
-        info: '#3498DB',
-        primaryText: '#474747ff',
-        secondaryText: '#4A4A4A',
-        placeholderText: '#7A7A7A',
-        primaryContainer: '#A2D2FF',
-        inversePrimary: '#1A1A1A',
-        card: '#eef7ffff', // Header and drawer background
+        error: '#EF4444',
+        warning: '#F59E0B',
+        success: '#22C55E',
+        info: '#3B82F6',
+        primaryText: '#1F2937',
+        secondaryText: '#6B7280',
+        placeholderText: '#9CA3AF',
+        primaryContainer: '#E0E7FF',
+        inversePrimary: '#FFFFFF',
+        card: '#F5F5F5', // Header and drawer background
 
-        successContainer: '#d4edda',
-        infoContainer: '#cce5ff',
-        errorContainer: '#f8d7da',
-        warningContainer: '#fff3cd',
+        successContainer: '#DCFCE7',
+        infoContainer: '#DBEAFE',
+        errorContainer: '#FEE2E2',
+        warningContainer: '#FEF3C7',
 
-
+        chipsContainer: '#F1F5F9',
+        // onPrimary: '#ee0b0bde', 
 
         // backdrop: '#00000099',
 
