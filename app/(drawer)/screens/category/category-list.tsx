@@ -1,12 +1,18 @@
 import DeleteCategoryConfirmation from '@/app/components/category/delete-category-confirmation';
 import NewCategoryModal from '@/app/components/category/new-category-modal';
+import { ThemedInput } from '@/app/components/themed/themed-input';
+import { ThemedText } from '@/app/components/themed/themed-text';
 import { useCategoriesInfiniteQuery } from '@/app/features/categories/category.query';
 import { useDebounce } from '@/app/hooks/debounce';
+import { CustomColors } from '@/app/theme/colors';
 import { Link, router } from 'expo-router';
-import { Edit3, Folder, Plus, Trash2, X } from 'lucide-react-native';
+import { Edit3, Folder, Plus, Search, Trash2, X } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { TextInput as PaperTextInput, useTheme } from 'react-native-paper';
+import { MD3Colors } from 'react-native-paper/lib/typescript/types';
 import EditCategoryModal from '../../../components/category/edit-category-modal';
+
 
 type Category = {
     id: string;
@@ -32,7 +38,8 @@ export default function CategoriesScreen() {
 
     const [users, setUsers] = useState<{ id: number; name: string; email: string }[]>([]);
 
-    const styles = makeStyles();
+    const { colors } = useTheme();
+    const styles = makeStyles(colors as CustomColors & MD3Colors);
 
     // const [categories, setCategories] = useState<Category[]>([
     //     { id: '1', name: 'Personal', color: '#FFD54F', noteCount: 5 },
@@ -82,14 +89,15 @@ export default function CategoriesScreen() {
 
     const navigateToNoteList = (categoryId: string) => {
         // navigation.navigate('NoteList', { categoryId });
-        router.navigate({ pathname: '/screens/note/note-list',
+        router.navigate({
+            pathname: '/screens/note/note-list',
             params: { category_id: categoryId }
         });
     };
 
     const renderCategoryItem = ({ item }: { item: Category }) => (
-        <Link href={{ pathname: `/(drawer)/screens/note/note-list`, params: { category_id: item.id } }} relativeToDirectory push asChild>
-            <TouchableOpacity activeOpacity={0.8} className="bg-white rounded-xl p-4 mb-3 shadow-sm flex-row items-center" style={styles.categoryContainer}>
+        <Link href={{ pathname: `/(drawer)/screens/note/note-list`, params: { category_id: item.id } }} relativeToDirectory push asChild style={styles.categoryContainer}>
+            <TouchableOpacity activeOpacity={0.8} className="bg-white rounded-xl p-4 mb-3 shadow-sm flex-row items-center" >
                 <View
                     className="w-12 h-12 rounded-full items-center justify-center mr-4"
                     style={{ ...styles.categoryIcon, backgroundColor: `${item.color}20` }}
@@ -98,8 +106,8 @@ export default function CategoriesScreen() {
                 </View>
 
                 <View className="flex-1" style={styles.categoryLabelsContainer}>
-                    <Text className="text-lg font-semibold text-gray-800" style={styles.categoryName}>{item.category_name}</Text>
-                    <Text className="text-gray-500" style={styles.categoryNoteCount}>{item.note_count} notes</Text>
+                    <ThemedText type='normalSemiBold' className="text-lg font-semibold text-gray-800" style={styles.categoryName}>{item.category_name}</ThemedText>
+                    <ThemedText type='default' className="text-gray-500" style={styles.categoryNoteCount}>{item.note_count} notes</ThemedText>
                 </View>
 
                 <View className="flex-row" style={styles.categoryIconsContainer}>
@@ -108,14 +116,14 @@ export default function CategoriesScreen() {
                         // onPress={() => handleEditCategory(item)}
                         onPress={() => handleEdit(item)}
                     >
-                        <Edit3 size={20} color="#666" />
+                        <Edit3 size={20} color={(colors as CustomColors & MD3Colors).secondaryText} />
                     </TouchableOpacity>
                     <TouchableOpacity
                         className="p-2"
                         // onPress={() => handleDeleteCategory(item.id)}
                         onPress={() => handleDelete(item)}
                     >
-                        <Trash2 size={20} color="#666" />
+                        <Trash2 size={20} color={(colors as CustomColors & MD3Colors).error} />
                     </TouchableOpacity>
                 </View>
             </TouchableOpacity>
@@ -127,7 +135,7 @@ export default function CategoriesScreen() {
             {/* Header */}
             <View className="bg-white py-4 px-4 shadow-sm" style={styles.headerContainer}>
                 <View className="flex-row justify-between items-center" style={styles.header}>
-                    <Text className="text-2xl font-bold text-gray-800" style={styles.headerTitle}>Categories</Text>
+                    <ThemedText type='title' className="text-2xl font-bold text-gray-800" style={styles.headerTitle}>Categories</ThemedText>
                     <TouchableOpacity
                         className="bg-blue-500 rounded-full p-3"
                         style={styles.headerSaveButton}
@@ -141,18 +149,32 @@ export default function CategoriesScreen() {
             {/* Search Bar */}
             <View className="bg-white py-3 px-4 mb-3" style={styles.searchBarContainer}>
                 <View className="flex-row items-center bg-gray-100 rounded-xl px-3" style={styles.searchBar}>
-                    <TextInput
+                    <ThemedInput
                         className="flex-1 py-3 px-2"
                         style={styles.searchInput}
+                        outlineStyle={{ borderRadius: 25 }}
+                        mode='outlined'
                         placeholder="Search categories..."
                         value={searchQuery}
                         onChangeText={setSearchQuery}
+                        right={
+                            searchQuery.length > 0 && (
+                                <PaperTextInput.Icon
+                                    icon={() => <X size={20} color={(colors as CustomColors & MD3Colors).placeholderText} onPress={() => setSearchQuery('')} />}
+                                />
+                            )
+                        }
+                        left={
+                            <PaperTextInput.Icon
+                                icon={() => <Search size={20} color={(colors as CustomColors & MD3Colors).placeholderText} />}
+                            />
+                        }
                     />
-                    {searchQuery.length > 0 && (
+                    {/* {searchQuery.length > 0 && (
                         <TouchableOpacity onPress={() => setSearchQuery('')}>
                             <X size={20} color="#999" />
                         </TouchableOpacity>
-                    )}
+                    )} */}
                 </View>
             </View>
 
@@ -186,14 +208,14 @@ export default function CategoriesScreen() {
 }
 
 
-const makeStyles = (colors?: any) => StyleSheet.create({
+const makeStyles = (colors: CustomColors & MD3Colors) => StyleSheet.create({
 
     container: {
         flex: 1,
-        backgroundColor: '#f9fafb'
+        // backgroundColor: '#f9fafb'
     },
     headerContainer: {
-        backgroundColor: 'white',
+        // backgroundColor: 'white',
         paddingVertical: 16,
         paddingHorizontal: 16,
         boxShadow: '0 1px 2px rgba(0,0,0,0.05)', // Tailwind shadow-sm
@@ -204,9 +226,10 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         alignItems: 'center',
     },
     headerTitle: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#1f2937'
+        // fontSize: 24,
+        // fontWeight: 'bold',
+        color: colors?.primaryText,
+
     },
     headerSaveButton: {
         backgroundColor: '#3b82f6', // Tailwind bg-blue-500
@@ -214,7 +237,7 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         padding: 12,
     },
     searchBarContainer: {
-        backgroundColor: 'white',
+        // backgroundColor: 'white',
         paddingVertical: 12,
         paddingHorizontal: 16,
         marginBottom: 12,
@@ -222,14 +245,18 @@ const makeStyles = (colors?: any) => StyleSheet.create({
     searchBar: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#f3f4f6',
-        borderRadius: 12,
-        paddingHorizontal: 12
+        // backgroundColor: '#f3f4f6',
+        borderRadius: 25,
+        // paddingHorizontal: 12
     },
     searchInput: {
         flex: 1,
-        paddingVertical: 12,
+        // paddingVertical: 12,
         paddingHorizontal: 8,
+        borderRadius: 25,
+        justifyContent: 'center',
+        alignContent: 'center',
+
     },
     categoryListContainer: {
         flex: 1,
@@ -251,12 +278,13 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         marginTop: 4,
     },
     categoryContainer: {
-        backgroundColor: 'white',
+        backgroundColor: colors.surface,
         borderRadius: 12,
         padding: 16,
         marginBottom: 12,
         elevation: 1,
-        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)', // Tailwind shadow-sm
+        // boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)', // Tailwind shadow-sm
+        // boxShadow: `0 1px 2px ${colors.shadow}`, // Tailwind shadow-sm
         flexDirection: 'row',
         alignItems: 'center'
     },
@@ -272,12 +300,12 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         flex: 1,
     },
     categoryName: {
-        fontSize: 18,
-        fontWeight: 600,
-        color: '#1f2937',
+        // fontSize: 18,
+        // fontWeight: 600,
+        color: colors.primaryText
     },
     categoryNoteCount: {
-        color: '#6b7280'
+        color: colors.secondaryText
     },
     categoryIconsContainer: {
         flexDirection: 'row',

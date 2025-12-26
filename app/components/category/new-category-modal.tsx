@@ -1,11 +1,15 @@
 import { useSnackbar } from "@/app/contexts/snackbar-provider";
 import { useAddCategoryMutation } from "@/app/features/categories/category.query";
+import { CustomColors } from "@/app/theme/colors";
 import { Check, Save } from "lucide-react-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { ActivityIndicator, TextInput } from "react-native-paper";
+import { ActivityIndicator, TextInput, useTheme } from "react-native-paper";
 import { useToast } from "react-native-paper-toast";
+import { MD3Colors } from "react-native-paper/lib/typescript/types";
+import { ThemedInput } from "../themed/themed-input";
+import { ThemedText } from "../themed/themed-text";
 
 
 
@@ -39,7 +43,8 @@ export default function NewCategoryModal({ isVisible, onClose }: NewCategoryModa
 
     const [isModalVisible, setIsModalVisible] = useState<boolean>(isVisible)
 
-    const styles = makeStyles();
+    const { colors } = useTheme();
+    const styles = makeStyles(colors as CustomColors & MD3Colors);
 
     const { control, handleSubmit, formState: { errors }, setError, setFocus } = useForm({
         defaultValues: {
@@ -104,16 +109,16 @@ export default function NewCategoryModal({ isVisible, onClose }: NewCategoryModa
         >
             <View className="flex-1 justify-center items-center bg-black/50" style={styles.modalOverlay}>
                 <View className="bg-white rounded-xl p-6 w-11/12 max-w-md" style={styles.modalContainer}>
-                    <Text className="text-xl font-bold text-gray-800 mb-4" style={styles.modalTitle}>
+                    <ThemedText type="subtitle" className="text-xl font-bold text-gray-800 mb-4" style={styles.modalTitle}>
                         {editingCategory ? 'Edit Category' : 'New Category'}
-                    </Text>
+                    </ThemedText>
 
                     <Controller
                         control={control}
                         name="category_name"
                         rules={{ required: "Category name is required" }}
                         render={({ field: { onChange, value } }) => (
-                            <TextInput
+                            <ThemedInput
                                 mode="outlined"
                                 // activeOutlineColor="red"
                                 // activeOutlineColor={newCategory.color ?? CATEGORY_COLORS[0]}
@@ -131,7 +136,7 @@ export default function NewCategoryModal({ isVisible, onClose }: NewCategoryModa
                     />
                     {errors.category_name && <Text style={styles.errorLabel}>{errors.category_name.message}</Text>}
 
-                    <Text className="font-semibold text-gray-700 mb-2" style={styles.categoryModalColorTitle}>Color</Text>
+                    <ThemedText type="normalSemiBold" className="font-semibold text-gray-700 mb-2" style={styles.categoryModalColorTitle}>Color</ThemedText>
                     <View className="flex-row flex-wrap mb-6" style={styles.categoryModalColorsContainer}>
                         {CATEGORY_COLORS.map((color) => (
                             <TouchableOpacity
@@ -156,7 +161,7 @@ export default function NewCategoryModal({ isVisible, onClose }: NewCategoryModa
                             // onPress={resetForm}
                             onPress={onClose}
                         >
-                            <Text className="text-gray-700" style={styles.modalCancelText}>Cancel</Text>
+                            <ThemedText className="text-gray-700" style={styles.modalCancelText}>Cancel</ThemedText>
                         </TouchableOpacity>
                         <TouchableOpacity
                             className="bg-blue-500 rounded-lg px-4 py-2 flex-row items-center"
@@ -168,10 +173,10 @@ export default function NewCategoryModal({ isVisible, onClose }: NewCategoryModa
                             {
                                 isPending ? <ActivityIndicator hidesWhenStopped={true} animating={isPending} color="white" /> :
                                     <>
-                                        <Save size={16} color="white" className="mr-1" />
-                                        <Text className="text-white" style={styles.modalSaveText}>
+                                        <Save size={16} color={colors.onPrimary} className="mr-1" />
+                                        <ThemedText type="defaultSemiBold" className="text-white" style={styles.modalSaveText}>
                                             {editingCategory ? 'Update' : 'Create'}
-                                        </Text>
+                                        </ThemedText>
                                     </>
                             }
 
@@ -186,37 +191,37 @@ export default function NewCategoryModal({ isVisible, onClose }: NewCategoryModa
 }
 
 
-const makeStyles = (colors?: any) => StyleSheet.create({
+const makeStyles = (colors: CustomColors & MD3Colors) => StyleSheet.create({
     modalOverlay: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)'
+        // backgroundColor: 'rgba(0, 0, 0, 0.5)'
+        backgroundColor: colors.backdrop,
     },
     modalContainer: {
-        backgroundColor: 'white',
+        backgroundColor: colors.surface,
         borderRadius: 12,
         padding: 24,
         width: '91.666667%',   // 11/12 in percentage
         maxWidth: 448,         // Tailwind 'max-w-md' = 28rem = 448px
     },
     modalTitle: {
-        fontSize: 20,           // Tailwind 'text-xl'
-        fontWeight: '700',       // Tailwind 'font-bold'
-        color: '#1f2937',        // Tailwind 'text-gray-800'
         marginBottom: 16,        // Tailwind 'mb-4' (1rem = 16px)
+        color: colors.onSurface,
     },
     modalCategoryNameInput: {
         // borderWidth: 1,           // Tailwind 'border'
-        borderColor: '#d1d5db',   // Tailwind 'border-gray-300'
+        // borderColor: '#d1d5db',   // Tailwind 'border-gray-300'
         borderRadius: 8,           // Tailwind 'rounded-lg'
         // padding: 12,               // Tailwind 'p-3' (0.75rem = 12px)
         marginBottom: 16,          // Tailwind 'mb-4' (1rem = 16px)
     },
     categoryModalColorTitle: {
-        fontWeight: '600',        // Tailwind 'font-semibold'
-        color: '#374151',         // Tailwind 'text-gray-700'
+        // fontWeight: '600',        // Tailwind 'font-semibold'
+        // color: '#374151',         // Tailwind 'text-gray-700'
         marginBottom: 8,          // Tailwind 'mb-2' (0.5rem = 8px)
+        color: colors.onSurface,
     },
     categoryModalColorsContainer: {
         flexDirection: 'row',    // Tailwind 'flex-row'
@@ -237,17 +242,17 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         justifyContent: 'flex-end',
     },
     modalCancelButton: {
-        backgroundColor: '#e5e7eb', // Tailwind 'bg-gray-200'
+        backgroundColor: colors.surfaceVariant,
         borderRadius: 8,             // Tailwind 'rounded-lg'
         paddingHorizontal: 16,       // Tailwind 'px-4' (1rem = 16px)
         paddingVertical: 8,          // Tailwind 'py-2' (0.5rem = 8px)
         marginRight: 8,              // Tailwind 'mr-2' (0.5rem = 8px)
     },
     modalCancelText: {
-        color: '#374151', // Tailwind 'text-gray-700'
+        color: colors.onSurface,
     },
     modalSaveButton: {
-        backgroundColor: '#3b82f6', // Tailwind 'bg-blue-500'
+        backgroundColor: colors.primary,
         borderRadius: 8,             // Tailwind 'rounded-lg'
         paddingHorizontal: 16,       // Tailwind 'px-4' (1rem = 16px)
         paddingVertical: 8,          // Tailwind 'py-2' (0.5rem = 8px)
@@ -256,10 +261,10 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         gap: 4
     },
     modalSaveText: {
-        color: 'white',
+        color: colors.onPrimary,
     },
     errorLabel: {
-        color: 'red',
+        color: colors.error,
         alignSelf: 'flex-start',
         marginBottom: 8,
         marginLeft: 4,

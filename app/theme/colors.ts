@@ -101,6 +101,7 @@ export const defaultColors = {
         infoContainer: '#cce5ff',
         errorContainer: '#f8d7da',
         warningContainer: '#fff3cd',
+        backdrop: '#000000CC',
 
 
         chipsContainer: '#1E293B',

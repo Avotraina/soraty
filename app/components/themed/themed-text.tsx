@@ -53,7 +53,7 @@ const makeStyles = (colors: CustomColors & MD3Colors) => StyleSheet.create({
     normal: {
         fontSize: 16,
         // lineHeight: 24,
-        fontWeight: '600',
+        // fontWeight: '600',
     },
     normalSemiBold: {
         fontSize: 16,
@@ -61,7 +61,7 @@ const makeStyles = (colors: CustomColors & MD3Colors) => StyleSheet.create({
         fontWeight: '600',
     },
     title: {
-        fontSize: 32,
+        fontSize: 24,
         fontWeight: 'bold',
         // lineHeight: 32,
     },

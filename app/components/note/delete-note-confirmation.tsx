@@ -1,7 +1,11 @@
 import { useSnackbar } from "@/app/contexts/snackbar-provider";
+import { CustomColors } from "@/app/theme/colors";
 import { CircleAlert, Delete } from "lucide-react-native";
-import { ActivityIndicator, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Modal, StyleSheet, TouchableOpacity, View } from "react-native";
+import { useTheme } from "react-native-paper";
+import { MD3Colors } from "react-native-paper/lib/typescript/types";
 import { useDeleteNoteMutation } from "../../features/notes/note.query";
+import { ThemedText } from "../themed/themed-text";
 
 type EditNoteModalProps = {
     isVisible: boolean;
@@ -17,7 +21,9 @@ type EditNoteModalProps = {
 };
 
 export default function DeleteNoteConfirmation({ isVisible, onClose, noteId, isEmpty, reminder, onSuccess }: EditNoteModalProps) {
-    const styles = makeStyles();
+
+    const { colors } = useTheme();
+    const styles = makeStyles(colors as CustomColors & MD3Colors);
 
     const { showSnackbar } = useSnackbar();
 
@@ -25,7 +31,7 @@ export default function DeleteNoteConfirmation({ isVisible, onClose, noteId, isE
     const { mutate: deleteNote, isPending } = useDeleteNoteMutation();
 
     const handleDelete = () => {
-        deleteNote({id: noteId, reminder}, {
+        deleteNote({ id: noteId, reminder }, {
             onSuccess: async () => {
                 showSnackbar("Deleted", 'success')
                 onSuccess?.()
@@ -49,17 +55,17 @@ export default function DeleteNoteConfirmation({ isVisible, onClose, noteId, isE
         >
             <View className="flex-1 justify-center items-center bg-black/50" style={styles.modalOverlay}>
                 <View className="bg-white rounded-xl p-6 w-11/12 max-w-md" style={styles.modalContainer}>
-                    <Text className="text-xl font-bold text-gray-800 mb-4" style={styles.modalTitle}>
+                    <ThemedText type="subtitle" className="text-xl font-bold text-gray-800 mb-4" style={styles.modalTitle}>
                         {/* {editingCategory ? 'Edit Category' : 'New Category'} */}
                         Delete { }
-                    </Text>
+                    </ThemedText>
 
                     <View style={styles.modalContentContainer}>
-                        <CircleAlert color={'red'} />
-                        <Text style={styles.modalContentText}>
+                        <CircleAlert color={colors.error} />
+                        <ThemedText type="defaultSemiBold" style={styles.modalContentText}>
                             {/* {isEmpty ? 'Do you really want to delete this note' : 'This Note is not empty, do you really want to delete it ?'} */}
                             Do you really want to delete this note?
-                        </Text>
+                        </ThemedText>
                     </View>
 
 
@@ -70,7 +76,7 @@ export default function DeleteNoteConfirmation({ isVisible, onClose, noteId, isE
                             // onPress={resetForm}
                             onPress={onClose}
                         >
-                            <Text className="text-gray-700" style={styles.modalCancelText}>Cancel</Text>
+                            <ThemedText className="text-gray-700" style={styles.modalCancelText}>Cancel</ThemedText>
                         </TouchableOpacity>
                         <TouchableOpacity
                             className="bg-blue-500 rounded-lg px-4 py-2 flex-row items-center"
@@ -84,11 +90,11 @@ export default function DeleteNoteConfirmation({ isVisible, onClose, noteId, isE
                             {
                                 isPending ? <ActivityIndicator hidesWhenStopped={true} animating={isPending} color="white" /> :
                                     <>
-                                        <Delete size={16} color="white" className="mr-1" />
-                                        <Text className="text-white" style={styles.modalSaveText}>
+                                        <Delete size={16} color={colors.onPrimary} className="mr-1" />
+                                        <ThemedText type="defaultSemiBold" className="text-white" style={styles.modalSaveText}>
                                             {/* {editingCategory ? 'Update' : 'Create'} */}
                                             Confirm
-                                        </Text>
+                                        </ThemedText>
                                     </>
                             }
 
@@ -101,15 +107,18 @@ export default function DeleteNoteConfirmation({ isVisible, onClose, noteId, isE
 
 }
 
-const makeStyles = (colors?: any) => StyleSheet.create({
+const makeStyles = (colors: CustomColors & MD3Colors) => StyleSheet.create({
     modalOverlay: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)'
+        // backgroundColor: 'rgba(0, 0, 0, 0.5)'
+        backgroundColor: colors.backdrop,
     },
     modalContainer: {
-        backgroundColor: 'white',
+        // backgroundColor: 'white',
+        backgroundColor: colors.surface,
+
         borderRadius: 12,
         padding: 24,
         width: '91.666667%',   // 11/12 in percentage
@@ -117,9 +126,10 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         // gap: 8
     },
     modalTitle: {
-        fontSize: 20,           // Tailwind 'text-xl'
-        fontWeight: '700',       // Tailwind 'font-bold'
-        color: '#1f2937',        // Tailwind 'text-gray-800'
+        // fontSize: 20,           // Tailwind 'text-xl'
+        // fontWeight: '700',       // Tailwind 'font-bold'
+        // color: '#e0e5ecff',        // Tailwind 'text-gray-800'
+        color: colors.onSurface,
         marginBottom: 16,        // Tailwind 'mb-4' (1rem = 16px)
     },
     modalContentContainer: {
@@ -132,25 +142,29 @@ const makeStyles = (colors?: any) => StyleSheet.create({
     },
     modalContentText: {
         // flex: 1,
-        fontSize: 16,
+        // fontSize: 16,
         // marginBottom: 16
+        color: colors.onSurfaceVariant,
     },
     modalFooterContainer: {
         flexDirection: 'row',
         justifyContent: 'flex-end',
     },
     modalCancelButton: {
-        backgroundColor: '#e5e7eb', // Tailwind 'bg-gray-200'
+        // backgroundColor: '#e5e7eb', // Tailwind 'bg-gray-200'
+        backgroundColor: colors.surfaceVariant,
         borderRadius: 8,             // Tailwind 'rounded-lg'
         paddingHorizontal: 16,       // Tailwind 'px-4' (1rem = 16px)
         paddingVertical: 8,          // Tailwind 'py-2' (0.5rem = 8px)
         marginRight: 8,              // Tailwind 'mr-2' (0.5rem = 8px)
     },
     modalCancelText: {
-        color: '#374151', // Tailwind 'text-gray-700'
+        // color: '#374151', // Tailwind 'text-gray-700'
+        color: colors.onSurface,
     },
     modalSaveButton: {
-        backgroundColor: '#f63b3bff', // Tailwind 'bg-blue-500'
+        // backgroundColor: '#f63b3bff', // Tailwind 'bg-blue-500'
+        backgroundColor: colors.primary,
         borderRadius: 8,             // Tailwind 'rounded-lg'
         paddingHorizontal: 16,       // Tailwind 'px-4' (1rem = 16px)
         paddingVertical: 8,          // Tailwind 'py-2' (0.5rem = 8px)
@@ -159,6 +173,7 @@ const makeStyles = (colors?: any) => StyleSheet.create({
         gap: 4
     },
     modalSaveText: {
-        color: 'white',
+        // color: 'white',
+        color: colors.onPrimary,
     },
 })

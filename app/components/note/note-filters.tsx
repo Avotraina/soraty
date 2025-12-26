@@ -95,12 +95,12 @@ export default function NoteFilters({ onFiltersChange, defaultValues }: {
                     placeholder="Search notes..."
                     right={
                         <PaperTextInput.Icon
-                            icon={() => <X size={20} color="#999" onPress={() => setSearchQuery('')} />}
+                            icon={() => <X size={20} color={(colors as CustomColors & MD3Colors).placeholderText} onPress={() => setSearchQuery('')} />}
                         />
                     }
                     left={
                         <PaperTextInput.Icon
-                            icon={() => <Search size={20} color="#999" />}
+                            icon={() => <Search size={20} color={(colors as CustomColors & MD3Colors).placeholderText} />}
                         />
                     }
                 />
