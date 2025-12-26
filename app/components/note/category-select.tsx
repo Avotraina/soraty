@@ -233,7 +233,7 @@ const makeStyles = (colors: CustomColors & MD3Colors) => StyleSheet.create({
         marginRight: 8,
     },
     selectedCategoryName: {
-        color: colors.primaryText,
+        color: colors.onPrimary,
     },
     noCategorySelectedText: {
         // color: '#9ca3af',
