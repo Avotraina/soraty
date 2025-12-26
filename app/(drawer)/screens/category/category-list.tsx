@@ -133,7 +133,7 @@ export default function CategoriesScreen() {
     return (
         <View className="flex-1 bg-gray-50" style={styles.container}>
             {/* Header */}
-            <View className="bg-white py-4 px-4 shadow-sm" style={styles.headerContainer}>
+            {/* <View className="bg-white py-4 px-4 shadow-sm" style={styles.headerContainer}>
                 <View className="flex-row justify-between items-center" style={styles.header}>
                     <ThemedText type='title' className="text-2xl font-bold text-gray-800" style={styles.headerTitle}>Categories</ThemedText>
                     <TouchableOpacity
@@ -144,7 +144,7 @@ export default function CategoriesScreen() {
                         <Plus size={20} color="white" />
                     </TouchableOpacity>
                 </View>
-            </View>
+            </View> */}
 
             {/* Search Bar */}
             <View className="bg-white py-3 px-4 mb-3" style={styles.searchBarContainer}>
@@ -198,6 +198,8 @@ export default function CategoriesScreen() {
                 )}
             </View>
 
+            <FAB onPress={() => setIsNewModalVisible(true)} />
+
             {/* Add/Edit Category Modal */}
             <NewCategoryModal isVisible={isNewModalVisible} onClose={() => setIsNewModalVisible(false)} />
             <EditCategoryModal isVisible={isEditModalVisible} onClose={() => setIsEditModalVisible(false)} initialValue={selectedCategory as Category} />
@@ -205,6 +207,40 @@ export default function CategoriesScreen() {
 
         </View>
     );
+}
+
+
+function FAB({
+    onPress,
+}: {
+    onPress?: () => void;
+}) {
+
+    const { colors } = useTheme();
+
+    const styles = makeStyles(colors as CustomColors & MD3Colors);
+
+    return (
+        // <Link href="/screens/note/new-note" asChild >
+        <TouchableOpacity onPress={onPress} style={{
+            position: 'absolute',
+            bottom: 32,
+            right: 32,
+            backgroundColor: colors.primary,
+            width: 56,
+            height: 56,
+            borderRadius: 28,
+            alignItems: 'center',
+            justifyContent: 'center',
+            elevation: 4
+        }}>
+            <Plus size={24} color={colors.background} />
+
+        </TouchableOpacity>
+        // </Link>
+    );
+
+
 }
 
 

@@ -89,7 +89,7 @@ export default function NoteDetailScreen() {
 
     const { control, handleSubmit, formState: { errors, isSubmitted, isSubmitSuccessful }, setError, setFocus, getValues, reset } = useForm({
         defaultValues: {
-            note_title: "New note",
+            note_title: "",
             note_content: "",
             category_id: null,
             color: COLORS[0],

@@ -190,25 +190,12 @@ export default function PostItListScreen() {
   return (
     <View className="flex-1 bg-gray-100" style={styles.container}>
       {/* Header */}
-      <View className="bg-white py-4 px-4 shadow-sm" style={styles.headerContainer}>
+      {/* <View className="bg-white py-4 px-4 shadow-sm" style={styles.headerContainer}>
         <View className="flex-row justify-between items-center" style={styles.header}>
           <ThemedText type='title' className="text-2xl font-bold text-gray-800" style={styles.headerTitle}>My Notes</ThemedText>
-          {/* <View className="flex-row" style={styles.headerButtonsContainer}>
-            <TouchableOpacity
-              className="mr-4 p-2 rounded-full bg-blue-100"
-              style={{ ...styles.headerButtonContainer }}
-            >
-              <Settings size={20} color="#4A90E2" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              className="p-2 rounded-full bg-blue-100"
-              style={{ ...styles.headerButtonContainer }}
-            >
-              <Plus size={20} color="#4A90E2" />
-            </TouchableOpacity>
-          </View> */}
+          
         </View>
-      </View>
+      </View> */}
 
       {/* Search and Filters */}
       <NoteFilters onFiltersChange={setFilters} defaultValues={{ ...filters, category: category_id ? category_id as string : null }} />
