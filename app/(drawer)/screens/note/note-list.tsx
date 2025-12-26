@@ -142,7 +142,7 @@ export default function PostItListScreen() {
               {item.note_title || 'Untitled'}
             </ThemedText>
             <TouchableOpacity style={styles.noteHeaderIconsContainer} onPress={() => handleDelete(item)}>
-              <Trash2 size={18} color="#666" />
+              <Trash2 size={18} color={(colors as CustomColors & MD3Colors).error} />
             </TouchableOpacity>
           </View>
 
