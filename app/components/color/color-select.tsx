@@ -1,3 +1,4 @@
+import { NOTE_COLORS } from "@/app/constants/colors";
 import { CustomColors } from "@/app/theme/colors";
 import { Palette } from "lucide-react-native";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
@@ -12,16 +13,16 @@ type ColorSelectProps = {
     value?: string;
 }
 
-export const COLORS = [
-    '#FFE599', // Yellow
-    '#A4C2F4', // Blue
-    '#F9CB9C', // Orange
-    '#B4A7D6', // Purple
-    '#8FBC8F', // Green
-    '#F9B7B7', // Red
-    '#E6B8AF', // Pink
-    '#D5A6BD', // Magenta
-];
+// export const COLORS = [
+//     '#FFE599', // Yellow
+//     '#A4C2F4', // Blue
+//     '#F9CB9C', // Orange
+//     '#B4A7D6', // Purple
+//     '#8FBC8F', // Green
+//     '#F9B7B7', // Red
+//     '#E6B8AF', // Pink
+//     '#D5A6BD', // Magenta
+// ];
 
 
 export default function ColorSelect({
@@ -56,13 +57,13 @@ export default function ColorSelect({
                 </View>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} className="max-h-16" style={styles.colorSelectionScrollView}>
                     <View className="flex-row gap-3" style={styles.colorsSelectionContainer}>
-                        {COLORS.map((color, index) => (
+                        {NOTE_COLORS.map((color, index) => (
                             <TouchableOpacity
                                 key={index}
-                                onPress={() => handleColorSelect(color)}
-                                className={`w-10 h-10 rounded-full border-2 ${currentColor === color ? 'border-blue-500' : 'border-gray-300'}`}
+                                onPress={() => handleColorSelect(color.value)}
+                                className={`w-10 h-10 rounded-full border-2 ${currentColor === color.value ? 'border-blue-500' : 'border-gray-300'}`}
                                 // style={{ ...styles.colorCircle, backgroundColor: color, borderColor: currentColor === color ? '#3b82f6' : '#d1d5db' }}
-                                style={{ ...styles.colorCircle, backgroundColor: color, borderColor: currentColor === color ? colors.primary : (colors as CustomColors & MD3Colors).chipsContainer }}
+                                style={{ ...styles.colorCircle, backgroundColor: color.value, borderColor: currentColor === color.value ? colors.primary : (colors as CustomColors & MD3Colors).chipsContainer }}
                             // style={{ backgroundColor: color }}
                             />
                         ))}

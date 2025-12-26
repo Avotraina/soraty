@@ -7,13 +7,14 @@ import {
 import React, { useEffect, useState } from 'react';
 import { Dimensions, Keyboard, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import ColorSelect, { COLORS } from '@/app/components/color/color-select';
+import ColorSelect from '@/app/components/color/color-select';
 import ExampleTheme from "@/app/components/dom-components/example-theme";
 import CategorySelect from '@/app/components/note/category-select';
 import DeleteNoteConfirmation from '@/app/components/note/delete-note-confirmation';
 import NoteReminderTimeSelect from '@/app/components/note/reminder/note-reminder-select';
 import { ThemedInput } from '@/app/components/themed/themed-input';
 import { ThemedText } from '@/app/components/themed/themed-text';
+import { NOTE_COLORS } from '@/app/constants/colors';
 import { useSnackbar } from '@/app/contexts/snackbar-provider';
 import { useGetNoteByIdQuery, useUpdateNoteMutation } from '@/app/features/notes/note.query';
 import { CustomColors } from '@/app/theme/colors';
@@ -83,7 +84,7 @@ export default function NoteDetailScreen() {
     const [json, setJson] = useState(null);
 
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-    const [selectedColor, setSelectedColor] = useState<string | undefined>(COLORS[0]);
+    const [selectedColor, setSelectedColor] = useState<string | undefined>(NOTE_COLORS[0].value);
 
     const [notificationId, setNotificationId] = useState<string | null>(null)
 
@@ -108,7 +109,7 @@ export default function NoteDetailScreen() {
             note_title: noteData?.note_title || '',
             note_content: noteData?.note_content || '',
             category_id: noteData?.category_id || null,
-            color: noteData?.color || COLORS[0],
+            color: noteData?.color || NOTE_COLORS[0].value,
             reminder: { date: noteData?.reminder_date || null, time: noteData?.reminder_time || null }
         },
         onSubmit: async ({ value }) => {
@@ -170,7 +171,7 @@ export default function NoteDetailScreen() {
         // Update form field values
         form.setFieldValue('note_title', noteData.note_title || '');
         form.setFieldValue('note_content', noteData.note_content || '');
-        form.setFieldValue('color', noteData.color || COLORS[0]);
+        form.setFieldValue('color', noteData.color || NOTE_COLORS[0].value);
         form.setFieldValue('category_id', noteData.category_id || null);
         const reminderPayload = {
             date: noteData.reminder_date || null,
@@ -188,7 +189,7 @@ export default function NoteDetailScreen() {
         // Initialize editor/json and selection states
         setJson(parsedContent);
         setEditorState(typeof noteData.note_content === 'string' ? noteData.note_content : null);
-        setSelectedColor(noteData?.color || COLORS[0]);
+        setSelectedColor(noteData?.color || NOTE_COLORS[0].value);
         if (noteData.category_id) {
             setSelectedCategory({
                 id: noteData.category_id,
@@ -265,7 +266,7 @@ export default function NoteDetailScreen() {
                         currentColor={field.state.value}
                         onSelectColor={(color) => {
                             setSelectedColor(color);
-                            field.handleChange((color as string) || COLORS[0]);
+                            field.handleChange((color as string) || NOTE_COLORS[0].value);
                         }}
                         value={field.state.value}
                     />

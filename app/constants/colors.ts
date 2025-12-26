@@ -1,4 +1,4 @@
-const CATEGORY_COLORS = [
+export const CATEGORY_COLORS = [
     '#FFD54F', // Yellow
     '#4FC3F7', // Blue
     '#81C784', // Green

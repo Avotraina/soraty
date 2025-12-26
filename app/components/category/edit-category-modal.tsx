@@ -1,3 +1,4 @@
+import { CATEGORY_COLORS } from "@/app/constants/colors";
 import { useSnackbar } from "@/app/contexts/snackbar-provider";
 import { useUpdateCategoryMutation } from "@/app/features/categories/category.query";
 import { CustomColors } from "@/app/theme/colors";
@@ -11,18 +12,6 @@ import { MD3Colors } from "react-native-paper/lib/typescript/types";
 import { ThemedInput } from "../themed/themed-input";
 import { ThemedText } from "../themed/themed-text";
 
-
-
-const CATEGORY_COLORS = [
-    '#FFD54F', // Yellow
-    '#4FC3F7', // Blue
-    '#81C784', // Green
-    '#E57373', // Red
-    '#BA68C8', // Purple
-    '#FF8A65', // Orange
-    '#4DB6AC', // Teal
-    '#9575CD', // Deep Purple
-];
 
 type Category = {
     id: string;

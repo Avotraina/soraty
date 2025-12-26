@@ -3,11 +3,12 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, Keyboard, StyleSheet, TouchableOpacity, View } from 'react-native';
 
-import ColorSelect, { COLORS } from '@/app/components/color/color-select';
+import ColorSelect from '@/app/components/color/color-select';
 import ExampleTheme from "@/app/components/dom-components/example-theme";
 import CategorySelect from '@/app/components/note/category-select';
 import NoteReminderTimeSelect from '@/app/components/note/reminder/note-reminder-select';
 import { ThemedInput } from '@/app/components/themed/themed-input';
+import { NOTE_COLORS } from '@/app/constants/colors';
 import { useSnackbar } from '@/app/contexts/snackbar-provider';
 import { useAddNoteMutation } from '@/app/features/notes/note.query';
 import { CustomColors } from '@/app/theme/colors';
@@ -78,7 +79,7 @@ export default function NoteDetailScreen() {
 
 
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-    const [selectedColor, setSelectedColor] = useState<string | undefined>(COLORS[0]);
+    const [selectedColor, setSelectedColor] = useState<string | undefined>(NOTE_COLORS[0].value);
     const [reminderDate, setReminderDate] = useState<string | undefined | any>(undefined);
     const [reminderTime, setReminderTime] = useState<string | undefined | any>(undefined);
 
@@ -92,7 +93,7 @@ export default function NoteDetailScreen() {
             note_title: "",
             note_content: "",
             category_id: null,
-            color: COLORS[0],
+            color: NOTE_COLORS[0].value,
             reminder: { date: null, time: null },
         },
         mode: 'onSubmit'
